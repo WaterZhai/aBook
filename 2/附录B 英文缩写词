@@ -1,0 +1,183 @@
+附录B  英文缩写词
+
+ACK（ACKnowledgement）  确认
+ADSL（Asymmetric Digital Subscriber Line）  非对称数字用户线
+AES（Advanced Encryption Standard）  先进的加密标准
+AF PHB（Assured Forwarding Per-Hop Behavior）  确保转发每跳行为
+AH（Authentication Header）  鉴别首部
+AIMD（Additive Increase Multiplicative Decrease）加法增大乘法减小
+AN（Access Network）  接入网
+ANSI（American National Standards Institute）  美国国家标准协会
+AP（Access Point）  接入点
+AP（Application）  应用程序
+API（Application Programming Interface）  应用编程接口
+APNIC（Asia Pacific Network Information Center）  亚太网络信息中心
+ARIN（American Registry for Internet Numbers）  美国因特网号码注册机构
+ARP（Address Resolution Protocol）  地址解析协议
+ARPA（Advanced Research Project Agency）  美国国防部远景研究规划局（高级研究计划署）
+ARQ（Automatic Repeat reQuest）  自动重传请求
+AS（Autonomous System）  自治系统
+AS（Authentication Server）  鉴别服务器
+ASCII（American Standard Code for Information Interchange）  美国信息交换标准码
+ASN（Autonomous System Number）  自制系统号
+ASN.1（Abstract Systax Notation One）  抽象语法记法1
+ATM（Asynchronous Transfer Mode）  异步传递方式
+ATU（Access Termination Unit）  接入端接单元
+ATU-C（Access Termination Unit Central Office）  端局接入端接单元
+ATU-R（Access Termination Unit Remote）  远端接入端接单元
+AVT WG（Audio/Video Transport Working Group）  音频/视频运输工作组
+AWT（Abstract Window Toolkit）  抽象窗口工具箱
+BER（Bit Error Rate）  误码率
+BER（Basic Encoding Rule）  基本编码规则
+BGP（Border Gateway Protocol）  边界网关协议
+BOOTP（BOOTstrap Protocol）  引导程序协议
+BSA（Basic Service Area）  基本服务区
+BSS（Basic Service Set）  基本服务集
+BSSID（Basic Service Set ID）  基本服务集标识符
+BT（Bit Torrent）  一种P2P程序
+CA（Certification Authority）  认证中心
+CA（Collision Avoidance）  碰撞避免
+CATV（Community Antenna TV，CAble TV）  有线电视
+CBT（Core Based Tree）基于核心的转发树
+CCIR（Consultative Committee，International Radio）  国际无线电咨询委员会
+CCITT（Consultative Committee，International Telegraph and Telephone）  国际电报电话咨询委员会
+CDM（Code Division Multiplexing）  码分复用
+CDMA（Code Division Multiplex Access）  码分多址
+CE（Consumer Electronics）  消费电子设备
+CFI（Canonical Format Indicator）  规范格式指示符
+CGI（Common Gateway Interface）  通用网关接口
+CHAP（Challenge-Handshake Authentication Protocol）  口令握手鉴别协议
+CIDR（Classless InterDomain Routing）  无分类域间路由选择
+CNAME（Canonical NAME）规范名
+CNNIC（Network Information Center of China）中国互联网信息中心
+CRC（Cyclic Redundancy Check）  循环冗余检验
+CS-ACELP（Conjugate-Structure Algebraic-Code-Excited Linear Predication）  共轭结构代数码激励线性预测（声码器）
+CSMA/CD（Carrier Sense Multiple Access/Collision Detection），载波监听多点接入/冲突检测
+CSMA/CA（Carrier Sense Multiple Access/Collision Avoidance），载波监听多点接入/冲突避免
+CSRC（Contributing SouRCe identifier）  参与源标识符
+CTS（Clear To Send）允许发送
+DACS（Digital Access and Cross-connect System）  数字交接系统
+DARPA（Defense Advanced Research Project Agency）  美国国防部远景规划局（高级研究署）
+DCF（Distributed Coordination Function）  分布协调功能
+DDoS（Distributed Denial of Service）  分布式拒绝服务
+DES（Data Encryption Standard）  数据加密标准
+DF（Don't Fragment）不能分片
+DHCP（Dynamic Host Configuration Protocol）  动态主机配置协议
+DiffServ（Differentiated Services）  区分服务
+DIFS（Distributed Coordination Function IFS）  分部协调功能帧间间隔
+DLCI（Data Link Connection Identifier）  数据链路连接标识符
+DMT（Discrete Multi-Tone）离散多音（调制）
+DNS（Domain Name System）  域名系统
+DOCSIS（Data Over Cable Service Interface Specifications）  电缆数据服务接口规约
+DoS（Denial of Service）  拒绝服务
+DS（Distribution System）  分配系统
+DS（Differentiated Services）  区分服务（也写作DiffServ）
+DSCP（Differentiated Services CodePoint）  区分服务码点
+DSL（Digital Subscriber Line）  数字用户栈
+DSLAM（DSL Access Multiplexer）  数字用户线接入复用器
+DSSS（Direct Sequence Spread Spectrum）  直接序列扩频
+DVMRP（Distance Vector Multicast Routing Protocol）  距离向量多播路由选择协议
+DWDM（Dense WDM）  密集波分复用
+EBCDIC（Extended Binary-Coded Decimal Interchange Code）  扩充的二/十进制交换码
+EDFA（Erbuum Doped Fiber Amplifier）  掺饵光纤放大器
+EFM（Ethernet in the First Mile）  第一英里的以太网
+EF PHB（Expedited Forwarding Per-Hop Behavior）  迅速转发每跳行为
+EGP（External Gateway Protocol）  外部网关协议
+EIA（Electronic Industries Association）  美国电子工业协会
+EOT（End Of Transmission）  传输结束
+ESP（Encapsulating Security Payload）  封装安全有效载荷
+ESS（Extended Service Set）  扩展的服务集
+ETSI（European Telecommunications Standards Institute）  欧洲电信标准协会
+EUI（Extended Unique Identifier）  扩展的唯一标识符
+FC（Fibre Channel）  光纤通道
+FCS（Frame Check Sequence）  帧检验序列
+FDDI（Fiber Distributed Data Interface）  光纤分布式数据接口
+FDM（Frequency Division Multiplexing）  频分复用
+FEC（Forwarding Equivalence Class）  转发等价类
+FFD（Full-Function Device）  全功能设备
+FHSS（Frequency Hopping Spread Spectrum）  跳频扩频
+FIFO（First In First Out）  先进先出
+FQ（Fair Queuing）  公平排队
+FTP（File Transfer Protocol）  文件传送协议
+FTTB（Fiber To The Building）  光纤到大楼
+FTTC（Fiber To The Curb）  光纤到路边
+FTTD（Fiber To The Door）  光纤到门户
+FTTF（Fiber To The Floor）  光纤到楼层
+FTTH（Fiber To The Home）  光纤到家
+FTTN（Fiber To The Neighbor）  光纤到邻区
+FTTO（Fiber To The Office）  光纤到办公室
+FTTZ（Fiber To The Zone）  光纤到小区
+GIF（Graphics Interchange Format）  图形交换格式
+GSM（Global System for Mobile）  全球移动通信系统，GSM体制
+HDLC（High-level Data Link Controll）  高级数据链路控制
+HDSL（High speed DSL）  高速数据用户线
+HFC（Hybrid Fiber Coax）  光纤同轴混合（网）
+HIPPI（High-Performance Parallel Interface）  高性能并行接口
+HR-DSSS（High Rate Direct Sequence Spectrum）  高速直接序列扩频
+HSSG（High Speed Study Group）  高速研究组
+HTML（HyperText Markup Language）  超文本标记语言
+HTTP（HyperText  Transfer Protocol）  超文本传送协议
+IAB（Internet Architecture Board）  因特网体系结构委员会
+IANA（Internet Assigned Numbers Authority）  因特网赋号管理局
+ICANN（Internet Corporation for Assigned Names and Numbers）  因特网名字与号码指派公司
+ICMP（Internet Controller Message Protocol）  网际控制报文协议
+IDEA（International Data Encryption Algorithm）  国际数据加密算法
+IEEE（Institute of Electrical and Electronic Engineering）  （美国）电气和电子工程师学会
+IESG（Internet Engineering Task Force）  因特网工程部
+IFS（InterFrame Space）  帧间间隔
+IGMP（Internet Group Management Protocol）  网际组管理协议
+IGP（Interior Gateway Protocol）  内部网关协议
+IM（Instant Messaging）  即时传信
+IMAP（Internet Message Access Protocol）  因特网报文存取协议
+IntServ（Intergrated Services）  综合服务
+IPCP（IP Controll Protocol）  IP控制协议
+IPng（IP Next Generation）  下一代的IP
+IPRA（Internet Policy Registration Authority）  因特网政策登记管理机构
+IPsec（IP security）  IP安全协议
+IPX（Internet Packet Exchange）  Novell公司的一种连网协议
+IR（InfraRed）红外技术
+IRSG（Internet Reseach Steering Group）  因特网研究指导小组
+IRTF（Internet Research Task Force）  因特网研究部
+ISDN（Integrated Services Digital Network）  综合业务数字网
+ISO（International Organization for Standardization）  国际标准化组织
+ISOC（Internet Society）  因特网协会
+ISM（Industrial，Scientific，and Medical）  工业、科学与医药（频段）
+ISP（Internet Service Provider）  因特网服务提供者
+ITU（International Telecommunication Union）  国际电信联盟
+ITU-T（ITU Telecommunication Standardization Sector）  国际电信联盟电信标准化部门
+JPEG（Joint Photographic Expert Group）  联合图像专家组
+JVM（Java Virtual Machine）  Java虚拟机
+KDC（Key Distribution Center）  密钥分配中心
+LACNIC（Latin American & Caribbean Network Internet Center）  拉美与加勒比海网络信息中心
+LAN（Local Area Network）  局域网
+LCP（Link Controll Protocol）  链路控制协议
+LDP（Label Distribution Protocol）  标记分配协议
+LED（Light Emitting Diode）  发光二极管
+LMDS（Local Multipoint Distribution System）  本地多点分配系统
+LLC（Logical Link Control）  逻辑链路控制
+LoS（Line of Sight）  视距
+LPC（linear Prediction Coding）  线性预测编码
+LSP（Label Switched Router）  标记交换路由器
+MAC（Medium Access Control）  媒体接入控制
+MACA（Multiple Access with Collision Avoidance）  具有碰撞避免的多点接入
+MAGIC（Mobile multimedia，Anytime/any-where,Globel mobility support,Integrated wireless and Customized personal service）移动多媒体、任何时间/地点、支持全球移动性、综合无线和定制的个人服务
+MAN（Metropolitan Area Network）  城域网
+MANET（Mobile Ad-hoc NETworks）  移动自组网络的工作组
+MBONE（Multicast Backbone O你the InterNEt）  多播主干网
+MCU（Multipoint Control Unit）  多点控制单元
+MD（Message Digest）  报文摘要
+MF（More Fragment）  分片
+MFTP（Multisource File Transfer Protocol）  多源文件传输协议
+MIB（Management Information Base）  管理信息库
+MIME（Multipurpose Internet Mail Extensions）  通用因特网邮件扩充
+MIPS（Million Instructions Per Second）  百万指令每秒
+MMUSIC（Multiparty MUltimedia SessIon Control）  多参与者多媒体会话控制
+MOSPF（Multicast extensions to OSPF）  开放最短通路优先的多播扩展
+MP3（Mpeg-1 Audio layer-3）  一种音频压缩标准
+MPEG（Motion Picture Experts Group）  活动图像专家组
+
+
+
+
+
+………………略
