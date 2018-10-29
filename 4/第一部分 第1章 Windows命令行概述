@@ -1,0 +1,94 @@
+第一部分    Windows命令行基础
+
+    第1章  Windows命令行概述
+    第2章  充分利用命令行
+    第3章  命令行脚本基础
+
+第1章   Windows命令行概述
+
+命令行内置在Microsoft Windows操作系统中，可以通过命令shell窗口访问。每个版本的Windows都有内置的命令行，用于运行内置的命令、工具以及脚本。尽管命令行是强大而多功能的，但有些Windows管理员从来都不使用它。有些Windows管理员乐于使用图形界面的管理工具，就可能一直使用这些工具--只是做一些鼠标单击的操作。
+然而，对精通系统特性的Windows管理员、熟练的技术支持人员以及高级用户而言，Windows命令行是无法回避的。如果知道如何正确使用命令行（包括不同的时间场合应该使用哪些命令行工具，以及如何借助这些命令行工具来有效地完成工作），就意味着系统会平稳地运转，而不是问题频发。如果你负责多个域或网络的管理，那么对这些日复一日的大量管理操作而言，学习一下如何借助命令行提高效率不仅仅是重要的，而且是必须的。
+本章我将讲述命令行的一些基础知识，包括如何使用内置的命令、如何运行命令行工具，以及如何使用其他支持工具进行工作。通过本章的讲解你会发现，默认安装下，Windows Vista与Windows Server 2008比以前的版本包含了更多的命令行工具。事实上，以前只有安装了Windows Support Tool与Windows Server Resource Kit工具之后才可用的跟多工具，现在在默认安装下就可以使用了。
+
+    真实场景：在阅读本章以及本书其余部分时，应该记住的一点是，本书是以Windows Vista与Windows Server 2008为描述对象的。除非特别说明，本书中讲述的技术同时适用于这两类系统。有些情况下，本书中讨论的技术也可以应用于其他Windows操作系统，尽管某些选项或功能会有一些变化。无论哪种情况，在实际使用之前，你应该对这些命令、选项以及脚本进行测试，最好是在开发或测试环境（与实际工作环境隔离）下进行。
+
+1.1命令行基础
+    Windows的每一个新版本都会对命令行做一些扩展与增强，这种持续的更新使得Windows命令行的性能与多功能性都得到了很大的改善。用现今的Windows版本可以使用命令行完成很多以前版本无法完成的任务。为帮助读者以最快、最具效率的方式来使用那些可用的命令行选项，下面将讨论命令shell的选项与配置，还包括一些使用命令历史机制的相关提示。
+    1.1.1理解Windows命令shell
+        在Windows系统中，最常用的命令行就是Windows自带的命令shell。Windows命令shell（cmd.exe）支持32位、64位两种环境，提供了使用Windows命令行进行工作的基本平台。在32位的Windows版本中，可以在%SystemRoot%\System32目录下找到这个32位的可执行程序cmd.exe。在64位的Windows版本的%SystemRoot%\System32目录中提供了64位的cmd.exe，在%SystemRoot%\SysWow64目录中提供了32位的cmd.exe。此外，Windows中还包括其他一些命令行，比如MS-DOS命令shell（command.com）与Windows PowerShell（powershell.exe），本章后面将对其进行讨论。
+        （注解  %SystemRoot%指代的是环境变量SystemRoot。Windows操作系统有很多环境变量，这些环境变量可用于指代用户特定的或系统特定的一些值。通常，我会使用标准的Windows语法格式%VariableName%来指代环境变量。）
+        要启动命令shell，可以使用“开始”菜单中的“搜索”对话框。单击“开始”，在“搜索”对话框中输入cmd，之后按Enter键。或者，使用鼠标依次单击“开始”、“所有程序”、“附件”，之后选择“命令提示符”。
+        可以通过不同的初始化Windows命令的shell的环境，比如，绕过cmd.exe的启动参数，或者使用custom启动文件（该文件存储在%SystemRoot%\System32目录下）。一个命令shell的窗口。默认情况下，命令行的宽度为80个字符，命令shell则可以展示25行文本。如果更多的文本需要在命令shell窗口中显示，或者在命令shell窗口已满时输入新的命令，此时命令shell窗口中将显示当前输入的文本，而以前的文本会被冲掉。在某条命令输出结果进行时，如果想暂时停止显示，可以按Ctrl+S键，之后可以按Ctrl+S键恢复显示，或者按Ctrl+C键终止执行。
+        （注解  custom启动文件用于需要特殊配置的MS-DOS程序，这些文件名为Autoexec.nt与Config.nt，存储在%SystemRoot%\System32目录下）。
+        这里，命令行中的命令提示符展示了当前的工作目录，默认情况下该目录为%UserProfile%，代表的是当前用户的文件目录。命令提示符后跟随着一个闪烁的光标，表明命令行处于交互模式下。在交互模式下，你可以直接在提示符后键入命令，并按Enter键执行该命令。比如键入dir之后按Enter键，就会得到当前目录列表。
+        出交互模式外，命令提示符还有一种批处理模式，该模式用于执行一系列命令。在批处理模式下，命令提示符逐一地读入并执行每一条命令。典型情况下，批处理命令是从脚本文件中读取的，但也可以在命令提示符下输入，比如，在使用FOR命令处理一组文件中每一个文件时就是如此。（关于批处理脚本、循环、命令控制等内容，将在第3张进行更细致的讲述）
+        在使用Windows命令行时，要注意所使用命令的出处。本地命令（由微软内置在操作系统中的命令）包括下面的两种。
+        · 内部命令。存在于命令shell内部，不包括单独的可执行文件。
+        · 外部命令。有自己的可执行文件，通常存在于%SystemRoot%\System32目录下。
+        表展示了命令shell（cmd.exe）的内部命令列表，其中对每条内部命令给出了简短的描述。
+        ---------------------------------------------------------------------------------------------
+        命令名       |描述
+        -------------|-------------------------------------------------------------------------------
+        assoc        |显示或修改当前的文件扩展关联
+        break        |设置调试中断
+        call         |在一个脚本内调用程序或其他目录位置
+        cd（chdir）  |显示当前目录名或改变当前目录位置
+        cls          |清理命令窗口并擦除屏幕缓冲区
+        color        |设置命令shell窗口的文本与背景色
+        copy         |将文件从一个位置复制到另外的位置，或者将多个文件连接在一起
+        date         |显示或设置系统日期
+        del（erase） |删除指定的文件、多个文件或目录
+        dir          |显示当前目录或执行目录中的子目录与文件列表
+        dpath        |允许程序打开指定目录中的数据文件（就像在当前目录一样）
+        echo         |显示命令行的文本字符串，设置命令回显状态（on|off）
+        endlocal     |变量局部化结束
+        exit         |退出命令shell
+        for          |对一组文件中的每一文件运行指定的命令
+        ftype        |显示当前文件类型或修改文件类型
+        goto         |将命令解释器直接跳转到批处理脚本中某个标记行
+        if           |命令的条件执行
+        md（mkdir）  |在当前目录或指定目录下创建子目录
+        mklink       |为文件或目录创建符号连接或硬链接
+        move         |将一个或多个文件从当前目录或指定源目录移动到指定的目标目录，也可以用于对目录进行重命名
+        path         |显示或设置系统用于搜索可执行文件与脚本的命令路径
+        pause        |中断批处理文件的处理过程（挂起），等待键盘输入
+        popd         |弹出由pushd保存的目录，使其成为当前目录
+        prompt       |为命令提示符设置文本
+        pushd        |保存当前目录位置，之后跳转到指定的目录（可选）
+        rd（rmdir）  |移除目录（也可以移除其子目录）
+        rem          |在批处理脚本或Config.sys种设置标记
+        ren（rename）|对一个或多个文件进行重命名
+        set          |显示当前的环境变量，或者为当前命令shell设置临时变量
+        setlocal     |在批处理脚本中标记变量局部化的开始
+        shift        |改变批处理脚本中可替换变量的位置
+        start        |启动一个单独的窗口，以便运行指定的程序或命令
+        time         |显示或设置系统时间
+        title        |设置命令shell窗口的标题
+        type         |显示文本文件的内容
+        verify       |在将文件写入磁盘后，指令操作系统对其进行验证
+        vol          |显示磁盘卷标与序列号
+        -----------------------------------------------------------------------------------------------
+        要了解任意内部命令（以及大多数外部命令）的语法格式，可以在提示符后键入这个命令名，其后跟随/?，如下所示：copy /?
+        随着对命令行的使用，你会发现，外部命令要远多于内部命令，包括哪些与内部命令（内置在命令行）非常相似的外部命令。大多数这些相似的外部命令对响应的内部命令进行了扩展与增强。比如，外部命令XCOPY要比内部命令COPY具备更丰富的功能，XCOPY允许复制目录树与文件并提供了更多的参数。再如，使用外部命令SETX，可以将环境变量的变化直接写入到Windows注册表，持久性地改变环境变量，而SET只是临时性地改变。
+        （提示  SETX是默认情况下Windows Vista与Windows Server 2008中支持的很多命令中的一条，也可以使用SETX获取当前注册表键值并将其写入到文本文件。）
+        除此之外，内部命令与外部命令之间的差别并不是特别重要。很多Windows实用工具都有命令行扩展（允许将参数从命令行传递给工具），使用起来实际上与外部命令类似。
+    1.1.2理解MS-DOS命令shell
+        MS-DOS命令shell（command.com）包含了16位的命令，用于MS-DOS子系统与其他子系统。与大多数早期的Windows发行版不同的是，64位版Windows Vista与Windows Server 2008中不再包含MS-DOS命令shell。在32位版的Windows Vista与Windows Server 2008中，可以使用RUN命令来启动MS-DOS命令shell。单击“开始”，选择“运行”，之后在打开字段中输入command，就可以启动MS-DOS命令shell。或者也可以在其他命令行中，键入command之后按Enter键，也可以启动MS-DOS命令shell。
+        （提示  如果在cmd.exe中启动MS-DOS命令shell，则命令shell标题将变为Command Prompt-Command。不再使用command.com时，可以键入exit退出MS-DOS命令shell并回到Windows命令行。）
+        可以通过集中方式初始化MS-DOS命令shell环境，比如，将启动参数传递给command.com，或者使用config.nt启动文件（位于%SystemRoot%\System32文件夹）。与cmd.exe类似，默认情况下，MS-DOS命令窗口也是每行80个字符宽、窗口最多容纳25行文本。启动MS-DOS命令shell时，标准的文本是：
+        与Windows命令shell类似，MS-DOS命令shell也有交互模式与批处理模式，也有微软内置的一些本地命令，这些命令可以划分为如下两组。
+        · 内部配置命令。用于配合MS-DOS子系统的命令（存在于启动文件或程序信息文件中，比如Config.nt与Autoexec.nt），配置命令包括：BUFFERS、COUNTRY、DEVICE、DEVICEHIGH、DOS、DOSONLY、DRIVEPARM、ECHOCONFIG、FCBS、FILES、INSTALL、LOADHIGH、LASTDRIVE、NTCMDPRO、SHELL、STACKS，SWITCHES。
+        · 标准的外部命令。可以在命令提示符下键入，可以放置在脚本中，有时还可以在启动文件中使用。标准的外部命令包括：APPEND、DEBUG、EDIT、EDLIN、EXE2BIN、EXPAND、FASTOPEN、FORCEDOS、GRAPHICS、LOADFIX、MEM、NLSFUNC、SETVER、SHARE，这些命令也可以在cmd.exe中运行。
+        在MS-DOS命令shell中执行其他命令时，这些命令将被传递给32位的命令shell并由真正执行，这也是可以在MS-DOS命令shell中使用内部命令COPY的原因。
+    1.1.3理解Windows PowerShell
+        Windows PowerShell（powershell.exe）是一个功能完备的命令shell，包含了一些内置的命令（cmdlets）、内置的程序设计功能以及标准的命令行工具。在Windows Server 2008中，Windows PowerShell作为一个组成部分包含在其中。在其他Windows操作系统中，Windows PowerShell可以作为一个独立的程序下载使用。为保证Windows PowerShell是最新版本，可以检查微软下载网站。
+        安装了Windows PowerShell之后，就可以在“开始\所有程序”菜单中（或者系统内相关的可执行程序中）找到程序快捷方式。通过“开始”菜单中的“搜索”对话框，可以启动默认的Windows PowerShell版本，具体方法是：单击“开始”，在“搜索”对话框中键入powershell，之后按Enter键。另外一种方法是，在其他命令行中，键入powershell，之后按Enter键。在32位系统中，上述方法将启动32位版本的Windows PowerShell。在64位系统中，上述方法将启动64位版本的Windows PowerShell。默认情况下，两个版本的Windows PowerShell都存储在%SystemRoot%\System32\WindowsPowerShell\Version目录中，这里，Version是系统中安装的PowerShell版本，比如v1.0或v2.0。在64位版本的Windows系统中，为保证兼容性，在%SystemRoot%\SysWow64\WindowsPowerShell\Version目录中可以找到32位的PowerShell。
+        启动Windows power后，会看到类似于如下的消息：
+        通过指定-Nologo参数，可以在启动PowerShell时禁止该消息，如下所示：powershell -nologo
+        （注解  不管以那种方式启动powershell，你都会知道自己确实在使用Windows PowerShell。因为启动后，命令提示符标题栏会改变为“Windows PowerShell”或“命令提示符-powershell”，并且当前路径是以PS引导的。）
+        通过使用-Noprofile参数，可以启动Windows PowerShell而不加载profiles，使用如下命令：powershell -noprofile
+        典型情况下，第一次启动Windows PowerShell时，你会看到一条消息，该消息声称降本被禁用列出的profiles没有被执行，这是Windows PowerShell默认的安全设置。为激活脚本的执行，可以在shell提示符下输入如下命令：set-executionpolicy allsigned
+        这一命令将执行策略设置为所有脚本必须具有可信的签名才能执行。对约束条件没有严格的环境，可以使用如下命令：set-exectionpolicy remotesigned
+        这一命令将执行策略设置为从网站下载的脚本，只有具有可信源的签名才能执行，本地脚本则不需要数字签名即可运行。要想使得脚本不受约束地运行，则可以使用如下命令：set-exectionpolicy unrestricted
+        这一命令将执行策略设置为云溪脚本运行，而不管其是否具有数字签名。
+        使用Windows PowerShell时，可以在提示符下输入命令集的名，之后就会以命令行命令类似的方式运行，也可以在脚本中执行cmdlets。在Windows PowerShell提示符下，键入help*-*可以得到cmdlets变量的完整列表。
