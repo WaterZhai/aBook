@@ -125,4 +125,212 @@
         每一个主要的参数都可以接受附加的参数与参数值，如下所示。
         · 使用-LogPath参数或-L参数将错误信息记录到指定的日志文件。
         · 使用-Restart参数自动重启计算机（适用于完成某操作时需要重启的情况）。
-        
+        · 使用-ResultPath参数或-Rp参数将标准输出结果写入到XML格式的文件中。
+        · 使用-Whatif参数或-W参数显示命令执行时的操作。
+        可以使用的参数值包括如下几个。
+        · AnswerFile.xml。使用XML格式的answer文件来确定要添加或删除的组件。
+        · ComponentName。指定要管理的角色、角色服务与功能。
+        · LogFile。设置文本文件名（将错误信息写入到其中）。
+        · Results.xml。将安装或删除操作的结果保存到指定的XML格式的文件中（不影响结果的正常显示）。
+        · SaveFile.xml。将标准输出结果保存到指定的XML格式的文件中（不影响结果的正常显示）。需要注意的是，这些结果中不包括错误信息，错误信息被单独写入到标准错误输出中。
+        · SettingName。通过名字识别必须的设置。
+        · SettingValue。为某一元素设置具体的配置值。
+        大多数可以安装的角色、角色服务与功能都有相应的组件名。通过组件名可以识别具体的组件，以便于在命令行中对其进行操作，对于从微软网站下载并安装的补充性的组件同样如此。
+        表中层次化地列出了组件名及其相关的角色、角色服务与子组件。安装某角色时，通过使用-AllSubFeatures参数，可以安装该角色下列出的所有从属的角色服务与功能。安装某角色服务时，通过使用-AllSubFeatures参数，可以安装该角色服务下列出的所有从属的功能。
+            -------------------------------------------------------------------------------------------
+            组件名                |角色                     |服务                         |功能
+            ----------------------|------------------------|-----------------------------|-------------
+            AD-Certificate        |活动目录证书服务          |                             |
+            ADCS-Cert-Authority   |                         |证书授权                     |
+            ADCS-Web-Enrollment   |                         |证书授权Web注册               |
+            ADCS-Online-Cert      |                         |在线响应者                   |
+            ADCS-Device-Enrollment|                         |网络设备注册服务              |
+            --------------------------------------------------------------------------------------------
+            活动目录域服务
+            -------------------------------------------------------------------------------------------
+            ADCS-Domain-Controller|                          |活动目录域控制器             |
+            ADDS-Identity-Mgmt    |                          |UNIX实体管理                |
+            ADDS-NIS              |                          |                           |网络信息服务器
+            ADDS-NIS              |                          |                           |口令同步
+            ADDS-IDMU-Tools       |                          |                           |管理工具
+            -------------------------------------------------------------------------------------------
+            活动目录联盟服务
+            -------------------------------------------------------------------------------------------
+            ADFS-Federation       |                          |联合身份验证服务             |
+            ADFS-Proxy            |                          |联合身份验证服务代理         |
+            ADFS-Web-Agents       |                          |AD FS Web代理               |
+            ADLDS                 |ActiveDirectory轻型目录服务|                            |
+            DHCP                  |DHCP服务器                 |                           |
+            DNS                   |DNS服务器                  |                           |
+            Fax                   |Fax服务器                  |                           |
+            -------------------------------------------------------------------------------------------
+            文件服务
+            -------------------------------------------------------------------------------------------
+            FS-FileServer         |                           |文件服务器                 |
+            FS-DFS                |                           |分布式文件系统             |
+            FS-DFS-Namespace      |                           |                          |DFS命名空间
+            FS-DFS-Replication    |                           |                          |DFS复制
+            FS-Resource-Manager   |                           |文件服务器资源管理器        |
+            FS-NFS-Services       |                           |网络文件系统服务            |
+            FS-Search-Services    |                           |Windows搜索服务            |
+            FS-Win2003-Services   |                           |Windows Server 2003文件服务|
+            FS-Replication        |                           |                          |文件复制服务
+            FS-Indexing-Services  |                           |                          |索引服务
+            Hyper-V               |Hyper-V                    |                          |
+            NPAS                  |网络策略与访问服务           |                          |
+            NPAS-Policy-Server    |                           |网络策略服务器              |
+            NPAS-RRAS-Services    |                           |路由与远程访问服务          |
+            NPAS-RRAS             |                           |                           |远程访问服务
+            NPAS-Routing          |                           |                           |路由
+            NPAS-Health           |                           |健康注册授权                |
+            NPAS-Host-Cred        |                           |主机凭据授权协议             |
+            Print-Services        |打印服务                    |                           |
+            Print-Server          |                           |打印服务器                  |
+            Print-LPD-Service     |                           |LPD服务                     |
+            Print-Internet        |                           |Internet打印                |
+            Terminal-Services     |终端服务                    |                           |
+            TS-Terminal-Server    |                           |终端服务器                  |
+            TS-Licensing          |                           |TS授权                      |
+            TS-Session-Broker     |                           |TS Session Broker          |
+            TS-Gateway            |                           |TS网关                      |
+            TS-Web-Access         |                           |TS Web Access              |
+            WDS                   |Windows部署服务             |                           |
+            WDS-Deployment        |                           |部署服务器                  |
+            WDS-Transport         |                           |传输服务器                  |
+            --------------------------------------------------------------------------------------------
+        表层次化地列出了一些功能、子功能以及对应的组件名。安装某功能时，可以使用-AllSubFeatures参数来安装该功能下所有从属的二级子功能与三级子功能。安装二级功能时，可以使用-AllSubFeatures参数来安装该二级功能下所有从属的三级子功能。
+        （注解  功能后跟随的星号（*）表达的含义是：该功能没有列出从属的子功能，而通常情况下，这鞋子功能是通过-AllSubFeatures参数一起安装的。）
+
+            关键功能与子功能的组件名
+            ------------------------------------------------------------------------------------------
+            组件                 |功能                    |二级子功能            |三级子功能
+            ---------------------|-----------------------|----------------------|----------------------
+            NET-Framework *      |.NET Framework 3.0功能  |                     |
+            BitLocker            |BitLocker驱动器加密     |                     |
+            CMSK                 |链接管理器管理工具       |                     |
+            BITS                 |BITS服务器扩展          |                     |
+            Desktop-Experience   |桌面体验                |                     |
+            Failover-Clustering  |Failover集群            |      、             |
+            GPMC                 |组策略管理控制台         |                     |
+            Internet-Print-Client|Internet打印客户端       |                    |
+            ISNS                 |Internet存储名服务器     |                    |
+            LPR-Port-Monitor     |LPR端口监控器            |                    |
+            MSMQ*                |消息队列                 |                    |
+            Multipath-IO         |多路径I/O               |                     |
+            NLB                  |网络负载均衡             |                     |
+            PNRP                 |对等名称解析协议         |                     |
+            qWave                |Windows音频/视频体验质量 |                     |
+            Remote-Assistance    |远程维护                 |                    |
+            RDC                  |远程差分压缩             |                    |
+            RSAT                 |远程服务器管理工具        |                    |
+            RSAT-Role-Tools      |                        |角色管理工具         |
+            RSAT-ADCS*           |                        |                    |活动目录证书服务工具
+            RSAT-ADDS*           |                        |                    |活动目录域服务工具
+            RSAT-ADLDS           |                        |                    |活动目录轻量级目录服务工具
+            RSAT-RMS             |                        |                    |活动目录权限管理服务工具
+            RSAT-DHCP            |                        |                    |DHCP服务器工具
+            RSAT-DNS-Server      |                        |                    |DNS服务器工具
+            RSAT-Fax             |                        |                    |传真服务器工具
+            RSAT-File-Services*  |                        |                    |文件服务工具
+            RSAT-NPAS*           |                        |                    |网络策略与访问服务工具
+            RSAT-Print-Services  |                        |                    |打印服务工具
+            RSAT-TS*             |                        |                    |终端服务工具
+            RSAT-UDDI            |                        |                     |UDDI服务工具
+            RSAT-Web-Server      |                        |                    |Web服务器（IIS）工具
+            RSAT-WDS             |                        |                    |Windows部署服务工具
+            RSAT-Feature-Tools   |                        |功能管理工具         |
+            RSAT-BitLocker       |                        |                     |BitLocker驱动器加密工具
+            RSAT-Bits-Server     |                        |                    |BITS服务器加密工具
+            RSAT-Clustering      |                        |                     |Failover集群工具
+            RSAT-NLB             |                        |                    |网络负载均衡工具
+            RSAT-SMTP            |                        |                     |WINS服务器工具
+            Removeable-Storage   |可移除存储管理器          |                    |
+            RPC-over-HTTP-Proxy  |运行于HTTP代理之上的RPC   |                    |
+            Simple-TCP/IP        |简单TCP/IP服务           |                    |
+            SMTP-Server          |SMTP服务器               |                    |
+            SNMP-Services        |SNMP服务                 |                    |
+            SNMP-Service         |                         |SNMP服务            |
+            SNMP-WMI-Provider    |                         |SNMP WMI提供者      |
+            Storage-Mgr-SANS     |用于SAN的存储管理器        |                   |
+            Substem-UNIX-Apps    |用于基于UNIX应用程序的子系统|                   |
+            Telnet-Client        |Telnet客户端              |                   |
+            Telnet-Server        |Telnet服务器              |                   |
+            TFTP-Client          |TFTP客户端                |                   |
+            Windows-Internal-DB  |Windows Internal Database |                   |
+            PowerShell           |Windows PowerShell        |                   |
+            Backup-Features      |Windows Server备份功能     |                  |
+            Backup               |                          |Windows Server备份 |
+            Backup-Tools         |                          |用于备份的命令行工具|
+            WSRM                 |Windows系统资源管理者      |                   |
+            WINS-Server          |WINS服务器                 |                  |
+            Wireless-Networking  |无线局域网服务             |                   |
+            ------------------------------------------------------------------------------------------
+        4.3.2查询已安装的角色、角色服务与功能
+            在一个增强的命令提示符中，可以使用命令servermanagercmd -query来查询哪些角色、角色服务于功能已经安装到服务器中。该命令执行后，ServerManagerCmd会列出系统中每个可用的角色、角色服务与功能的配置状态。已安装的橘色、角色服务与功能会突触显示并标记为已安装。在输出信息中，角色与角色服务会在功能前列出，如下面实例所示：
+                ----- Roles -----
+                [ ] Active Directory Certificate Services  [AD-Ceartificate]
+                    [ ] Certification Authority  [ADCS-Cert-Authority]
+                    [ ] Certification Authority Web Enrollment  [ADCS-Web-Enrollment]
+                    [ ] Online Responder  [ADCS-Online-Cert]
+                    [ ] Network Device Enrollment Service  [ADCS-Device-Enrollment]
+                [x] Active Directory Domain Services
+                    [x] Active Directory Domain Controller  [ADDS-Domain-Controller]
+                    [ ] Identity Management for UNIX  [ADDS-Identity-Mgmt]
+                        [ ] Server for Network Information Services [ADDS-NIS]
+                        [ ] Password Synchronization  [ADDS-Password-Sync]
+                        [ ] Administration Tools  [ADDS-IDMU-Tools]
+                ...
+                ----- Features -----
+                [ ] .NET Framework 3.0 Features [NET-Framework]
+                    [ ] .NET Framework 3.0  [NET-Framework-Core]
+                    [ ] XPS Viewer  [NET-XPS-Viewer]
+                    [ ] WCF Activation  [NET-Win-CFAC]
+                        [ ] HTTP Activation  [NET-HTTP-Activation]
+                        [ ] Non-HTTP Activation  [NET-Non-HTTP-Activ]
+                [x] BitLocker Drive Encryption  [BitLocker]
+                [x] BITS Server Extensions  [BITS]
+                [ ] Connection Manager Administration Kit  [CMAK]
+                [x] Desktop Experience  [Desktop-Experience]
+            除了用于粗略查看系统中已经安装了哪些组件之外，Servermanagercmd -query还可以用于记录服务器配置信息。要做到这一点，可以使用重定向符号（>）将该命令的输出保存在文本文件中，如下所示：
+                servermanagercmd -query > ServerConfig06-15-2008.txt
+            上面的命令中，将命令的输出信息保存到名为ServerConfig06-15-2008.txt的文本文件中。如果希望将结果保存到XML格式的文件中，只需要将-query后面的文件改为XML文件即可，比如：
+                servermanagercmd -query MySaveFile.xml
+            将输出结果保存在XML文件中的好处是，便于使用自动化技术进行处理。
+        4.3.3安装角色、角色服务与功能
+            在一个增强的命令提示符中，可以通过命令servermanagercmd -install ComponentName来安装角色、角色服务与功能。其中，ComponentName为所要安装的组件名。通过包含-AllSubFeatures参数，还可以安装所有从属的组件，如下所示：
+                servermanagercmd -install fs-dfs  -allsubfeatures
+            上面的命令中，在安装分布式文件系统角色服务的同时，也安装了从属于该角色服务的DFSNamespaces与DFS Replication等角色服务。成功安装后，其输出应该类似于如下的格式：
+                Start Installation...
+                [Installation] Succeeded: [File Services] Distributed File System.
+                [Installation] Succeeded: [File Services] DFS Namespaces.
+                [Installation] Succeeded: [File Services] DFS Replication.
+                <100/100>
+
+                Success: Installation succeeded.
+            如果需要重启完成整个安装过程，则可以使用-Restart参数，借助于该参数，ServerManagerCmd可以重启计算机。如果需要在实际安装之前进行测试，则可以使用-Whatif参数。如果试图安装系统中已安装的组件，会得到如下的提示信息。其中声明“no changes were made”等内容，表明该组件已经安装：
+                NoChange: No changes were made because the roles.role services and feature
+                es specified are already installed, or have already been removed from the
+                local computer.
+            如果发生错误，并且ServerManagerCmd无法执行指定的操作，会得到错误信息。通常，错误信息文本以红色显示，并且包含了错误标志与错误文本，如下所示：
+                WriteError: Failed to write the log file:  Access to the path 'C:\windows\logs\ServerManager.log' is denied.
+            上面的错误消息表明，ServerManagerCmd无法执行指定的操作，原因是无法获取对日志文件的写权限。安装组件时，ServerManagerCmd会讲扩展的日志信息写入到%SystemRoot%\Logs\servermanager.log这些扩展的日志信息详细记录了ServermanagerCmd的每一步操作。通过使用-Logpath参数或-L参数，uekeyi将这些信息写入到系统中其他位置。下面的实例中，将日志信息写入到c:\logs\install.log：
+                servermanaercmd -install fs-dfs -allsubfeatures -logpath c:\logs\install.log
+            其他常见的错误还包括向命令行传递了无效参数等情况，如下面的错误信息所示：
+                ArgumentNotValid: Invalid Parameters. Only specify either -install or -remove.
+                ArgumentNotValid: invalid role, role Service, or feature: 'fs-dfsd'. The name was not found.
+            对于这种无效参数导致的错误，使用正确的参数即可解决。最后，还有一种错误是未以管理员身份运行命令提示符，此时会得到错误提示信息。其中声明ServerManagerCmd只能由本地计算机上内置管理员组中的某个成员运行，要解决这一错误，就需要以管理员权限来运行命令提示符。
+        4.3.4移除角色、角色服务与功能
+            在一个增强的命令提示符中，可以通过命令servermanagercmd -remove ComponentName来移除角色、角色服务与功能。其中，ComponentName为所要卸载的组件名。通过包含-AllSubFeatures参数，还可以卸载所有从属的组件，如下所示：
+                servermanagercmd -remove fs-dfs -allsubfeatures
+            上面的命令中，在卸载分布式文件系统角色服务的同时，也卸载了从属于该角色服务的DFS命令空间与DFS复制等角色服务。成功卸载后，其输出应该类似于如下的格式：
+                Start Removal...
+                [Removal] Succeeded: [File Services] Distributed File System.
+                [Removal] Succeeded: [File Services] DFS Namespaces.
+                [Removal] Succeeded: [File Services] DFS Replication.
+                <100/100>
+
+                Success: Removal succeeded.
+            如果需要重启来完成整个卸载过程，则可以使用-Restart参数，借助于该参数，ServerManagerCmd可以重启计算机。如果需要在实际卸载之前进行测试，则可以使用-Whatif参数。如果试图卸载系统中未安装的组件，会得到如下的提示消息。其中声明no changes were made等内容，表明该组件尚未安装：
+                NoChange: No changes were made because the roles, role services and featur
+                es specified are already installed, or have already been removed from the local computer.
+            如果
