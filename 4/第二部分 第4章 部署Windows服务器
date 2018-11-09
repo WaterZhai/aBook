@@ -333,4 +333,4 @@
             如果需要重启来完成整个卸载过程，则可以使用-Restart参数，借助于该参数，ServerManagerCmd可以重启计算机。如果需要在实际卸载之前进行测试，则可以使用-Whatif参数。如果试图卸载系统中未安装的组件，会得到如下的提示消息。其中声明no changes were made等内容，表明该组件尚未安装：
                 NoChange: No changes were made because the roles, role services and featur
                 es specified are already installed, or have already been removed from the local computer.
-            如果
+            如果发生错误，使得ServerManagerCmd无法执行指定的操作，会得到错误信息。卸载组件时，ServerManagerCmd会将扩展的日志信息写入到%SystemRoot%\logs\servermanagercmd.log。与安装组件的过程类似，通过使用-Logpath参数或-L参数，也可以将这些信息写入到系统中其他位置。
