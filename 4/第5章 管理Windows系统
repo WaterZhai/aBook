@@ -43,4 +43,117 @@
     （警告  错误修改Windows注册表可能会引发严重问题，如果对注册表造成严重损坏，你可能不得不重装系统。在执行注册表相关命令之前，要认真理解该命令的用法，确保这些命令能正确地达到预定执行目标。）
     5.2.1理解注册表与键值
         Windows注册表存储了操作系统、应用程序、用户以及硬件等设备的配置设置信息。这些信息是以注册表键与键值的形式存储的，注册表键与键值存储在特定的root键下，并由其控制不同键与键值的使用时间和方式。
-        表列出了注册表的root键及其描述信息，
+        表列出了注册表的root键及其描述信息，并给出了引用名（使用REG命令操作注册表时，可以根据引用名来引用不同的root键）。在root键之下，包含了一些子健，用于对系统、用户、应用程序以及硬件的设置信息进行控制。这些子健在组织形式上为树结构，使用文件夹来表示键值。比如，在HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services键下，可以发现一些与系统中已安装的所有服务相关的文件夹。这些文件夹中包含了注册表键值，键值中存储了重要的服务配置设置信息以及一些子健。
+        要想操作某个注册表键，必须指定某文件夹路径。比如，DNS键的路径为HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\DNS，要查看并操作该键，可以使用缩略路径名HKEY\SYSTEM\CurrentControlSet\Services\DNS。
+            Windows注册表中的键
+            ----------------------------------------------------------------------------------------------------
+            root键             |引用名|描述
+            -------------------|---- |---------------------------------------------------------------------------
+            HKEY_CURRENT_USER  |HKCU |存储了当前用户的配置设置信息
+            HKEY_LOCAL_MACHINE |HKLM |存储了系统级的配置设置信息
+            HKEY_CLASSES_ROOT  |HKCR |存储了应用程序与文件的配置设置信息，可以确保系统使用正确的应用程序打开要访问的文件
+            HKEY_USERS         |HKU  |存储了默认用户与其他用户的配置设置信息（根据配置文件）
+            HKEY_CURRENT_CONFIG|HKCC |存储了使用中的硬件配置文件的相关信息
+            ----------------------------------------------------------------------------------------------------
+        注册表键值以一些特定的数据类型进行存储，表总结了注册表键值使用的一些主要数据类型。
+            注册表键值与及其数据类型
+            -------------------------------------------------------------------------------------------------------------------------------
+            数据类型      |描述                                                                                  |实例
+            -------------|------------------------------------------------------------------------------------------------------------------
+            REG_BINARY   |用于识别二进制值。二进制值采用二进制形式存储（0、1组合），但在现实与输入时采用十六进制格式    |01 00 14 80 90 00 00 9c 00
+            REG_DEORD    |用于识别二进制数据类型，以4字节长度的十六进制格式存储32位的整数值                           |0x00000002
+            REG_EXPAND_SZ|用于识别可扩展的字符串值，通常用于存储目录路径                                             |%SystemRoot%\dns.exe
+            REG_MULTI_SZ |用于识别多个字符串值                                                                     |Tcpip Afd RpcSc
+            REG_NONE     |用于识别没有指定特定数据类型的数据。这种数据采用二进制形式存储，但在显示与输入时采用十六进制格式|23 45 67 80
+            REG_SZ       |用于识别包含字符序列的字符串值                                                            |DNS Server
+            ---------------------------------------------------------------------------------------------------------------------------------
+        在知道了注册表键路径以及可用的键值数据类型之后，就可以以多种方式使用REG命令对注册表键进行查阅和操作。REG命令有一些不同的子命令，我们将在下面分别讨论如下的一些子命令。
+        · REG add。为注册表添加一个新子健或条目。
+        · REG delete。从注册表删除一个子健或条目。
+        · REG query。列出某注册表键下的条目以及子健名（如果存在）。
+        · REG compare。比较注册表键或条目。
+        · REG copy。将注册表条目复制到特定的注册表键路径（本地或远程系统上）。
+        · REG flags。显示并管理指定键的当前标记。
+        · REG restore。将保存的子健、条目、键值等写回到注册表。
+        · REG save。将指定的子健、条目、键值保存到文件。
+        除上述命令之外，还对如下一些命令进行了讨论，这些命令可以执行一些高级的注册表操作功能。
+        · REG import。将指定的hive文件导入到注册表。
+        · REG export。将指定的子健、条目、键值导出到注册表文件。
+        · REG loading。将指定的hive文件加载到注册表。
+        · REG unload。从注册表卸载指定的hive文件。
+        （注解  REG命令以当前用户的权限运行。如果想使用不同的权限，最简单的方式是以具有该权限的用户账号登录。）
+    5.2.2查询注册表值
+        使用REG query命令，可以引用想要操作的键名或键值的全路径来读取注册表值，其基本语法为：
+            reg query KeyName [/v ValueName]
+        其中，KeyName为要检查键的键名，ValueName是一个可选的参数，用于指定特定的键值。下面给出的实例中，对current control set中的DNS键进行了查询：
+            reg query HKLM\SYSTEM\CurrentControlSet\Services\DNS
+        对于这种查询，如果知道待检查键的特定键值，还可以使用另一种方法，该方法使用/V参数对查询结果进行限定。下面的实例中，列出了DNS键的ImagePath条目的值：
+            reg query HKLM\SYSTEM\CurrentControlSet\Services\DNS /v ImagePath
+        注册表键路径也可以包含UNC名或远程计算机的IP地址，比如\\Mailer或\\192.168.1.100。不过，对远程计算机，只能对HKLM与HKU这两个root键进行操作。下面的实例中，对MAILER1上的DNS键进行查询：
+            reg query \\Mailer\HKLM\SYSTEM\CUrrentControlSet\Services\DNS
+        （注解  如果指定了不存在的键或键值，命令shell会显示一条错误消息，典型情况下，该消息为错误：系统找不到指定的注册表项或值。）
+    5.2.3比较注册表值
+        使用REG compare命令，可以对两台系统上相同的注册表条目与键进行比较，也可以对同一系统上两个不同的键进行比较。在如下的场景下，进行注册表比较是有用的。
+        · 对服务于应用程序配置的问题进行故障排除。这种情况下，对两台不同系统的注册表陪住进行比较是有用的。理想情况下，两台系统中应该有一台进行了正确配置，要检查的那台配置失误，通过对注册表中相关配置键的比较，就可以发现问题所在。
+        · 确保应用程序或服务在多台系统上进行了相同配置。这种情况下，可以使用一台系统作为基准，以便对其他系统的配置进行测试和调整。理想情况下，基准系统应该先按需求目标进行正确配置，之后在对其他系统的配置进行比较和调整。
+        REG compare命令的基本语法格式为：
+            reg compare KeyName1 keyName2 [/v ValueName]
+        其中，KeyName1与KeyName2位待比较的子健名，键名可以包含UNC名或待检查远程计算机的IP地址。ValueName为可选的参数，用于指定带比较的特定键值。下面的实例中，对MAILER1与MAILER2上current control set下的DNS键进行比较：
+            reg compare \\Mailer1\HLLM\SYSTEM\CurrentControlSet\Services\DNS
+            \\Mailer2\HKLM\SYSTEM\CurrentControlSet\Services\DNS
+            如果这两台系统上该键的配置相同，则输出信息为：
+            Results Compared： Identical
+            The operation completed successfully.
+        如果这两台系统上该键的配置不同，则输出信息会显示这种差别。以<字符开始的差别信息属于第一个键，以>字符开始的差别信息则属于第二个键。此外，输出信息中还包括如下声明：
+            Results Compared： Different
+            The operation completed successfully.
+        （提示  之所以会显示差别信息，是因为/Od参数是默认使用的。通过指定其他参数，还可以在输出信息中查看所有的查看信息与匹配信息（/Oa）、只查看匹配信息（/Os），或者没有结果信息（/On）。）
+        此外，如果需要递归地比较所有子健与条目，可以使用/S参数，如下所示：
+            reg compare \\Mailer1\HKLM\SYSTEM\CurrentControlSet\Services\DNS
+            \\Mailer2\HKLM\SYSTEM\CurrentControlSet\Services\DNS /s
+        通过这一命令，可以对MAILER1与MAILER2上DNS键及其所有子健与相关条目进行比较。
+    5.2.4注册表键的保存与恢复
+        在对注册表条目进行修改之前，较好的做法是对要修改的键进行保存。这样，如果有任何错误发生，都可以将这些键恢复到原始的设置。要保存注册表键及其相关子健与值，可以使用REG save命令，如下所示：
+            reg save KeyName "FileName"
+        其中，KeyName为要保存的子健的路径，FileName为要创建的注册表hive文件名。子健路径也可以包含UNC名或远程计算机的IP地址，不过，对远程计算机，只能对HKLM与HKU这两个root键进行操作。此外，文件名应该包含在双引号中，并以.hiv扩展名结尾，以表明其为注册表hive文件，如下面的实例所示：
+            reg save HKLM\SYSTEM\CurrentControlSet\Services\DNS "DNSKey.hiv"
+        通过这一命令，将DNS子健及其相关子健与值保存到名为Dnskey.hiv的文件中。文件名中也可以包含目录路径，如下所示：
+            reg save \HKLM\SYSTEM\CurrentControlSet\Services\DNS
+            "\\Mailer1\SavedData\DNSKey.hiv"
+        如果注册表hive文件存在，则命令shell会给出提示信息询问是否重写文件，此时选择Y，也即重写文件。如果希望默认地重写文件，而不弹出提示信息，则可以使用/Y参数。
+        要恢复以前保存的注册表键，可以使用Reg restore命令，该命令的语法格式为：
+            reg restore KeyName "FileName"
+        qizhong ,KeyName为要恢复的子健的路径，FileName为用于恢复注册表键的原始注册表hive文件名。与REG copy命令不同的是，Reg restore命令只能在本地机上执行，而不能使用该命令对远程计算机上的注册表键进行恢复。不过，你可以在远程计算机上启动宇哥远程桌面会话，之后通过远程桌面登录来恢复本地机上的注册表键。
+        下面给出了一个使用REG restore命令的实例：
+            reg restore HKLM\SYSTEM\CurrentControlSet\Services\DNS "DNSKey.hiv"
+        该命令对以前保存在DNSKey.hiv文件中的DNS键进行了恢复。
+    5.22.5添加注册表键
+        要向Windows注册表中添加子健与值，可以使用REG add命令，其基本语法为：
+            reg add KeyName  /v ValueName /t DataType /d Data
+        其中，keyName为所要使用的注册表键的键名，ValueName为所要创建的子健或键值，DataType为数据类型，Data为要插入的实际值。尽管这一命令似乎涉及到很多数据和对象，但实际上该命令的使用是很直接的，参考如下实例：
+            reg add HKLM\SYSTEM\CurrentControlSet\Services\DNS /v DisplayName
+            /t REG_SZ /d "DNS Server"
+        上面命令的功能是：向注册表中的DNS键添加一个名为DisplayName的键值，该键的入口为一个包含有DNS Server的字符串。该命令中使用了双引号，因为字符串中包含了空格，使用双引号才能保证命令shell对字符串的正确理解。如果要添加的键或值已经存在，命令shell会给出提示信息询问是否重写数据。选择Y重写，选择N则放弃执行。如果希望默认地重写文件，而不弹出提示信息，则可以使用/F参数。
+        设置可扩展的字符串值时（REG_EXPAND_SZ），必须使用插入记号（^）符号对百分号（%）进行转义处理。这里，%用于指定环境变量。参考如下实例：
+            reg add HKLM\SYSTEM\CUrrentControlSet\Services\DNS /v ImagePath
+            /t REG_EXPAND_SZ /d ^%SystemRoot^%\System32\dns.exe
+        其中，使用了^%SystemRoot^%，以便确保环境变量SystemRoot的正确输入以及命令shell的正确理解。
+        设置非字符串值时，不需要使用引号，如下所示：
+            reg add HKLM\SYSTEM\CurrentComtrolSet\Services\DNS /v ErrorControl
+            /t REG_DWORD /d 0x00000001
+    5.2.6复制注册表键
+        使用REG copy命令，可以将注册表条目复制到本地机或远程系统上的某一位置。该命令的基本语法为：
+            reg copy KeyName1 KeyName2
+        其中，KeyName1为要复制的源子健路径，KeyName2位目标子健路径。需要说明的是，尽管子健路径可以包含UNC名或远程计算机的IP地址，但使用REG copy命令对远程的源注册表与目标注册表进行操作时，仍然存在一些限制，如下所示。
+        · 远程的源注册表子健只能使用HKLM与HKU这两个root建。
+        · 远程的目标注册表子健只能使用HKLM与HKU这两个root键。
+        下面的实例中，将本地系统上的DNS子健复制到MAILER2上的DNS子健：
+            reg copy HKLM\SYSTEM\CurrentControlSet\Services\DNS
+            \\Mailer2\HKLM\SYSTEM\CurrentControlSet\Services\DNS
+        通过使用/s参数，可以复制指定的子健以及该子健下的所有子健与注册表条目。下面的实例中，复制了DNS子健及其相关的所有子健与值：
+            reg copy HKLM\SYSTEM\CurrentControlSet\Services\DNS
+            \\Mailer2\HKLM\SYSTEM\CurrentControlSet\Services\DNS /s
+        如果目标路径中已经存在要复制的值，则REG copy命令执行时会弹出提示信息，对每个已存在的值都需要确认是否重写。你可以根据实际情况选择Y或N，也可以按A键来重写所有已存在的值而不再显示提示信息。
+        （注解  如果不希望看到提示信息，可以使用/F参数重写所有已存在的值而不显示提示信息。不过，在重写已存在的注册表键之前，你可能需要对其进行保存，以便在发生问题的时候对其进行恢复。为此，可以使用5.2.4中讨论的REG save命令与REG restore命令。）
+    5.2.7删除注册表键
+        要从Windows注册表中删除子健与值，可以使用REG delete命令。
