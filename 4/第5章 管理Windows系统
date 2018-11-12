@@ -156,4 +156,232 @@
         如果目标路径中已经存在要复制的值，则REG copy命令执行时会弹出提示信息，对每个已存在的值都需要确认是否重写。你可以根据实际情况选择Y或N，也可以按A键来重写所有已存在的值而不再显示提示信息。
         （注解  如果不希望看到提示信息，可以使用/F参数重写所有已存在的值而不显示提示信息。不过，在重写已存在的注册表键之前，你可能需要对其进行保存，以便在发生问题的时候对其进行恢复。为此，可以使用5.2.4中讨论的REG save命令与REG restore命令。）
     5.2.7删除注册表键
-        要从Windows注册表中删除子健与值，可以使用REG delete命令。
+        要从Windows注册表中删除子健与值，可以使用REG delete命令。REG delete命令有几种不同的语法格式，如果需要删除某子健以及该子健下所有子健与注册表条目，可以使用如下语法：
+            reg delete KeyName
+        其中，KeyName为所要删除的子健名。此外，尽管子健路径可以包含UNC名或远程计算机的IP地址，但远程源子健只能使用HKLM与HKU这两个root键，参考如下实例：
+            reg delete \\Mailer1\HKLM\SYSTEM\CUrrentControlSet\Services\DNS2
+        该命令删除了MAILER1上的DNS2子健以及该子健下的所有子健与条目。
+        如果需要限定删除的范围，比如，只删除子健下某一个特定的条目，则可以使用如下的语法：
+            reg delete KeyName /v ValueName
+        其中，KeyName为所要处理的子健名，ValueName为所要删除的特定的条目名。与前面类似，这里的子健路径也可以包含UNC名或远程计算机的IP地址，但远程源子健只能使用HKLM与HKU这两个root键。下面的实例中，删除了MAILER2上DNS2子健的Descriptions条目：
+            reg delete \\Mailer2\HKLM\SYSTEM\CurrentControlSet\Services\DNS2 /v Description
+        （提示  对上面两种情况，命令shell都会给出提示信息，询问是否永久性地删除指定的注册表条目。如果是则选择Y。也可以使用/F参数来默认删除，而不再弹出提示信息。另外一个有用的参数是/Va，该参数的作用是，只删除子健下的值，而不删除该子健下的其他子健。）
+    5.2.8导入与导出注册表键
+        有时候，可能需要将注册表的全部或部分复制到一个文件中，之后在其他计算机上使用该文件。比如，在计算机1上安装了一个组件，并对其进行了一些扩展的配置，之后需要在计算机2上也使用该组件，但不希望重复整个配置过程。要做到这一点，可以在计算机2上安装该组件，对其进行初始的配置，之后从计算机1中导出该组件的注册表配置文件，并将该文件导入到计算机2中，从而保证该组件的正确配置，又避免了低效的重复。当然，这种方法只适用于组件的完整配置设置存储在注册表中的情况，但从中可以看出这种注册表导出、导入的作用和能力。
+        使用REG export命令与REG import命令时，导出、导入注册表数据是非常容易的，包括特定的root键的分支数据以及个别的子健及其包含的数据。导出数据时，要创建一个.reg文件来保存导出的注册表数据。该文件实力上是一个脚本文件，通过REG import命令，可以将其导入到原计算机或其他计算机上的注册表中。
+        由于注册表文件是以标准的文本写入的，因此可以使用任意的标准文本标记器对其进行查阅与修改（如果需要）。要将注册表数据导入到当前目录下的文件中，可以使用如下的语法：
+            reg export KeyName FileName
+        其中，KeyName为要使用的子健名，FIleName为用于存储导出的注册表数据的文件名。与前面类似，这里的子健路径也可以包含UNC名或远程计算机的IP地址，但远程源子健只能使用HKLM与HKU这两个root键。下面的实例中，导出了MAILER1上的MSDTC子健：
+            reg export \\Mailer1\HKLM\SOFTWARE\Microsoft\MSDTC msdtc-regkey.reg
+        通过REG export命令，可以导出任意层次的注册表数据。比如，如下命令可以导出HKLM root键及其所有子健：
+            reg export HKLM  hklm.reg
+        （提示  通过/Y参数，可以使REG export命令在导出注册表数据时默认重写已存在的文件。通过regedit /e SaveFile命令，可以导出完整的注册表数据。其中，SaveFile为所要保存的注册表文件存储位置的全路径。比如，如果需要将整个注册表数据复制到C:\Save\Regdata.reg，可以使用命令regedit /e c:\Save\Regdata.reg。）
+        导入注册表数据会注册表脚本文件的内容添加到目标计算机的注册表中，添加数据时，或者是创建新的注册表键与值（如果此前不存在），或者是重写注册表键与值（如果此前存在）。以如下的语法格式使用REG import命令，可以导入注册表数据：
+            reg import FileName
+        其中，FileName为当前目录中要导入的注册表文件名，比如：
+            reg import msdtc-regkey.reg
+        要注意的是，不能远程执行导入命令，也不能导入非本地的注册表文件。导入注册表键时，必须登录本地系统，并且要导入的注册表文件也必须存在于本地计算机上。
+    5.2.9加载与卸载注册表键
+        正如有时候需要导出或导入注册表数据一样，有时候你还需要使用单独的注册表hive文件。最可能导致此需求的原因是：必须修改某用户的配置文件，以便纠正其中存在的、导致该用户无法访问或使用系统的问题。比如，由于某用户不恰当地改变了显示模式，导致其变为一种无效的设置，因此无法访问该计算机，这时候就需要加载并修改该用户配置文件的设置时。将该用户的配置文件数据设置加载到注册表中后，就可以编辑注册表，纠正其中存在的问题，并保存所作的改变，之后该用户就可以登录系统。
+        另一个迅速要加载注册表键的原因是：需要改变远程系统上注册表中某一特定的部分。需要说明的是，加载与卸载注册表hive文件只影响HKEY_LOCAL_MACHINE与HKEY_USERS，只有在选择了其中的某一个时，才能执行加载与卸载操作。加载注册表hive文件时，加载数据并不会替换选定的root键，而是变为该root键的子健。由于HKEY_LOCAL_MACHINE与HKEY_USERS是构建系统注册表中所有root键的基础，因此，实际上这两个命令可以操作注册表中的任何区域。
+        进行加载操作之前，必须使用REG save命令将加载的注册表数据保存为注册表hive文件。以如下语法使用REG load命令，可以将以前保存的注册表hive文件加载到注册表中：
+            reg load RootKey、KeyName FileName
+        其中，RootKey为加载命令使用的root键（加载的临时注册表键将在其下创建），KeyName为所要创建的临时子健的名，FileName为所要加载的注册表hive文件名。要注意的是，只能在HKLM或HKU这两个root键下创建临时子健。下面的实例中，在HKLM下创建了一个名为CurrTemp的临时子健，并将Working.hiv文件记载到该子健中：
+            reg load HKLM\CurrTemp Working.hiv
+        再次重申：不能远程执行导入命令，也不能导入非本地的注册表文件。导入注册表键时，必须登录本地系统，并且要导入的注册表文件也必须存在于本地计算机上。
+        加载了注册表键之后，就可以使用前面讨论的技术对其子健与值进行操作。在完成了对某注册表键的修改后，可以使用REG save命令将其保存到新的注册表文件中。保存后，就可以以如下的语法格式使用REG unload命令，以便卸载hive文件，并将其从内存与注册表中移除：
+            reg unload RootKey\KeyName
+        其中，RootKey为卸载命令使用的root键（临时注册表键在其下创建），KeyName为所要卸载的临时子健的名。下面的实例中，从HKLM下卸载了一个名为CurrTemp的临时子健，并将Working.hiv文件加载到该子健中：
+            reg unload HKLM\CurrTemp
+        （注解  不能对正在被操作系统或其他进程使用的hive文件本身进行卸载等操作，不过可以复制一个该文件的副本，之后对文件副本进行处理。要保存文件副本，可以使用reg save命令，其后跟随要保存的root键的缩略名以及该hive文件的文件名。比如，命令reg save hkcu c:\currhkcu.hiv可以将HKEY_LOCAL_MACHINE保存到名为Currhkcu.hiv的hive文件中，该文件存在于C盘根目录。尽管可以以这种模式保存注册表的逻辑root键（HKCC、HKCR、HKCU），但本技术中只能保存HKLM、HKU下的子健。）
+        如果需要修复远程计算机上注册表的某个区域，可以遵循如下规则与步骤。
+        （1）访问远程计算机，使用REG save命令将注册表hive保存到文件中。
+        （2）使用XCOPY命令或类似命令将注册表文件复制到本地系统。
+        （3）使用REG load命令，将相关的hive文件复制到本地机的注册表中。
+        （4）进行必要的修改，之后使用REG save命令保存所作的修改。
+        （5）将修改后的hive文件上传到远程计算机，之后使用REG import命令将其导入注册表中，以便修复存在的问题。
+        （6）在远程计算机上测试有效后，使用REG unload命令从本地机上卸载hive文件。
+5.3管理系统服务
+    系统服务为工作站与服务器提供了关键功能。要对本地机与远程计算机上的系统服务进行管理，可以使用服务控制器命令SC，该命令包含很多子命令，这里只讲述其中的一部分。具体第说，接下来将逐一讨论如下一些命令。
+    · SC config。用于配置服务启动与登录帐号。
+    · SC query。用于显示计算机上已配置的所有服务的列表。
+    · SC qc。用于显示某特定服务的配置。
+    · SC start。用于启动服务。
+    · SC stop。用于结束服务。
+    · SC pause。用于暂停服务。
+    · SC continue。用于恢复服务。
+    · SC failure。用于设置服务失效时执行的操作。
+    · SC qfailure。用于查看服务失效时执行的操作。
+    上面这些命令都可以对远程计算机的服务进行操作，方法是在要使用的子命令前插入UNC名或远程计算机的IP地址，其语法格式为：
+        sc ServerName Subcommand
+    5.3.1查看已配置的服务
+        要查看系统中已配置的所有服务，可以在命令提示符中键入如下命令：
+            sc query type= service state= all
+        或
+            sc ServerName query type= service state= all
+        其中，ServerName为UNC名或远程计算机的IP地址，比如\\Mailer1或\\192.168.1.100，如下面的实例所示：
+            sc \\Mailer1 query type= service state= all
+            sc \\192.168.1.100 query type= service state= all
+        （注解  在type= service与state= all中使用的等号（=）后面，必须紧跟着一个空格。如果没有使用空格，则命令会失败。）
+        对state标记，可以复制为active（只显示运行中的服务），也可以复制为inactive（显示所有暂停的或终止的服务），如下所示：
+            sc \\Mailer1 query type= service state= active
+            sc \\Mailer query type= service state= inactive
+        上面第一个实例中，查询MAILER1上所有运行中的服务，并返回一个列表。第二个实例中，查询MAILER1上所有终止状态的服务，并返回一个列表。
+        SC query命令的输出信息展示了各种服务及其配置信息，每个服务条目的格式如下：
+            SERVICE_NAME: W3SVC
+            DISPLAY_NAME: WORLD Wide Web Publishing Service
+                    TYPE: 20 WIN32_SHARE_PROCESS
+                   STATE: 4 RUNNING
+                            (STOPPABLE, PAUSEBLE, ACCEPTE_SHUTDOWN)
+        （注解  参数/V "x0"的作用是，使得FIND命令值显示那些不包括文字x0的输出航，x0是WIN32_Exit_Code、Service_Exit_code、Checkpoint、Wait_Hint等字段中常见的文本，通过这种方法，就在显示的输出信息中去除了不需要的字段。）
+        如果已知要使用的服务名，就可以使用SC qc命令来显示其配置信息，其语法为：
+            sc qc ServiceName
+        其中，ServiceName为所要处理的服务名，这种格式命令的输出信息类似于：
+            SERVICE_NAME: w3svc
+                    TYPE: 20 WIN32_SHARE_PROCESS
+              START_TYPE: 2 AUTO_START
+           ERROR_CONTROL: 1 NORMAL
+        BINARY_PATH_NAME: c:\WINDOWS\System32\svchost.exe -k iissvcs
+        LOAD_ORDER_GROUP:
+                     TAG: 0
+            DISPLAY_NAME: World Wide Web Publishing Service
+            DEPENDENCIES: RPCSS
+                        : HTTPFilter
+                        : IISADMIN
+      SERVICE_START_NAME: LocalSystem
+        可以看出，输出信息中没有包含服务的当前状态，但包含了如下一些与该服务相关的要素。
+        · 二进制路径名。该服务的可执行文件路径。
+        · 依赖关系。该服务正常运行的一些依赖因素。
+        · 显示名。描述性的服务名。
+        · 服务启动名。该服务的登录账号名。
+        · 启动类型。该服务的启动配置。
+        （注解  配置为自动启动的服务的启动类型为AUTO_START，配置为手动启动的服务的启动类型为DEMAND_START，已禁用服务的启动类型为DISABLED。）
+        · 类型。服务类型及其是否为共享进程。
+        （注解  配置服务登录时，有些情况下，需要了解进程是在自己专有的上下文中运行，还是与其他进程共享运行。共享进程在类型中列出为WIN32_SHARE_PROCESS，在自己专有上下文中运行的进程在类型中列出为WIN32_OWN_PROCESS。）
+    5.3.2启动、终止与暂停服务
+        作为管理员，经常需要对Windows服务进行启动、终止或暂停等操作，相关的命令及其语法分别为：
+            启动某服务
+            sc start ServiceName
+            暂停某服务
+            sc pause ServiceName
+            恢复暂停的服务
+            sc continue ServiceName
+            终止某服务
+            sc stop ServiceName
+        上述命令中，ServiceName均指待处理的服务的缩略名，比如：
+            sc start w3svc
+        在所有的SC命令中，都可以通过指定远程计算机名来使用其中的服务。比如，要启动MAILER1上的w3svc服务，可以使用如下的命令：
+            sc \\Mailer1 start w3svc
+        上面命令输出结果中状态应该为STATE_PENDING，对于stop、pause、continue等命令，状态则分别对应STOP_PENDING、PAUSE_PENDING、CONTINUE_PENDING。如果得到错误的结果，则输出信息中会声明FAILED，并给出错误文本，其中详细描述了导致失败的的原因。比如，如果试图启动一项已经启动的服务，则会得到错误信息：
+            An instance of the service is already running.
+        如果试图终止一项已经终止的服务，则会得到如下的错误信息：
+            The service has not been started.
+    5.3.3配置服务的启动方式
+        对Windows服务，可以将其设置为手动启动或自动启动，也可以通过对服务的禁用来永久性地关闭服务。通过如下命令，可以配置服务的启动：
+            sc config ServiceName start= flag
+        其中，ServiceName为所要使用的服务的缩略名，flag为所要使用的启动类型。对Windows服务而言，有效的flag值包括如下几个。
+        · Auto。在系统启动时启动服务。
+        · Demand。根据需要手工启动服务。
+        · Disabled。禁用服务。
+        · Delayed-Auto。延迟服务的启动，直至所有非延迟的自动服务都已启动。
+        根据这些flag值的含义，要将某服务配置为自动启动，可以使用命令：
+            sc config w3svc start= auto
+        或
+            sc \\Mailer1 config w3svc start= auto
+        （注解  在start= auto中使用的等号（=）后面，必须紧跟着一个空格。如果没有使用空格，则命令会失败。另外，上面的命令只会报告SUCCESS或FAILUER，而不会报告说服务已经在指定的启动模式中进行了配置。
+        禁用某服务并不会立即终止该服务，而是在计算机下次启动的时候不再启动该服务。要确保某服务被禁用并且终止，可以在使用SC stop命令再运行SC config命令。）
+    5.3.4配置服务的登录方式
+        对Windows服务，可以将其配置为系统账号登录，也可以将其配置为以特定用户账号登录。比如，要使得某服务以本地系统账号登录，可以使用如下命令：
+            sc config ServiceName obj= LocalSystem
+        其中，ServiceName为正在配置的、准备以本地系统账号登录的服务名。如果某服务提供了一个可操作的用户界面，就可以在其中添加标记type=interact type=own，如下面奶奶实例所示：
+            sc config w3svc obj= LocalSystem type= interact type= own
+        其中，type= interact标记表明该服务可以与Windows桌面进行交互，type= own标记表明该服务在自己专有的进程空间运行。在某服务与其他服务共享器可执行文件的情况下，则应该使用标记type= share，如下面实例所示：
+            sc config w3svc obj= LocalSystem type= interact type= share
+        （提示  如果不知道某服务是以共享进程的方式运行，还是以自己专有进程空间运行，则可以使用SC qc命令查询该服务的启动类型。SC qc命令在5.3.1中进行了讨论。）
+        服务也可以配置为以指定账号登录，要做到这一点，可以使用如下命令：
+            sc config ServiceName obj= [Domain\]User Password= Password
+        其中，Domain为可选的域名（要指定的用户账号存在于该域中），User为要使用的用户账号名，Password为该账号的口令。参考如下实例：
+            sc config w3svc obj= adatum\webbies password= blue5!CraZy
+        上面的命令中，将W3svc服务配置为使用Adatum域中的Webbies账号登录。该命令应该在输出信息中声明SUCCESS或FAILUER。如果账号名无效或者不存在，或者提供的口令无效，则命令会失败。
+        （注解  如果某服务配置为在本地系统账号下与桌面交互，则不能将其改变为在域账号下运行，除非使用标记type=own，此时的语法格式为： sc config ServiceName obj= [Domain\]User password= Password type=own。）
+        （真实场景  作为管理员，应该保持对那些由服务使用的账号的追踪和审计。如果没有进行正确配置，这些账号就可能成为重大安全问题的根源。对这些由服务使用的账号，应该采用最严格的安全设置，并在保证其完成必要功能的前提下赋予其尽可能小的权限。典型情况下，由服务使用的账号并不需要很多通常用户账号所需要的权限。比如，大多数服务账号不需要本地登录的权限。管理员应该准确了解系统中使用了哪些服务账号（以便于对其进行追踪和审计），并且应该向配置管理员账号一样对其进行配置。当然，这并不是说赋予其管理员权限，而是说应该为其设置安全的口令，对账号的使用进行认真的检测，以及对账号权限与特权的小心使用等。）
+    5.3.5配置服务的恢复方式
+        使用SC failure命令，可以将Windows服务配置为在服务失败时采取特定的动作。比如，可以在服务失败时重启该服务或者运行某个应用程序。
+        你可以为服务恢复选项设置第一个、第二个以及依此类推的恢复尝试，每次服务失败发生时，当前的失败技术会递增。你也可以设置一个参数，用于规定失败计数器重置之前必须消逝的时间长度。比如，可以规定，在最后一次失败发生24小时之后重置计数器。
+        在对服务恢复进行配置之前，可以使用SC qfailure命令检查当前的服务恢复设置，其语法为：
+            sc qfailure ServiceName
+        其中，ServiceName为所要设置的服务名，比如：
+            sc qfailure w3svc
+        此外，也可以对远程计算机进行检查，比如：
+            sc \\Mailer1 qfailure w3svc
+        或
+            sc \\192.168.1.100 qfailure w3svc
+        这些命令的输出信息中，失败动作是以其应该执行的先后顺序列出的。在下面的实例输出中，W3svc服务的恢复策略设置为：服务第一次、第二次失败时都尝试重启该服务，在第三次失败时则重启计算机。
+            [SC] QueryServiceConfig2 SUCCESS
+
+            SERVICE_NAME: w3svc
+                    RESET_PERIOD(in seconds): 86400
+                              REBOOT_MESSAGE:
+                                COMMAND_LINE:
+                             FAILURE_ACTIONS:RESTART -- Delay = 1 milliseconds.
+                                             RESTART -- Delay = 1 milliseconds.
+                                             REBOOT -- Delay = 1000 milliseconds.
+        （注解  对某些关键性的系统服务，Windows会自动地为其配置恢复策略。典型情况下，这些服务的恢复策略设置为在失败时重启该服务。还有一些服务配置为失败时运行某程序，比如，IIS Admin服务配置为失败时运行一个名为lisreset.exe的程序，该程序可以在重启IIS Admin服务的同时纠正服务中存在的问题，并安全地管理IIS服务。）
+        用于配置服务恢复的命令是SC failure，其基本语法为：
+            sc failure ServiceName reset= FailureResetPeriod actions= RecoveryActions
+        其中，ServiceName为所要配置的服务名，FailureResetPeriod规定了在重置失败计数器之前应该达到的正常运行时间（以秒为计数单位），RecoveryActions为失败发生时执行的操作以及该操作启动之前的延迟时间（以毫秒为计数单位），可用的恢复操作如下所示。
+        · 无操作（以空字符串“ ”为标志）。操作系统不会为本次失败尝试恢复操作，但可能为此前或此后的其他失败进行恢复操作。
+        · 重启服务。终止该服务，并在短暂暂停后重启该服务。
+        · 运行一个程序。失败时运行一个程序或脚本，脚本可以是一个批处理脚本，也可以是一个Windows脚本。如果选择这个恢复操作，要注意为所要运行的程序设置完整的文件路径，并设置程序启动时需要传递给该程序的命令行参数。
+        · 重新引导计算机。关闭计算机，并在指定的延迟时间达到后重启计算机。
+        （最佳实践  为关键性的系统服务设置恢复选项时，可以采用一个较好策略是：在第一次、第二次失败时重启该服务，第三次失败时则重新引导服务器。）
+        使用SC failure命令时，要记住如下几个要点。
+        · 重置时间间隔的计数单位为秒。重置计数器的时间间隔通常设置为几个小时或几天，但计数单位是秒。一个小时有3600秒，一天有86400秒。比如，要设置两小时的充值时间间隔，应该使用的值为7200。
+        · 每一个恢复操作后必须跟随执行该操作之前需要等待的时间（计数单位为毫秒）。对于重启服务的操作，可能需要较短的延迟，比如1毫秒（无延迟），1秒（1000毫秒），或者5秒（5000毫秒）。对于重启计算机的操作，则可能需要较长的延迟，比如15秒（15000毫秒），或30秒（30000毫秒）。
+        · 在输入操作及其延迟时间时，应该将其作为一个统一的文本字符串，每个值之间都以正斜杠（/）间隔。比如，可以使用如下的形式：restart/1000/restart/1000/reboot/15000，其含义为：第一次、第二次失败时，在1秒的延迟后重启该服务，第三次失败时，在15秒的延迟后重新引导计算机。
+        参考如下实例：
+            sc failure w3svc reset= 86400 actions= restart/1/restart/1/reboot/300000
+        根据上面命令行中的约定，第一次、第二次服务失败时，几乎立即重启该服务，第三次失败时，则在30秒的延迟后重新引导计算机。此外，如果在24小时（86400秒）的时间间隔内没有发生服务失败，则重置失败计数器。与前面实例中类似，你也可以在上面的命令行中指定远程计算机（插入UNC名或远程计算机的IP地址）。
+        如果要在服务失败时使用Run操作，则可以使用Command= parameter来指定要运行的命令或程序，parameter负责指定要运行的命令的全路径以及传递给该命令的参数。要注意的是，命令路径与参数等内容需要使用双引号封装在一起，如下面实例所示：
+            sc failure w3svc reset= 86400 actions= restart/1/restart/1/run/30000
+            command= "c:\restart_w3svc.exe 15"
+  5.4从命令行重启与关闭系统
+      关机或重启系统是经常要执行的系统管理任务。要完成这些任务，一种方法是使用Shutdown工具，该工具可同时用于本地机与远程系统。另一种方法是对关机进行调度，比如，使用Schtasks指定关机的执行时间，或者创建一个脚本，其中包含对某台系统的关机命令列表。
+      （真实场景  尽管大多数情况下Windows系统的启动与关机都不会遇到问题，但偶尔也可能会在执行过程中停止响应。如果出现这种情况，应该设法找到导致问题的根源以便于故障排除，下面给出了几种可能导致系统停止响应的原因。）
+      （1）系统正在尝试执行（或正在运行）一个启动脚本或关机脚本，该脚本尚未执行完毕，或者脚本本身失去响应（在这种情况下，系统需要等待直至脚本超时）。
+      （2）启动初始化文件或服务导致的问题，如果确认，就需要使用系统配置工具（Msconfig）对启动项进行故障排除。禁用服务、禁用某启动项或启动初始化文件的某个条目也可能解决问题。
+      （3）系统中安装的防病毒程序导致的问题。比如，有些情况下，在关机时，防病毒程序会扫描可移除的截至驱动器。为解决这一问题，可以对防病毒程序进行配置，使其在系统关机时不再扫描可移除的介质驱动器或其他带有可移除介质的驱动器，也可以临时性地禁用或关闭防病毒程序。
+      （4）错误地配置了声音设备导致的启动与关机问题。为确定可能的问题根源，可以依次检查这些设备。关闭声音设备，之后重启计算机。如果问题解决，说明确实是声音设备的问题，则需要为声音设备安装新的驱动程序（另外一种可能性不是很大的原因是开机、关机的声音文件损坏）。
+      （5）错误地配置了网卡导致的启动与关机问题。此时，可以尝试关闭网络适配器并重启计算机，如果问题解决，说明确实是网卡的问题，则需要重新安装网络适配器驱动程序，或者从制造商获取新的驱动程序。
+      （6）错误地配置了显卡适配器驱动程序导致的启动与关机问题。此时，可以从其他计算机远程登录，并将当前显卡驱动程序回滚到以前的版本。如果无法做到，就卸载显卡驱动程序之后重新安装。
+      5.4.1管理本地系统的重启与关闭
+          在本地系统上，可以使用如下命令对关机与重启进行管理：
+          关闭本地系统
+              shutdown /s /t shutdownDelay /l /f
+          重启本地系统
+              shutdown /r /t shutdownDelay /l /f
+          取消本地计算机的延迟关机
+              shutdown /a
+          其中，/T shutdownDelay参数用于设置在关机或重启之前的秒数（可选的），/L参数用于立即退出当前用户的登录，/F参数用于强制关闭运行中的应用程序（而不预先弹出警告信息）。需要说明的是，上面这几个参数都是可选的。下面的实例中，本地系统在60秒的延迟后重启：
+              shutdown /r /t 60
+          （最佳实践  在大多数网络环境下，系统正常运行时间是最重要的，系统在重启或关机时都无法为用户提供服务，使得用户无法完成必要的工作，从而导致用户的不快。作为管理员，不要在营业时间关闭或重启系统，而应该在营业时间之外对系统进行关机或重启。如果不得不在营业时间关机，则应该在关机之前通知用户，使得用户可以保存当前的工作，或退出系统，以免造成不必要额损失。）
+      5.4.2管理远程系统的重启与关闭
+          对于远程系统，需要使用/M参数来指定UNC名或远程系统的IP地址。因此，前面讲述的用于关机、重启、取消延迟的关机等命令的基本语法应该做一些修改，如下面一些实例所示：
+          关闭远程系统
+              shutdown /s /t shutdownDelay /l /f /m \\System
+          重启远程系统
+              shutdown /r /t shutdownDelay /l /f /m \\System
+          取消远程计算机的延迟关机
+              shutdown /a /m \\system
+          下面的实例中，MAILER1在30秒的延迟后重启：
+              shutdown /r /t 30 /m \\Mailer1
+          下面的实例中，IP地址为192.168.1.105的系统将立即重启，正在运行中的应用程序被强迫停止：
+              shutdown /r /f /m \\192.168.1.105
+      5.4.3添加关机或重启原因与注释
+          在大多数网络环境下，对关机或重启的原因给出说明是一个好做法。对计划外的关机，你可以再计算机的系统日志中对关机的原因进行记录，这需要对原有命令进行扩展，使其包含如下的参数：
+              /e /c "UnplannedReason" /d MajorCode:MinorCode
+          其中，/e取代了原来的/r开关，/c "UnplannedReason"用于对关机或重启的详细原因进行设置（长度最大为512个字符），/d MajorCode:MinorCode用于设置关机的原因代码。原因代码是任意的，有效的主代码范围为0~255，有效的从代码范围为0~65535。
+          对于计划中的重启，参考如下实例：
+              shutdown /r /m \\Mailer1 /c "System Reset" /d 5:15
+          在上面的实例中，重启了MAILER1，并将规划外重启的原因标记为System Reset，原因代码为5：15。
+          表总结了Windows Vista与Windows Server 2008中关机与重启原因与代码。从表中可以看出，
