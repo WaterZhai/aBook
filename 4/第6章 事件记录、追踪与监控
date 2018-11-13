@@ -1,0 +1,110 @@
+第6章  事件记录、追踪与监控
+
+到这里为止，本书主要讲解了从命令行管理本地系统与远程系统的工具与技术。本章将讲述如何将事件日志用于系统监控与优化。这里，监控是指经常性地对系统进行检查，以便及时发现存在的问题。优化是指对系统性能进行调试，使其达到最优化的性能指标。
+本章将讨论Windows系统中的日志工具，这些工具有助于管理员识别与追踪系统中存在的问题、监控应用程序与服务、维护系统安全等。如果系统出现速度显著降低。行为失常等问题，就需要查看事件日志，以便识别潜在的问题根源。识别了问题根源之后，就可以执行一些维护性或预防性的任务，以便化解或消除这些问题源。通过性能监控，可以观察系统中事件的发生情况，并采取适当的措施对其进行处理。
+
+6.1Windows事件日志
+    在微软Windows系统中，事件是指操作系统中发生的那些显著的、需要用户或管理员加以注意的操作。事件被系统记录在Windows事件日志中，提供了重要的历史信息，有助于完成监控系统、维护系统安全、解决问题、进行系统诊断等任务。定期地检查事件日志不仅是重要的，也是基础性的工作。管理员应该密切监控每台商业服务器的事件日志，同时也要确保工作站进行了正确的配置，以便对重要的系统时间进行追踪。对服务器，要确保系统是安全的，应用程序与服务是正常运行的，并且服务器不能出现影响系统性能的错误。对工作站，要确保那些有助于系统维护和解决问题的时间被记录下来，并且能在需要的时候方便地访问事件日志。
+    用于管理事件日志的Windows服务称为Windows Event Log服务。该服务启动后，Windows会记录重要的时间信息。系统中有哪些可用的时间日志依赖于系统本身的角色以及安装了哪些服务。两种通用的日志文件类型包括下面几个。
+    · Windows日志。操作系统使用的用于记录通用系统事件（与应用程序、安全性、启动、系统组件等相关）的事件日志。
+    · 应用程序与服务日至。特定的应用程序与服务使用的、用于记录应用程序或服务特定事件的事件日志。
+    具体来讲，有如下的一些时间日志。
+    · 应用程序日志。该日志记录了与特定应用程序相关的重要事件。比如，Exchange Server会记录与邮件交换相关的事件，包括信息存储、邮箱、服务声明等事件。默认情况下，应用程序日志存储在%SystemRoot%\System32\Winevt\Logs\Application.Evtx。
+    · 目录服务日志。在域控制器上，该日止记录了来自活动目录域服务（AD DS）的事件，包括目录启动、全局编目以及完整性检查等。默认情况下，目录服务日志存储在%SystemRoot%\System32\Winevt\Logs\Directory Service.Evtx。
+    · DNS服务器日志。在DNS服务器上，该日志记录了DNS查询、响应以及其他相关的DNS活动。默认情况下，DNS服务器日志存储在%SystemRoot%\System32\Winevt\Logs\DNS Server.Evtx。
+    · DFS复制日志。在使用DFS复制的域控制器上，该日志记录了系统中的文件复制活动，包括服务状态与控制、系统卷中数据扫描、复制集管理等事件。默认情况下，DFS复制日志存储在%SystemRoot%\System32\Winevt\Logs\DFS Replication.Evtx。
+    · 文件复制服务日志。该日志记录了系统中的文件复制活动。默认情况下，该日志存储在%SystemRoot%\System32\Winevt\Logs\File Replication Service.Evtx。
+    · 转发事件日志。系统中配置了事件转发功能时，该日志会记录在其他服务器转发而来的事件。转发事件日志默认的存储位置为%SystemRoot%\System32\Winevt\Logs\ForwardedEvents.Evtx。
+    · 硬件事件日志。系统中配置了硬件子系统事件报告机制时，该日志会记录报告给操作系统的硬件事件。硬件事件日志默认的存储位置为%SystemRoot%\System32\Winevt\Logs\HardwareEvents.Evtx。
+    · Microsoft\Windows。用于追踪特定的Windows服务与功能相关事件的一组日志，以组件类型与时间类别进行组织。
+    · 安全性日志。该日志记录了与安全性相关的事件，比如登录/注销、特权使用、资源访问等。默认情况下，安全性日志存储在%SystemRoot%\System32\Winevt\Logs\Security.Evtx。
+    （注解  要访问安全性日志，比如具备Manage Auditing And Security Log这一用户权限。默认情况下，管理员组中的成员具备这一权限。在Windows Server 2008 Administrator's Pocket Consultant（Microsoft Press，2008）一书的第10章，讲述了用户权限的分配问题。）
+    · 安装日志。该日志记录了操作系统或其组件在安装时的相关事件。安装日志的默认存储位置为%SystemRoot%\System32\Winevt\Logs\Setup.Evtx。
+    · 系统日志。该日志记录了来自操作系统或其组件的事件，比如某服务启动失败、驱动程序初始化、系统范围的消息、其他与系统相关的消息等。默认情况下，系统日志存储在%SystemRoot%\System32\Winevt\Logs\System.Evtx。
+    · Windows PowerShell日志。该日志记录了与使用Windows PowerShell相关啊的事件。Windows PowerShell日志默认的存储位置为%SystemRoot%\System32\Winevt\Logs\Windows PowerShell.Evtx。
+    在事件日志中，每一事件都带有严重程序，从信息性的事件到一般的警告事件、到严重事件（比如关键性错误与失败等）。事件所属类别是由其时间级别标示的，事件级别包括下面5个。
+    · 信息。表示系统中发生了信息性的事件，通常与某已成功的动作相关。
+    · 警告。表示一般性的警告，一般用于提醒用户防止以后的系统问题。
+    · 错误。表示系统中发生了关键性的错误，比如某服务启动失败。
+    · 成功审核。表示通过审核进行追踪的某个操作成功执行，比如特权使用。
+    · 失败审核。表示通过审核进行追踪的某个操作执行失败，比如登录失败。
+    （注解  在众多的事件类型中，应该密切关注的是警告事件与错误事件。在产生这两类事件而又不能确定其原因后，你应该进一步研究，以便决定是否有必要采取进一步的动作。）
+    除事件级别外，每一事件还有如下一些常见的属性。
+    · 日期与时间。记录了时间发生的日期与时间。
+    · 事件源。记录了事件源，比如应用程序、服务或系统组件等。事件源有助于找到导致事件的根源。
+    · 事件ID。使用数字形式的标识符来记录特定的事件。事件ID是由事件源生成的，用于唯一性地标记事件。
+    · 事件类别。表示事件所属的类别，有时可用于进一步地描述相关操作。每一事件源都有自己的时间类别。比如，对于安全性事件源，其事件类别包括登录/注销、特权使用、策略改变、账号管理等。
+    · 用户。便是导致生成改时间的用户账号。用户可以包括特殊的标识符，比如本地服务、网络服务、匿名登录，以及实际的用户名。用户账号也可以标记为不适用，表示该场景下不适用用户账号。
+    · 计算机。表示导致发生该事件的计算机。
+    · 描述。为时间提供了详尽的描述信息，也可以包括关于从哪里找到更多信息（以便解决或处理问题）等内容。在事件查看器中，双击某日志条目，就可以查看描述字段。
+    · 数据。时间的相关数据或错误代码等输出信息。
+    可用于事件管理的图形界面工具是事件查看器。在命令行中，键入eventvwr命令可以启动本地计算机上的时间查看器，而如果要启动远程计算机上的事件查看器，则需要键入eventvwr ComputerName命令，其中ComputerName是远程计算机名。与大多数GUI工具类似，时间查看器易于使用，并且对于某些特定的管理任务，只能使用该工具。比如，如果需要控制事件日志的大小、指定事件日志的处理方式、对事件日志进行存档等，就必须使用事件查看器，而无法在命令行完成这些任务。
+    Windows Vista与Windows Server 2008提供了一些不同的工具与技术，可用于在命令行对事件日志进行处理，主要包括下面3个。
+    · PowerShell Get-Eventlog。搜索事件日志并收集那些匹配特定标准的事件条目。在脚本中，可以使用PowerShell Get-Eventlog来检查多个日志中的事件，并将结果存储到文件中，以便于追踪信息、警告与错误等不同严重程度的事件。
+    · Eventcreate。在事件日志中创建自定义事件。根据计划（或者作为例行维护任务的一部分）运行自定义脚本时，你可以希望在事件日志中记录这些动作，Eventcreate可以用于完成这一任务。
+    · 自定义视图。使用XPath查询来创建自定义或过滤后的事件日志视图，以便快速、方便地发现匹配特定标准的事件。由于XPath查询可以在兼容的系统上重用，因此，在目标计算机上重新运行该查询，就可以重建自定义或过滤后的事件日志视图。
+    （真实场景  监控系统事件并不是一件根据个人兴趣随意未之的事情。相反，这是一项应该经常地、彻底地执行的任务。对于服务器，应该至少每天检查一次事件日志。对于工作站，应该在需要的时候检查其上的事件日志，比如在用户声称存在问题的时候。）
+6.2查看与过滤事件日志
+    通过Windows PowerShell的Get-Eventlog cmdlet，可以从时间日志中获取详尽的信息。使用Get-Eventlog时，不要忽略自动化的威力。你没有必要每次都从Windows Powershell提示符中手工运行该命令，而是可以创建一个脚本来自动化地查询事件日志，并将结果保存到文件中。如果将结果文件复制到内部网服务器上的发布文件夹，还可以使用Web浏览器来对事件列表进行查看。通过这种做法，不仅可以节省时间，还为事件日志检查提供了一个单独的场所，以便确定是否存在需要进一步研究和解决的问题。
+    （注解  本书讨论的工具都是从命令行中完成相应任务的最佳工具。在这一场景中，通过命令行从事件日志中提取信息的首选工具是Windows PowerShell。遗憾的是，尽管本书介绍了Windows PowerShell并讨论了cmdlet，但囿于篇幅和定位，本书没有提供关于Windows PowerShell更多的信息。要获取Windows PowerShell相关的更进一步的信息，推荐参阅在Windows PowerShell Administrator's Pocket Consultant（Microsoft Press，2008）一书。）
+    6.2.1查看事件
+        Get-Eventlog需要在Windows PowerShell提示符中运行，其基本语法格式为：
+            get-eventlog “LogName”
+        其中，LogName为待处理的事件日志名，比如“应用程序”、“系统”、“目录服务”等。下面的实例检查应用程序日志：
+            get-eventlog “Application”
+        （注解  理论上，上面命令行实例中的引号只有在日志名中包含空格时才是必要的，比如DNS Server、Directory Service、File Replication Service等日志名。不过，我建议任何时候都使用引号将日志名包含起来，养成这一习惯后，就不会在需要引号的时候后忘记使用，从而避免脚本或计划任务的失败。）
+        执行上述命令后，其输出类似于如下的格式：
+            Index Time           Type Source              EventID Message
+            ----- ----           ---- ------              ------- -------
+            15959 Mar 20 16:56 Erro MSExchange System...  4001 A transient failure
+             has occurred. The problem may resolve its...
+            15958 Mar 20 16:55 Erro MSExchange System...  4001 A transient failure
+             has occurred. The problem may resolve its...
+            15957 Mar 20 16:54 Erro MSExchange System...  4001 A transient failure
+             has occurred. The problem may resolve its...
+            15956 Mar 20 16:53 Erro MSExchange System...  4001 A transient failure
+             has occurred. The problem may resolve its...
+        可以看出，输出信息展示了索引、时间、类型、事件源、事件ID、时间消息属性等内容。索引是该事件在事件日志中所处的位置，该实例中为15956~15959。此外，在Get-Eventlog后跟随日志名后，-Logname参数是暗含的，但也可以直接指定-Logname参数，如下所示：
+            get-eventlog -logname“security”
+        默认情况下，Get-Eventlog会返回指定的事件日志中的每一个事件（从最近事件到最早事件）。显然，大多数情况下，返回的信息量会大到无法处理，因而需要对事件进行过滤，以便使事件量处于可处理的范围。一种简单的时间过滤方法是在命令行中指定只希望查看最新事件。比如，你可能只需要查看事件日志中最新的100条事件。
+        通过使用-Newest参数，就可以将返回的事件限制在最新事件的范围。如下的实例列出了安全事件日志中最新的100条事件：
+            get-eventlog "security" -newest 50
+        要注意的是，与前面讲过的一些命令行工具不同的是，Get-Eventlog是一个Windows PowerShell cmdlet。如果是第一次使用Windows PowerShell，要确保该功能已经安装在系统中。如果不希望调用一个单独的Windows PowerShell实例，就可以在调用Windows PowerShell时使其只运行Get-Eventlog cmdlet，如下所示：
+            powershell.exe get-eventlog -logname "Security"
+        你也可以将这一命令插入到脚本中。在批处理脚本中，这一命令将调用Windows PowerShell，执行Get-Eventlog cmdlet，之后退出Windows PowerShell。
+    6.2.2过滤事件
+        使用Get-Eventlog的一个原因是，该工具可以在结果集中对事件进行分组与过滤。通过将事件按类型分组，可以更方便地将信息时间与关键事件、警告事件与错误事件等不同类型的事件区分开来。通过按事件源进行分组，可以更方便地对来自特定源的事件进行追踪。通过按事件ID进行分组，可以更方便地对特定事件的重现进行关联分析。
+        通过下面讲述的方法和技术，可以根据事件源、事件ID、事件条目类型、生成时间等对事件进行分组。
+        （1）获取需要处理的事件，并将其存储在$e变量中：
+            $e= get-eventlog -newest 100 -logname “application”
+        (2)根据特定的属性，使用Group-Object cmdlet对存储在$e变量中的事件进行分组。本例中是根据事件ID进行分组：
+            $e | group-object-property eventid
+        另一种处理时间的方法是根据特定属性进行排序。通过下面讲述的方法和技术，可以根据事件源、事件ID、事件条目类型、生成时间等对时间进行排序。
+        （1）获取需要处理的时间，并将其存储在$e变量中：
+            $e = get-eventlog -newest 100 -logname "application"
+        （2）根据特定的属性，使用Sort-Object cmdlet对存储在$e变量中的事件进行排序。本例中是根据事件条目类型进行排序：
+            $e | sort-object-property entrytype
+        典型情况下，并不需要查看系统中生成的每一事件。更多的时候，只需关注警告事件与关键性错误事件，这也是事件过滤的主要用途所在。通过时间过滤器，可以只包含那些匹配特定标准的事件。下面给出的一个实例，通过搜索事件条目类型属性来寻找关键字error，来过滤出错误事件。
+        （1）获取需要处理的时间，并将其存储在$e变量张淑红：
+            $e = get-eventlog -newest 500 -logname "application"
+        （2）对存储在$e变量中的事件对象的指定属性，使用Where-Object cmdlet搜索匹配的文本。本例中是搜索事件条目类型为error的事件：
+            $e | where-object {$_.EntryType -match "error"}
+        Where-Object cmdlet使用的搜索算法不区分大小写，也就是说，输入Error、error或ERROR等都可以匹配错误事件。此外，Where-Object采用的是部分匹配策略。因此，如果要搜索警告、关键性事件、信息事件等事件时，不需要输入完整的事件条目类型，而只需分别输入warn、crit或info，如下所示：
+            $e = get-eventlog -newest 100 -logname "application"
+            $e | where-object {$_.Source -match "MSDTC"}
+        下面的实例搜索事件ID15001：
+            $e = get-eventlog -newest 500 -logname "application"
+            $e | where-object {$_.EventID -match "15001"}
+        如果希望将这些工作自动化，你可以创建一个Windows PowerShell脚本，获取需要查看的事件信息，并将其写入到文本文件。参考如下实例：
+            $e = get-eventlog -newest 100 -logname "system"
+            $e | where-object {$_.EntryType -match "error"} > currentlog.txt
+
+            $e = get-eventlog -newest 500 -logname "application"
+            $e | where-object {$_.EntryType -match "error"} >> currentlog.txt
+
+            $e = get-eventlog -newest 500 -logname "directory service"
+            $e | where-object {$_.EntryType -match "error"} >> currentlog.txt
+        上面的脚本命令中，检查了系统、应用程序、目录服务等事件日志，并将任意输出结果写入到CorpIntranet01上的网络共享位置。如果某事件日志中的最新500条事件中包含了错误事件，则错误事件被写入到Currentlog.txt文件中。由于第一个重定向字符是重写（>），而余下的入口使用的重定向字符是添加（>>）。因此该脚本每次运行时，现有的Currentlog.txt文件都将被重写，从而确保事件的最新。要更进一步地自动化，可以创建一个计划任务，使其每天运行该脚本，或在特定的时间间隔后运行该脚本。
+        Windows PowerShell脚本文件的文件扩展名为.ps1（注意，依次为字母p、字母s、数字1），要在Windows PowerShell提示符中运行Windows PowerShell脚本，需要键入脚本名，后面跟随扩展名（可选的）。在脚本名前，必须指定脚本的全路径，即便脚本在当前目录。要指明当前目录，可以使用目录名，也可以使用句点（.）来代表当前目录。根据这些约定，如果将Windows PowerShell脚本文件以文件名CheckEvent.ps1存储在当前目录，要运行该文件，就需要在Windows PowerShell提示符中输入.\checkEvent.ps1。
+6.3向事件日志中写入自定义事件
+    
