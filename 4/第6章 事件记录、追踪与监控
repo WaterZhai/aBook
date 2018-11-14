@@ -107,4 +107,224 @@
         上面的脚本命令中，检查了系统、应用程序、目录服务等事件日志，并将任意输出结果写入到CorpIntranet01上的网络共享位置。如果某事件日志中的最新500条事件中包含了错误事件，则错误事件被写入到Currentlog.txt文件中。由于第一个重定向字符是重写（>），而余下的入口使用的重定向字符是添加（>>）。因此该脚本每次运行时，现有的Currentlog.txt文件都将被重写，从而确保事件的最新。要更进一步地自动化，可以创建一个计划任务，使其每天运行该脚本，或在特定的时间间隔后运行该脚本。
         Windows PowerShell脚本文件的文件扩展名为.ps1（注意，依次为字母p、字母s、数字1），要在Windows PowerShell提示符中运行Windows PowerShell脚本，需要键入脚本名，后面跟随扩展名（可选的）。在脚本名前，必须指定脚本的全路径，即便脚本在当前目录。要指明当前目录，可以使用目录名，也可以使用句点（.）来代表当前目录。根据这些约定，如果将Windows PowerShell脚本文件以文件名CheckEvent.ps1存储在当前目录，要运行该文件，就需要在Windows PowerShell提示符中输入.\checkEvent.ps1。
 6.3向事件日志中写入自定义事件
-    
+    运行自动化脚本、计划任务以及自定义应用程序时，你可能希望这些自动化脚本。计划任务以及自定义应用程序向事件日志中写入自定义事件。比如，如果脚本正常运行，就向应用程序日志写入信息事件，以便确认脚本正常执行完毕。同样地，如果脚本不能正常运行并产生错误，就向应用程序日志中写入错误事件或警告信息，通过查看应用程序事件日志，就可以获知脚本运行出错，需要进一步检查其出错原因。
+    （提示  使用%ErrorLevel%可以追踪脚本中发生的错误。这一环境变量可以追踪最近使用命令的退出代码。如果命令正常执行，则错误级别为0；如果命令执行出错，则错误级别设置为非0值。要了解关于错误级别的更多知识，可以参考第3章3.4节。）
+    要创建自定义事件，可以使用Eventcreat工具。自定义事件可以吸入到除安全日志以外的任意可用的事件日志中，内容上可以包含事件源、事件ID以及想要添加的描述信息。Eventcreat的语法格式如下：
+        eventcreate /l LogName /so EventSource /t EventType /id EventID
+        /d EventDescr
+    其中各字段含义如下。
+    · LogName。设置事件将要写入的事件日志名。如果事件日志名中包含空格，则应该使用引号将其封装，比如DNS Server。
+    （提示  要注意不能向安全事件日志中写入自定义事件，其他事件日志都可以写入。写入时，首先使用待追踪的事件源写入一个dummy事件，与该事件源相关的初始化事件会写入到应用程序日志，之后可以使用该事件源与指定的日志操作自己的自定义事件。）
+    · EventSource。指定要使用的事件源。EventSource可以是任意的字符串，如果字符串中包含空格，则应该使用引号将其封装，比如Event Tracker。大多数情况下，使用事件源是为了识别应用程序、任务或产生错误事件的脚本。
+    （警告  在使用事件源将时间写入到事件日志之前（这里，事件源是自己命名的），要对事件源的命名进行认真规划。每一个事件源名必须是独一无二的，不能与系统中安装的应用程序或服务所使用的事件源重名，也不能使用由Windows角色、角色服务与功能使用的事件源名。比如，不能使用DNS、W32Time、Ntfrs等作为自定义事件的事件源名，因为Windows Server 2008已经使用了这些名。此外，一旦为某特定事件日志使用了某个事件源，则该事件源就与该日志绑定在一起。比如，不能将EventChecker同时作为MAILER1上应用程序与系统日志的时间源。如果闲钱已经使用EventChecker作为事件源将事件写入到应用程序日志，后面又试图使用EventChecker作为事件源将事件写入到系统日志，系统会给出错误信息："错误：源存在于Application日志汇总，源不能被复制"。）
+    · EventType。将事件类型设置为信息、警告、错误等类型，但不能将其设置为“成功审核”或“失败审核”等类型。因为这两种类型是与安全日志相关的，而自定义事件不允许写入到安全日志。
+    · EventID。设置事件的事件ID，其取值范围从1~1000。在设置事件ID之前，最好对常见事件进行分类，之后为每一类事件分别设定一个事件ID取值范围。比如，事件ID在100以内的为通常事件，事件ID取值范围100~200的为状态事件，事件ID取值范围200~500的为警告事件，事件ID取值范围500~900的则为错误事件。取值范围的划分是任意的，只要能有效区分事件类型即可。
+    · EventDescr。设置时间的相关描述信息，可以是任意的字符串，注意要包含在引号中。
+    （注解  默认情况下，在本地系统上，Eventcreate以当前登录用户的权限运行。必要的时候，如果需要查询远程计算机上的任务并指定运行权限，可以使用类似于/s Computer /u [Domain\]User[/P Password]的语法格式。其中，Computer为远程计算机名或IP地址，Domain为可选的域名（用户账号存在于该域内），User为要用户账号名（要使用的就是该用户账号的权限），Password为该用户账号的口令（可选的）。）
+    要进一步了解如何使用Eventcreate，参考如下示例。
+    在应用程序日志中创建信息事件，事件源为Event Tracker，事件ID为209：
+        eventcreate /1 "application" /t information /so "Event Tracker"
+        /id 209 /d "evs.bat script ran without errors."
+    在系统日志中创建警告事件，事件源为CustApp，事件ID为511：
+        eventcreate /l "system" /t warning /so "CustApp" /id 511 /d
+        "sysck.exe didn't complete successfully."
+    在MAILER1的系统日志中创建错误事件，事件源为SysMon，事件ID为918：
+        eventcreate /s Mailer1 /l "system" /t error /so "SysMon" /id 918
+        /d "sysmon.exe was unable to verify write operation."
+6.4创建与使用保存的查询
+    在设计Windows Vista与Windows Server 2008时，微软对事件查看器的过滤与查询功能做了很大的增强。受益于这种增强，事件查看器可以支持XPath查询，以便创建自定义视图和过滤事件日志。XPath是一种non-XML语言，用于识别XML文档中的特定部分。事件查看器可以使用XPath表达式在源日志中匹配与选择特定的部分，并将其复制到目标日志，以便创建自定义或过滤的视图。
+    在事件查看器中创建自定义或过滤的视图时，可以将XPath查询复制并保存到事件查看器的自定义视图文件中。以后再次运行这一查询时，就可以在任意运行Windows Vista与Windows Server 2008的计算机上重建自定义或过滤的视图。比如，你可以为应用程序日志创建一个过滤的视图，来识别Microsoft SQL Server中存在的问题。在创建的同时，可以将相关的XPath查询保存到自定义视图中，通过这一文件，就可以很便利地在组织内其他计算机上为应用程序日志创建过滤的视图。
+    事件查看器会自动地为事件日志创建几种过滤的视图，这些过滤的视图在自定义视图节点下列出。选择管理员事件节点时，会看到事件日志中所有错误事件与警告事件。扩展服务器角色节点并选择其中一个特定角色的视图时，可以看到该角色相关的所有事件。
+    通过如下步骤，可以创建并保存自己的自定义视图。
+    （1）启动事件查看器，方法是依次单击"开始"、"管理工具"、"事件查看器"。
+    （2）选择自定义视图节点，在操作菜单中，单击"创建自定义视图"。
+    （3）在图所示的"创建自定义视图"对话框中，使用Logged列表选择事件记录的时间帧。你可以选择包含事件的开始时间，可以是任何时间、前一个小时、过去的12小时、过去的24小时、最后7天、最后30天等。
+    （4）使用时间级别复选框指定要包含的事件级别，选择详细可以获取更多的详细资料。
+    （5）为特定的一组日志或事件源创建自定义视图。
+        · 使用时间日志列表选择要包含的事件日志。可以使用相应的复选框选择多个事件日志，如果选择了特定的事件日志，则其他日志会被排除在外。
+        · 使用事件来源列表选择要包含的事件源。可以使用相应的复选框选择多个事件源，如果选择了特定的事件源，则其他事件源会被排除在外。
+    （6）使用用户与计算机对话框来指定应该包含的用户与计算机（可选的）。如果不指定这一选项，则所有用户与计算机生成的事件都会包含在其中。
+    （7）单击XML选项卡来显示相关的XPath查询，如图所示。
+    （8）单击"确定"，关闭"创建自定义视图"对话框。在图中所示的"将筛选器保存到自定义视图"对话框中，为该自定义视图键入名称及描述信息。
+    （9）选择自定义视图的保存位置。默认情况下，自定义视图保存在自定义视图节点，但也可以为其创建一个新节点--单击"新文件夹"，输入新文件夹名，之后单击"确定"即可。
+    （10）单击"确定"，关闭“将筛选器保存到自定义视图”对话框。至此，应该可以看到过滤后的事件列表。
+    （11）鼠标右击“自定义视图”，选择“导出自定义视图”，使用另存为对话框选择保存位置，为事件查看器自定义视图输入文件名。
+    自定义视图包含了此前已在XML选项卡中显示的XPath查询。事件日志阅读组的成员、管理员组成员以及其他具有适当权限的用户，可以运行该查询，以便查看远程计算机上的事件，如下所示：
+        eventvwr ComputerName /v: QueryFile
+    其中，ComputerName是远程计算机名（要检查其上的事件），QueryFile是包含XPath查询的自定义视图的文件名或全路径，比如：
+        eventvwr mailserver25 /v: importantevents.xml
+    启动时间查看器时，可以在自定义视图节点下发现自定义视图。
+6.5性能监控：基础
+    前面讲解了如何查看、筛选与创建事件，本节将讲解可用于计算机性能监控的相关技术。Windows Vista与Windows Server 2008包含了几款可用于性能监控的工具，本节将讲述命令行工具Typeperf，第7章将讲述可用于性能监控的其他工具。
+    6.5.1理解如何在命令行中进行性能监控
+        Typeperf是一款用于实时追踪并显示性能信息的命令行工具，该工具可以根据已配置的性能监控参数收集信息，并将其在命令行中显示出来。待监控的性能项目是由如下3个部分来定义的。
+        · 性能对象。代表任意具备一组可测量属性的系统组件。性能对象可以是操作系统的物理组成部分，比如内存、处理器或页面文件。也可以是逻辑组件，比如逻辑磁盘或打印队列。还可以是软件组件，比如进程或线程。
+        · 性能对象实例。代表性能对象的单一出现。如果特定性能对象有多个实例，比如，计算机有多个处理器或多个磁盘驱动器，就可以使用性能对象实例来指定该对象的某个单一出现。你也可以选择追踪与监控某性能对象的所有实例，比如监控系统中所有处理器。
+        · 性能计数器。待变性能对象中可测量的属性。比如，对页面文件，可以使用%Usage计数器来度量其使用的百分比。
+        在Windows Vista与Windows S而儿 2008的标准安装中，有很多可以监控的性能对象。添加服务、应用程序与组件后，又会增加一些新的性能对象。比如，在服务器上安装DNS后，该服务器上就增加了一个可供监控的DNS对象。
+        表中总结了实际工作中需要监控的常见性能对象，其中列出的每一个性能对象都有一组可以追踪与监控的计数器。通常，管理员监控最多的性能对象是内存、物理磁盘以及处理器。
+            最常追踪的性能对象
+                -----------------------------------------------------------------------------------------------------
+                性能对象    |描述
+                ------------|----------------------------------------------------------------------------------------
+                缓存        |监控文件系统缓存，缓存是一块反映应用程序I/O活动的内存区域
+                数据库==>实例|监控操作系统使用的嵌入式数据库管理系统实例的性能
+                IPv4        |监控IPv4通信及相关活动
+                IPv6        |监控IPv6通信及相关活动
+                逻辑磁盘     |监控计算机上的逻辑卷
+                内存         |监控系统缓存（包括换页池内存以及非换页池内存）、物理内存、虚拟内存的性能
+                网络接口     |监控计算机上配置的网络适配器
+                对象         |监控计算机上事件、互斥对象、进程、段、信号以及线程的数量
+                页面文件     |监控页面文件的当前使用与峰值使用情况
+                物理磁盘     |监控硬盘读写活动，以及数据传输、硬件失效与软件失效等情况
+                打印队列     |监控打印任务、打印池以及打印队列的活动
+                进程         |监控计算机上运行的所有进程
+                处理器       |监控处理器的空闲时间、空闲状态、使用情况、延迟的过程调用以及中断等情况
+                服务器       |监控计算机与网络的通信情况，以及一些重要的统计信息，包括登录错误、访问错误以及用户会话等
+                服务器工作队列|监控线程与客户端请求
+                系统         |监控系统级的计数器，包括进程、线程、线程上下文切换、文件系统控制操作、系统调用以及系统正常运行时间等
+                TCPv4        |监控TCPv4通信及相关活动
+                TCPv6        |监控TCPv6通信及相关活动
+                线程          |监控系统中运行的所有线程，也可以根据进程ID来检查单独的线程的使用情况统计信息
+                UDPv4        |监控UDPv4通信及相关活动
+                UDPv6        |监控UDPv6通信及相关活动
+                ---------------------------------------------------------------------------------------------------------
+    6.5.2追踪性能数据
+        通过Typeperf，可以将心梗数据写入到命令行或日志文件。使用Typeperf时，关键是指定待追踪的性能计数器的路径名，性能计数器路径具有如下的语法格式：
+            \\ComputerName\ObjectName\ObjectCounter
+        其中，ComputerName为本地或远程计算机的计算机名或IP地址，ObjectName为性能对象名，ObjectCounter为性能对象计数器名。比如，如果需要追踪FileServer42上可用内存情况，可以使用如下命令：
+            typeperf "\\fileserver42\memory\available mbytes"
+        （注解  本例中，由于计数器路径中包含空格，因此需要使用双引号对其进行封装。此外，尽管不是所有情况都必须使用双引号，但总是使用双引号进行封装是一个好做法。）
+        通过将星号（*）作为计数器名，可以很方便地对某性能对象的所有计数器进行追踪，如下所示：
+            typeperf "\\fileserver42\Memory\*"
+        该实例中，实现了对内存对象所有计数器的追踪。
+        如果某性能对象有多个实例，比如处理器或逻辑磁盘对象，就必须指定具体的对象实例。其基本语法格式为：
+            \\ComputerName\ObjectName(ObjectInstance)\ObjectCounter
+        其中，具体的对象实例使用花括号进行封装，跟随在对象名之后。如果某对象有多个实例，通过将——Total作为实例名，可以实现对该对象所有实例的处理。通过某实例的标识符，可以处理性能对象的某个具体实例。比如，如果想要检查Processor\%ProcessorTime计数器，可以使用如下命令处理所有处理器实例：
+            typeperf "\\fileserver42\Processor(_Total)\%Processor Time"
+        下面的命令则用于处理一个特定的处理器实例：
+            typeperf "\\fileserver42\Processor(0)\%Processor Time"
+        其中，Processor(0)指代系统中的第一个处理器。
+        Typeperf有很多可用的参数，表对其进行了总结。
+        默认情况下，Typeperf将其输出信息以逗号分隔的列表形式写入到命令行。你也可以使用-O参数对输出信息仅此鞥重定向，使用-F参数对输出格式进行设置。设置时输出格式时，CSV代表逗号分隔的文本文件，TSV代表制表符分隔的文本文件，BIN代表二进制文件，SQL代表SQL二进制文件。参考如下实例：
+            typeperf "\\fileserver42\Memory\*" -o memperf.bin -f bin
+           Typeperf的参数
+           -----------------------------------------------------------------------------------
+           参数                |描述
+           --------------------|--------------------------------------------------------------
+           -cf<filename>       |识别包括了待监控性能计数器列表的文件
+           -config<filename>   |识别包含了命令选项的设置文件
+           -f<CSV|TSV|BIN|SQL|>|设置输出文件格式。默认情况下，对以逗号分隔开的值，输出文件为.csv文件
+           -o<filename>        |数值输出文件或SQL数据库的路径
+           -q[object]          |列出某指定对象已安装的计数器
+           -qx[object]         |列出已安装计数器与实例
+           -s<ComputerName>    |设置待监控的远程计算机（如果计数器路径中没有指定计算机）
+           -sc<samples>        |设置要收集的采样数
+           -si<[hh:]]mm:]ss>   |设置采样之间的时间间隔，默认为1秒
+           -y                  |对所有问题，设置回答信息为"是"，从而不再弹出提示符
+           -------------------------------------------------------------------------------------
+        上面的命令中，对内存对象的所有计数器进行了追踪，并将输出信息写入到当前目录下名为MemPerf.bin的二进制文件中。
+        如果需要确定某性能对象所有可用的计数器，可以键入typeperf -q命令，其后跟随对象名。比如，如果输入如下命令：
+            typeperf -q Memory
+        就会得到一个类似于如下的可用计数器列表：
+            \memory\Page Faults/sec
+            \memory\Available Bytes
+            \memory\Committed Bytes
+            \memory\Commit Limit
+            \memory\Write Copies/sec
+            \memory\Transition Faults/sec
+            \memory\Cache Faults/sec
+            \memory\Demand Zero Faults/sec
+            \memory\Pages/sec
+            \memory\Pages Input/sec
+            \memory\Page Reads/sec
+            \memory\Pages Output/sec
+            \memory\Pool Paged Bytes
+            \memory\Pool Nonpaged Bytes
+            \memory\Page Writes/sec
+            \memory\Pool Paged Allocs
+            \memory\Pool Nonpaged Allocs
+            \memory\Free System Page Table Entries
+            \memory\Cache Bytes
+            \memory\Cache Bytes Peak
+            \memory\Pool Paged Resident Bytes
+            \memory\System Code Total Bytes
+            \memory\System Code Resident Bytes
+            \memory\System Driver Total Bytes
+            \memory\System Driver Resident Bytes
+            \memory\System Cache Resident Bytes
+            \memory\% Commited Bytes In Use
+            \memory\Available KBytes
+            \memory\Available MBytes
+            \memory\Transition Pages RePurposed/sec
+            \memory\Free & Zero Page List Bytes
+            \memory\Modifled Page List Bytes
+            \memory\Standby Cache Reserve Bytes
+            \memory\Standby Cache Normal Priority Bytes
+            \memory\Standby Cache Core Bytes
+        如果某对象有多个实例，通过-Qx参数，可以列出与某具体实例对应的已安装的计数器。如下所示：
+            typeperf -qx PhysicalDisk
+        执行后，输出信息中给出了一个很长的可用计数器列表，并分别与各自的对象实例对应：
+            \PhysicalDisk(0 E: C:)\Current Disk Queue Length
+            \PhysicalDisk(1 D:)\CUrrent Disk Queue Length
+            \PhysicalDisk(2 I:)\Current Disk Queue Length
+            \PhysicalDisk(3 J:)\Current Disk Queue Length
+            \PhysicalDisk(4 K:)\Current Disk Queue Length
+            \PhysicalDisk(5 L:)\Current Disk Queue Length
+            \PhysicalDisk(6 N:)\Current Disk Queue Length
+            \PhysicalDisk(7 O:)\Current Disk Queue Length
+            \PhysicalDisk(8 P:)\CUrrent Disk Queue Length
+            \PhysicalDisk(9 Q:)\Current Disk Queue Length
+            \PhysicalDisk(_Total)\Current Disk Queue Length
+            \PhysicalDisk(0 E: C:)\% Disk Time
+            \PhysicalDisk(1 D:)\% Disk Time
+            \PhysicalDisk(2 I:)\% Disk Time
+            \PhysicalDisk(3 J:)\% Disk Time
+            \PhysicalDisk(4 K:)\% Disk Time
+            \PhysicalDisk(5 L:)\% Disk Time
+            \PhysicalDisk(6 N:)\% Disk Time
+            \PhysicalDisk(7 O:)\% Disk Time
+            \PhysicalDisk(8 P:)\% Disk Time
+            \PhysicalDisk(9 Q:)\% Disk Time
+            \PhysicalDisk(_Total)\% Disk Time
+            \PhysicalDisk(0 E: C:)\Avg. Disk Queue Length
+            \PhysicalDisk(1 D:)\Avg. Disk Queue Length
+            \PhysicalDisk(2 I:)\Avg. Disk Queue Length
+            \PhysicalDisk(3 J:)\Avg. Disk Queue Length
+            \PhysicalDisk(4 K:)\Avg. Disk Queue Length
+            \PhysicalDisk(5 L:)\Avg. Disk Queue Length
+            \PhysicalDisk(6 N:)\Avg. Disk Queue Length
+            \PhysicalDisk(7 O:)\Avg. Disk Queue Length
+            \PhysicalDisk(8 P:)\Avg. Disk Queue Length
+            \PhysicalDisk(9 Q:)\Avg. Disk Queue Length
+            ...
+            \PhysicalDisk(0 E: C:)\% Idle Time
+            \PhysicalDisk(1 D:)\% Idle Time
+            \PhysicalDisk(2 I:)\% Idle Time
+            \PhysicalDisk(3 J:)\% Idle Time
+            \PhysicalDisk(4 K:)\% Idle Time
+            \PhysicalDisk(5 L:)\% Idle Time
+            \PhysicalDisk(6 N:)\% Idle Time
+            \PhysicalDisk(7 O:)\% Idle Time
+            \PhysicalDisk(8 P:)\% Idle Time
+            \PhysicalDisk(9 Q:)\% Idle Time
+            \PhysicalDisk(_Total)\% Idle Time
+            \PhysicalDisk(0 E: C:)\Split IO/sec
+            \PhysicalDisk(1 D:)\Split IO/sec
+            \PhysicalDisk(2 I:)\Split IO/sec
+            \PhysicalDisk(3 J:)\Split IO/sec
+            \PhysicalDisk(4 K:)\Split IO/sec
+            \PhysicalDisk(5 L:)\Split IO/sec
+            \PhysicalDisk(6 N:)\Split IO/sec
+            \PhysicalDisk(7 O:)\Split IO/sec
+            \PhysicalDisk(8 P:)\Split IO/sec
+            \PhysicalDisk(9 Q:)\Split IO/sec
+            \PhysicalDisk(_Total)\Split IO/sec
+        上面的信息也可以用作Typeperf命令的输入。添加一个-O参数并将输出信息写入到文本文件，如下所示：
+            typeperf -qx PhysicalDisk -o perf.txt
+        编辑该文本文件，使其只包含所要追踪的计数器。通过使用-Cf参数，其后跟随该计数器文件的文件路径，就可以使用该文件来确定追踪了哪些性能计数器。参考如下实例：
+            typeperf -cf perf.txt -o c:\perflogs\perf.bin -f bin
+        上面的命令中，Typeperf从Perf.txt中读取了要追踪的计数器列表，之后以二进制格式将性能数据写入到c:\perflogs目录下的文件中。
+        默认情况下，Typeperf以1秒为时间间隔对性能数据进行取样，除非按下Ctrl+C键。在使用命令行工作并监控输出时，这种做法是有益的。然而，如果同时还进行其他处理工作，不能对输出进行活跃监控时（大多数情况下是这样的），这种做法就不能起到好的效果。因此，通常需要控制取样间隔与持续时间。
+        要控制取样间隔与取样时间，可以分别使用-Si参数与-Sc参数。比如，如果希望Typeperf每隔120秒进行一次取样，并在取样100次之后终止，就可以使用如下命令：
+            typeperf -cf perf.txt -o c:\perflogs\perf.bin -f bin -si 120 -sc 100
