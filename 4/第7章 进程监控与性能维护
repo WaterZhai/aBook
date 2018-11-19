@@ -39,4 +39,160 @@
             ----------------------------------------------------------------------
             Image Name                   PID    Session Name   Session#  MemUsage
             =======================     ===== ============== =========  ==========
-            
+            System Idle Process             0 Services               0          28K
+            System                          4 Services               0       28952K
+            smss.exe                      488 Services               0         776K
+            csrss.exe                     560 Services               0        5272K
+            wininit.exe                   608 Services               0        4056K
+            csrss.exe                     620 Console                1       13004K
+            services.exe                  652 Services               0        7456K
+            lsass.exe                     664 Services               0        1852K
+            Ism.exe                       680 Services               0        6400K
+            svchost.exe                   835 Services               0        7228K
+            winlogon.exe                  868 Console                1        5544K
+            svchost.exe                   932 Services               0        9440K
+            svchost.exe                   984 Services               0       23304K
+            svchost.exe                  1048 Services               0       12208K
+            svchost.exe                  1100 Services               0       71696K
+            svchost.exe                  1132 Services               0       36920K
+            dwm.exe                      2832 Console                1       65456K
+            explorer.exe                 2892 Console                1       26624K
+        输出信息中包含如下一些字段。
+        · 镜像名。进程或运行该进程的可执行程序的镜像名。
+        · PID。进程的ID号。
+        · 会话名。运行该进程的会话名，如果取值为console则表明该进程是本地启动的。
+        · 会话#。运行该进程的会话标识符。
+        · 内存使用。在Tasklist运行时刻该进程的内存总量。
+        如果需要获取更多的详细信息，可以指定详细模式。这是通过包含/V参数实现的，使用该参数后，输出信息中会增加如下一些项目。
+        · Status。进程的当前状态，可以为运行、无响应或未知。状态为未知的进程仍然可以正常运行与响应，但处于无响应状态的进程通常必须终止或重启。
+        · 用户名。运行该进程的用户账号，并以域\用户格式列出。对由Windows启动的进程，用户账号通常为系统账号，比如系统、本地服务或网络服务等，域名则为NT AUTHORITY。
+        · CPU时间。该进程自启动到目前为止所使用的CPU时钟周期总量。
+        · 窗口标题。如果可用，则Windows显示进程名，否则为暂缺。比如，进程HelpPana.exe的进程名显示为“Windows帮助和支持中心”。
+        使用Tasklist对运行中进程进行检查时，可能会发现两个独特的System与System Idle进程。System进程展示了本地系统进程的资源使用情况，System Idle进程则用于表述当前未使用的CPU资源。因而，如果System Idle进程的CPU一列取值为99，则说明当前有99%的系统资源处于闲置状态。如果觉得系统处于过载状态，则应该监控System Idle进程，查看CPU使用情况与总CPU时间。如果系统持续性地处于低空闲时间（即高CPU占用率），则可以考虑对处理器进行升级，甚至添加处理器。
+        检查进程时，要记住的一点是：单一的应用程序可能会启动多个进程。通常，这些进程依赖于一个主进程，并以该进程为根形成一颗进程数。终止进程时，通常需要定位并终止该应用程序的主进程，而不是那些依赖性的附加进程，这将确保应用程序的彻底终止。
+        2.查看运行中的进程与服务的关系
+        运行Tasklist命令时，通过使用/svc参数，可以检查运行中进程与系统中配置的服务之间的关系。输出信息中，包括进程镜像名、进程ID，以及使用该进程的所有服务的列表，类似于如下的格式：
+            Image Name                         PID    Services
+            ===========================      ========  ==================================================
+            System Idle Process                     0  N/A
+            System                                  4  N/A
+            smss.exe                              488  N/A
+            csrss.exe                             560  N/A
+            wininit.exe                           608  N/A
+            csrss.exe                             620  N/A
+            services.exe                          652  N/A
+            Isass.exe                             664  KeyIso, ProtectedStorage, SamSs
+            Ism.exe                               680  N/A
+            svchost.exe                           836  DcomLaunch, PlugPlay
+            winlogon.exe                          868  N/A
+            svchost.exe                           932  RpcSs
+            svchost.exe                           984  WinDefend
+            svchost.exe                          1048  Audiosrv, Dhcp, Eventlog, Imhosts, wscsvc
+            svchost.exe                          1100  AudioEndpointBuilder,CscService, EMDMgmt,
+                                                        Netman, PcaSvc, SysMain,
+                                                        TabletInputService, TrkWks, UmRdpService,
+                                                        UxSms, WdiSystemHost, Wlansvc, WPDBusEnum,
+                                                        wudfsvc
+            svchost.exe                          1132  AeLookupSvc, BITS, Brower, CertPropSvc,
+                                                        EapHost, gpsvc, IKEEXT, iphlpsvc,
+                                                        LanmanServer, MMCSS, ProfSvc, RasMan,
+                                                        Schedule, seclogon, SENS, SessionEnv,
+                                                        ShellHWDetection, Themes, Winmgmt, wuauserv
+            svchost.exe                          1384  EventSystem, fdPHost,FdResPub,
+                                                        LanmanWorkstation, netprofm, nsi, SSDPSRV,
+                                                        upnphost, W32Time, WebClient
+            svchost.exe                          1520  CryptSvc, Dnscache, KtmRm, NlaSvc, TapiSrv,
+                                                        TermService
+            spoolsv.exe                          1776  Spooler
+            svchost.exe                          1800  BFE, DPS, MpsSvc
+            dwm.exe                              2832  N/A
+            explorer.exe                         2892  N/A
+            ----------------------------------------------------------------------------------------------------
+        默认情况下，上述命令的基本输出信息是以表格形式呈现的，并且不能使用list或CSV格式。除了格式之外，要注意的重要一点是服务是以缩略名形式列出的，这是Sc（一款用于对服务进行管理的命令行工具）的命名风格。
+        你可以使用进程与服务之间的关联关系来对系统进行管理。比如，如果感觉W3svc服务存在问题，对该服务进行故障排除时，一个有用的步骤就是监控该服务对应的进程。监控的主要要素包括：
+        · 进程状态
+        · 内存使用
+        · CPU时间。
+        通过对这些信息金层统计追踪，就有可能发现一些线索表明该进程已经通知响应，或者是一个霸占CPU资源的失控进程，或者存在内存泄露问题。
+        3.查看进程使用过的DLL
+        运行Tasklist命令时，通过使用/M参数，可以检查运行中进程与系统中配置的DLL之间的关系。输出信息中，包括进程镜像名、进程ID以及使用该进程的所有DLL的列表，如下面的实例所示：
+            Image Name                          PID  Modules
+            ===========================       =====  =========================================
+            System Idle Process                   0  N/A
+            System                                4  N/A
+            smss.exe                            488  N/A
+            csrss.exe                           560  N/A
+            wininit.exe                         608  N/A
+            csrss.exe                           620  N/A
+            services.exe                        652  N/A
+            lsass.exe                           664  N/A
+            lsm.exe                             680  N/A
+            svchost.exe                         836  N/A
+            winlogon.exe                        868  N/A
+            svchost.exe                         932  N/A
+            svchost.exe                         984  N/A
+            svchost.exe                        1048  N/A
+            svchost.exe                        1100  N/A
+            svchost.exe                        1132  N/A
+            dwm.exe                            2832  ntdll.dll, kernel32.dll, ADVAPI32.dll,
+                                                      RPCRT4.dll, GDI32.dll, USER32.dll,
+                                                      msvcrt.dll, ole32.dll, OLEAUT32.dll,
+                                                      UxTheme.dll, IMM32.dll, MSCTF.dll,
+                                                      dwmredir.dll, SLWGA.dll, urlmon.dll,
+                                                      SHLWAPI.dll, iertutil.dll, WTSAPI32.dll,
+                                                      slc.dll, LPK.DLL, USP10.dll, comctl32.dll,
+                                                      NTMARTA.DLL,WLDAP32.dll, WS2_32.dll,
+                                                      NSI.dll, PSAPI.DLL, SAMIB.dll,
+                                                      milcore.dll, dwmapi.dll, uDWM.dll,
+                                                      WindowsCodecs.dll, ctagent.dll, d3d9.dll,
+                                                      VERSION.dll, d3d8thk.dll, nvd3dum.dll,
+                                                      IconCodeService.dll
+            explorer.exe                       2892  ntdll.dll kernel32.dll, ADVAPI32.dll,
+                                                      RPCRT4.dll, GDI32.dll, USER32.dll,
+                                                      msvrt.dll, SHLWAPI.dll, SHELL32.dll,
+                                                      ole32.dll, OLEAUT32.dll, SHDOCVW.dll,
+                                                      UxTheme.dll, POWRPROF.dll, dwmapi.dll,
+                                                      gdiplus.dll, slc.dll, PROPSYS.dll,
+                                                      BROWSEUI.dll, IMM32.dll, MSCTF.dll,
+                                                      DUser.dll,LPK.dll, USP10.dll,
+                                                      comctl32.dll, WindowsCodecs.dll,
+                                                      apphelp.dll, CLBCatQ.dll, cscui.dll,
+                                                      CSCDLL.dll, CSCAPI.dll,
+                                                      IconCodecService.dll, Secur32.dll,
+                                                      rsaenh.dll, msiltcfg.dll, VERSION.dll,
+                                                      msi.dll, NTMARTA.dll, WLDAP32.dll,
+                                                      WS2_32.dll, NSI.dll, PSAPI.DLL, SAMLIB.dll,
+                                                      SFC.dll, sfc_os.dll, SETUPAPI.dll,
+                                                      timedate.cpl, ATL.DLL, NETAPI32.dll,
+                                                      OLEACC.dll, actxprxy.dll ,USERENV.dll
+        获知进程加载了哪些DLL模块有助于确定导致进程不正常（失去响应、不释放CPU，或者占用了超过正常需求的内存）的原因。有些情况下，你可能需要检查DLL版本，以便确定其是否为系统应该使用的DLL版本。为此，你应该查询微软知识库或制造商文档，以便确定DLL版本及其他相关信息。
+        如果需要确定有哪些进程使用了某个指定的DLL，也可以在命令中指定DLL名。比如，如果怀疑打印机缓冲池驱动程序Winpool.drv是导致进程挂起的根源，就可以搜索使用Winspool.drv（而非Winspool32.drv）的进程，并检查这些进程的状态及资源使用情况。
+        用于指定DLL的语法格式如下：
+            tasklist /m DllName
+        其中，DLLName为要搜索的DLL名。Tasklist在匹配DLL文件名时不区分大小写，你可以以任意大小写或混合形式输入要搜索的DLL文件名：
+            tasklist /m winspool.drv
+        通过上面的命令来搜索使用Winspool.drv的进程，其输出信息应该包括所有使用该DLL文件的进程名及各自的进程ID：
+            Image Name                 PID  Modules
+            ========================  ===== ==============================
+            exporer.exe                2892 WINSPOOL.DRV
+            rundll32.dll               3308 WINSPOOL.DRV
+            acrotray.exe               3340 WINSPOOL.DRV
+            IAAnotif.exe               3464 WINSPOOL.DRV
+            IntelHCTAgent.exe          3584 WINSPOOL.DRV
+            DrgToDsc.exe               3636 WINSPOOL.DRV
+            WINWORD.EXE                4836 WINSPOOL.DRV
+        4.对Tasklist的输出进行过滤
+        通过Tasklist工具的/Fi参数，可以使用任何可用的信息字段对Tasklist的输出进行过滤，即便由于指定参数导致信息字段并没有正常包含在输出信息中。通过这种过滤机制，你可以只查看那些状态为失去响应的进程，或者只查看Svchost.exe进程相关的信息，或者查看占用了大量CPU时间的进程。
+        通过使用过滤器操作符，可以过滤特定的Tasklist信息字段，如下的一些过滤器操作符是可用的。
+        · Eq。等于，如果进程的某个字段包含了指定的值，则该进程应该包含在输出信息中。
+        · Ne。不等于，如果进程的某个字段包含了指定的值，则该进程应该排除在输出信息之外。
+        · Gt。大于，如果进程的某个字段包含了大于指定值的数值，则该进程应该包含在输出信息中。
+        · Lt。小于，如果进程的某个字段包含了小于指定值的数值，则该进程应该包含在输出信息中。
+        · Ge。大于等于，如果进程的某个字段包含了大于或等于指定值的数值，则该进程应该包含在输出信息中。
+        · Le。小于等于，如果进程的某个字段包含了小于或等于指定值的数值，则该进程应该包含在输出信息中。
+        如表所示，过滤器操作符可以使用的值依赖于该操作符针对Tasklist信息字段。要记住的是，所有字段都是可用过的，即便某些字段不能根据指定的参数正常显示。比如，你可以对status字段进行匹配，而不使用/V (verbose)标记。
+            ----------------------------------------------------------------------------------------
+            过滤器字段名|有效操作符|有效值
+            ---------------------------------------------------------------------------------------
+            CPUTime |eq、ne、gt、lt、ge、le、eq、ne|以hh:mm:ss格式呈现的任意有效值
+            Services|eq、ne|任意有效的字符串
