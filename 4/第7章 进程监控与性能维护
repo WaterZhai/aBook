@@ -310,22 +310,187 @@
             Threads, TotalProcessorTime, VirtualMemorySize, WorkingSet, CPU, Path
         (提示  默认请款下，很多用于度量内存使用请款过的属性是以32位值的形式定义的，在64位系统上操作Get-Process时，你会发现这些属性值同时具备32位于64位两个版本。在内存大于4GB的64位系统上，需要使用64位的版本，以便获取准确的属性值。)
             Get-Process的属性及其使用方式
-                -----------------------------------------------------------------------------------------
-                属性名|属性描述
-                ----------------------------------------------------------------------------------------------------------
-                BasePriority|展示进程的优先级。优先级决定了系统资源分配给该进程的优先程度，标准的优先级包括：低（4）、低于标准（6）、标准（8）、高于标准（10）、高（13）、实时（24）。默认情况下，大多数程序的优先级为标准，最高的优先级一般赋予实时进程
-                CPU|展示该进程的CPU占用率。System Idle进程展示了CPU资源有多大百分比是空闲的，如果值为99，则说明当前有99%的系统资源处于空闲状态。如果在峰值或平均使用率上系统空闲时间较低（意味着高CPU使用率），则可以考虑升级到更快的处理器或添加处理器
-                Description|展示进程的描述信息
-                FileVersion|展示进程可执行文件的文件版本
-                HandleCount|展示由该进程维护的文件句柄数，该数值描述了该进程对文件系统的依赖程度。有些进程有数千个打开的文件句柄，每个文件句柄都需要一定的系统内存进行维护
-                ID|展示该进程的运行时标识数
-                MinWorkingSet|展示该进程使用的working set内存的最小总量
-                Modules|展示该进程使用的可执行文件与动态链接库
+                ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+                属性名                                            |属性描述
+                --------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+                BasePriority                                      |展示进程的优先级。优先级决定了系统资源分配给该进程的优先程度，标准的优先级包括：低（4）、低于标准（6）、标准（8）、高于标准（10）、高（13）、实时（24）。默认情况下，大多数程序的优先级为标准，最高的优先级一般赋予实时进程
+                CPU                                               |展示该进程的CPU占用率。System Idle进程展示了CPU资源有多大百分比是空闲的，如果值为99，则说明当前有99%的系统资源处于空闲状态。如果在峰值或平均使用率上系统空闲时间较低（意味着高CPU使用率），则可以考虑升级到更快的处理器或添加处理器
+                Description                                       |展示进程的描述信息
+                FileVersion                                       |展示进程可执行文件的文件版本
+                HandleCount                                       |展示由该进程维护的文件句柄数，该数值描述了该进程对文件系统的依赖程度。有些进程有数千个打开的文件句柄，每个文件句柄都需要一定的系统内存进行维护
+                Id                                                |展示该进程的运行时标识数
+                MinWorkingSet                                     |展示该进程使用的working set内存的最小总量
+                Modules                                           |展示该进程使用的可执行文件与动态链接库
                 NonpagedSystemMemorySize/onpagedSystemMemorySize64|展示该进程所拥有的、不允许写入磁盘的虚拟内存总量。这块RAM内存区域也就是非换页池，用于存储那些不能写入到磁盘的对象，对需要很高非换页池容量的对象，应该重点关注。如果服务器没有足够的空闲时间，则这些进程很可能会成为导致大量页失效的根源
-                PagedSystemMemorySize/agedSystemMemorySize64|展示该进程所提交的、可以写入磁盘的虚拟内存总量。这块RAM内存区域也就是换页池，用于存储那些可以在不使用时写入到磁盘的对象。随着进程的不断活动，所需要的内存缓冲池容量也不断增加，大多数进程对换页池的需求超过对非换页池的需求
-                Path|展示该进程可执行文件的全路径
-                PeakPageMemorySize/PeakPageMemorySize64|展示该进程使用的页面内存总量的峰值
-                PeakVirtualMemorySize/PeakVirtualMemorySize64|展示该进程使用的虚拟内存总量的峰值
-                PeakWorkingSet/PeakWorkingSet64|展示该进程使用的内存总量的最大值，包括私有的working set与非私有的working set。如果峰值内存异常大，则可能存在内存泄漏问题
-                PriorityBootEnabled|显示一个布尔型值，用于表示进程是否激活了PriorityBoost特性
-                
+                PagedSystemMemorySize/agedSystemMemorySize64      |展示该进程所提交的、可以写入磁盘的虚拟内存总量。这块RAM内存区域也就是换页池，用于存储那些可以在不使用时写入到磁盘的对象。随着进程的不断活动，所需要的内存缓冲池容量也不断增加，大多数进程对换页池的需求超过对非换页池的需求
+                Path                                              |展示该进程可执行文件的全路径
+                PeakPageMemorySize/PeakPageMemorySize64           |展示该进程使用的页面内存总量的峰值
+                PeakVirtualMemorySize/PeakVirtualMemorySize64     |展示该进程使用的虚拟内存总量的峰值
+                PeakWorkingSet/PeakWorkingSet64                   |展示该进程使用的内存总量的最大值，包括私有的working set与非私有的working set。如果峰值内存异常大，则可能存在内存泄漏问题
+                PriorityBootEnabled                               |显示一个布尔型值，用于表示进程是否激活了PriorityBoost特性
+                PriorityClass                                     |显示进程的优先级类别
+                PrivilegedProcessorTime                           |显示该进程内核模式使用时间的总量
+                ProcessName                                       |显示进程名
+                ProcessorAffinity                                 |显示该进程的处理器关联设置
+                Responding                                        |显示一个布尔型值，用于表示测试时该进程是否响应
+                SessionId                                         |显示运行该进程的用户识别号（会话），对应的是任务管理器中用户选项卡的ID
+                StartTime                                         |显示该进程启动的时间与日期
+                Threads                                           |显示该进程正在使用的线程数。大多数服务器应用程序都是多线程的，用于处理并发请求，有些应用程序还可以动态控制并发执行的线程数，用来提高应用程序的性能。然而，过多的线程也会降低性能，因为操作系统不得不进行频繁的线程上下文切换
+                TotalProcessorTime                                |显示进程启动以来使用的CPU时间总量。如果某进程使用了大量CPU时间，则相关的应用程序可能存在配置问题，也可能表示某个失控进程或失去响应的进程不必要地占用了CPU
+                UserProcessorTime                                 |显示进程在用户模式下使用时间的总量
+                VirtualMemorySize/VirtualMemorySize64             |显示为某进程分配与保留的虚拟内存总量。虚拟内存是位于磁盘上的内存，在访问速度上慢于缓冲池内存。如果将应用程序配置为使用更多的物理内存，则有助于提高性能。当然，这样做的前提是系统中存在可用的内存，否则会导致系统中运行的其他进程性能下降
+                WorkingSet/WorkingSet64                           |显示进程当前正在使用的内存总量，包括私有的working set与非私有的working set，私有的working set是指不能与其他进程共享的内存区域，非私有的working set则可以与其他进程共享。如果某进程的内存使用随时间缓慢增长，并且不再回退到正常值，则可能存在内训泄露问题
+                -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    7.1.4终止进程
+        如果需要终止运行在本地或远程系统上的进程，可以使用命令行工具Taskkill。通过该工具，可以根据进程ID（使用/Pid参数）或进程镜像名（使用/Im参数）来终止进程。如果需要根据进程ID或进程镜像名来终止进程，则可以输入多个/Pid参数与/Im参数。不过，在使用镜像名是要特别小心，因为Taskkill会终止所有使用该镜像名的进程。因为，如果系统中运行了Heplctr.exe的3个实例，则对该镜像名使用Taskkill之后，所有这3个进程都将被终止。
+        与Tasklist类似，默认情况下，Taskkill以当前登录用户的许可权限运行。你也可以指定远程主机（要查询其上的任务）以及Run As许可权限，这是通过使用包含如下一些参数的扩展的语法格式实现的：
+            /s Computer /u [Domain\]User [/p Password]
+        其中，Computer为远程计算机名或IP地址，Domain为可选的域名，用户账号就存在于该域内，User为用户账号名（要使用的就是该用户账号的许可权限），Password为该用户账号的口令（可选）。如果没有指定域，则系统会假定当前域作为默认的域名。如果没有指定口令，则会弹出提示信息要求输入口令。
+        （注解  有时候，强制进程终止运行是必须的。典型情况下，当进程在打开文件、读写数据或执行其他读写操作的过程中停止响应时，就需要强制终止。要强制终止进程，可以使用/F参数，且该参数只适用于本地系统上运行的进程，远程系统上终止的进程通常都是强制终止的。）
+        （提示  检查进程时，要记住的是，一个的应用程序可能会启动多个进程。通常，这些进程依赖于一个主进程，并以该主进程为根形成一颗进程树。偶尔，你可能需要终止整个进程树，包括父应用程序进程与所有依赖于该进程的进程。要做到这一点，可以使用/T参数。）
+        要了解如何使用Taskkill，参考如下一些实例。
+            终止进程ID为208的进程：
+                taskkill /pid 208
+            终止镜像名为cmd.exe的所有进程
+                taskkill /im cmd.exe
+            终止Mailer1上进程ID为208、1346、2048的进程：
+                taskkill /s Mailer1 /pid 208 /pid 1346 /pid 2048
+            强制终止PID为1346的进程：
+                taskkill /f /pid 1346
+            终止进程树，以PID为1248的进程开始，包括所有子进程：
+                taskkill /t /pid 1248
+        要确保只终止匹配特定标准的进程，可以使用表中列出的所有过滤器（SessionName除外）。比如，你可以使用过滤器规定只有失去响应的cmd.exe实例才应该终止，而不是终止所有的cmd.exe实例（使用/I参数时，默认情况下是终止所有）。
+        与Tasklist类似，Taskkill提供了模块过滤器以及EQ与NE等操作符，用于指定应该包含或排除的DLL。回想一下，Tasklist /M的作用是检查运行中进程与系统中配置的DLL之间的关系。通过使用Taskkill模块过滤器与EQ操作符，可以终止所有使用某特定DLL的进程。通过使用Taskkill模块过滤器与NE操作符，可以确保所有使用某特定DLL的进程不会被终止。
+        （提示  使用过滤器时，并不一定需要指定特定的镜像名或进程ID。也就是说，可以只根据进程是否匹配过滤器标准来终止进程。比如，你可以规定只终止所有失去响应的进程。）
+        与Tasklist类似，你可以再Taskkill中使用多个过滤器，要记住必须使用双引号封装过滤字符串。要了解如何在Taskkill中使用过滤器，参考如下实例。
+            终止失去响应的cmd.exe实例：
+                taskkill /im cmd.exe /fi "status eq not responding"
+            终止所有PID大于4并且失去响应的进程：
+                taskkill /fi "pid gt 4" /fi "status eq not responding"
+            终止所有使用Winspool.drv这一DLL的进程：
+                taskkill /fi "modules eq winspoll.drv"
+        可以看到，尽管第2个实例中没有使用/Im参数与/Pid参数，但对进程ID进行了过滤，从而只影响部分进程。你可能需要避免无意间终止System进程或System Idle进程。典型情况下，这两个进程的PID分别为4和0。如果终止了这两个进程，系统就会停止响应或关机。
+7.2通过监控来检测与解决性能问题
+    在命令行中，Tasklist与Windows PowerShell Get-Process可以检测与解决大多数性能问题。不过你还是需要进行深入研究，以便发现存在的问题。如果存在问题，就努力找出导致问题的根源。
+    7.2.1监控内存分页与磁盘页面
+        通常，你可能需要获取关于内存页面硬失效与软失效的详细信息。当某进程请求内存的一个页面，而这个页面不存在于请求的位置时，就会发生页面失效。如果请求的页面内容存在于内存中的某处，就称之为页面软失效。如果请求的页面内容只能从磁盘获取，就称之为页面硬失效。
+        如果需要实时查看系统中发生页面失效的情况，可以在命令行中输入如下命令：
+            typeperf "\memory\Page Faults/sec" -si 5
+        要停止Typeperf，可以按Ctrl+C。页面失效是根据每秒钟硬失效与软失效的次数展示的。其他可用于追踪页面失效的内存对象计数器包括：
+            · Cache Faults/sec
+            · Demand Zero Faults/sec
+            · Page Reads/sec
+            · Page Writes/sec
+            · Write Copies/sec
+            · Transition Faults/se
+            · Transition Pages Repurposed/sec
+        需要特别关注的是Page Reads/sec与Page Writes/sec这两个计数器，因为这两个计数器提供了页面硬失效的信息。尽管开发人员主要关心的是导致页面失效的根源，但管理员更关心的是发生了多少次页面失效。
+        大多数处理器都可以处理大量的软失效，即从内存中其他位置处寻找请求的内存页面。而对于硬失效，则必须从磁盘中取回请求的内存页面，这可能导致很大的延迟。如果系统中发生了大量的硬失效，则可能需要增加系统的内存总量，或者降低系统与应用程序缓存的内存总量。
+        除了前面讨论的计数器与内存对象之外，还可以使用下面的对象与计数器来检查磁盘页面问题。
+        · Paging File(*)\%Usage。当前使用中该页面文件占总页面文件百分比。如果对所有实例，这一数值都接近100%，则应该考虑增大虚拟内存容量，或者为系统增添物理内存。这将确保计算机有充足的内存资源，以备不时之需（比如计算机工作负载增加的时候）。
+        · Paging File(*)\%usage Peak。当前使用中页面文件占可用的总页面文件百分比的峰值。如果这一数值过高，则说明页面文件不够大，不足以处理增加的工作负载需求。
+        · PhysicalDisk(*)\%Disk Time。选定磁盘用于处理读写请求所花费的时间。对其上包含页面文件的物理磁盘，应该关注这一数值。如果这一数值在几个检测周期内呈增加趋势，则应该密切关注页面文件使用情况，并考虑为系统增添物理内存。
+        · PhysicalDisk(*)\Avg. Disk Queue Length。采样周期内等待选定磁盘处理的平均读写请求次数。对其上包含页面文件的物理磁盘，应该关注这一数值。如果这一数值呈增加趋势，同时Memory\Page Reads/sec也在增加，则说明系统正在处理大量的页面文件读请求。
+        上面的描述中，圆括号中的星号是对象实例的占位符。如果某特定对象有多个实例，比如计算机有多个物理磁盘或多个页面文件，则可以使用一个对象实例追踪该对象的特定出现。你也可以追踪某对象的所有实例，比如监控某系统上所有物理磁盘。通过Total，可以操作所有计数器实例，或指定待监控的单独计数器实例。
+        示例展示了如何使用Typeperf获取磁盘页面快照，该实例中，使用了一个名为Perf.txt的文件来执行需要追踪的计数器，并以30秒为间隔进行了5次采样，采样结果存储到一个名为SaveData.txt的文件中。如果将此文件导入到电子表格中，或将其转换为Word文档中国的表格，就会对输出内容有更好的了解，并对计算机使用页面文件以及文件分页的方式有准确的理解。
+            检查磁盘页面
+                Command line
+                typeperf -cf c:\logs\pageperf.txt -o c:\logs\savepagedata.txt -sc 5 -si 30
+
+                Source for PagePerf.txt
+                \memory\Pages/sec
+                \Paging File(_Total)\% Usage
+                \Paging File(_Total)\% Usage Peak
+                \PhysicalDisk(_Total)\% Disk Time
+                \PhysicalDisk(_Total)\Avg.Disk Queue Length
+    7.2.2监控单个进程的内存使用与Working Memory Set
+        你可以使用Tasklist获取某个进程的基本的内存使用情况，其语法格式为：
+            tasklist /fi 'pid eq ProcessID'
+        其中，ProcessID为待操作进程的进程ID，输出信息将展示该进程当前使用了多少内存资源。比如，如果待追踪进程PID为7292，则上面命令的输出类似于如下的格式：
+            Image Name           PID       Session Name      Session#          Mem Usage
+            =================== =====  ====================  ===========     ================
+            jvappm.exe           7292                                 1           7424K
+        从输出信息可以看出，该进程占用了7424KB内存资源。通过对内存使用请款过的监控，可以判断占用的内存资源是不断增长。如果某进程占用的内存资源找过了典型情况下应该占据的内存资源标准，则该进程可能存在内存相关的问题。
+        示例提供了一个命令行脚本源代码，该脚本用于定期检查进程的资源使用情况。运行时，该脚本要求以进程ID为第一个参数。如果没有提供PID，则会返回错误信息。
+            示例7-3在命令行中查看内存使用情况
+                MemUsage.bat:
+                @echo off
+                if "%1"=="" (echo Error: please enter Process ID to track) & (goto EXIT)
+                tasklist /fi "pid eq %1"
+                timeout /t 600
+                tasklist /fi "pid eq %1"
+                tiemout /t 600
+                tasklist /fi "pid eq %1"
+                :EXIT
+
+                Sample Output:
+                ImageName            PID     SessionName  Session#  MemUsage
+                =================== =====  =============  ========  ==========
+                jvapm.exe            7292                        1     7452K
+                Waiting for 0 seconds,press a key to continue...
+
+                ImageName            PID     SessionName  Session#  MemUsage
+                =================== =====  =============  ========  ==========
+                jvapm.exe            7292                        1     7452K
+                Waiting for 0 seconds,press a key to continue...
+
+                ImageName            PID     SessionName  Session#  MemUsage
+                =================== =====  =============  ========  ==========
+                jvapm.exe            7292                        1     7452K
+        示例中，进程的内存使用更没有随着不同的采样间隔而变化。因为，该进程不太可能存在泄漏问题，但如果要确认这一点，则需要更多次采样。
+        你可以使用Windows PowerShell Get-Process cmdlet来追中某进程内存使用请款过的详细信息，其语法格式如下：
+            get-process ProcessName | format-table -property
+            NonpagedSystemMemorySize, PagedSystemMemorySize, VirtualMemorySize,
+            PeakVirtualMemorySize,MinWorkingSet, WorkingSet, PeakWorkingSet
+        其中，ProcessName为进程名（不带.exe或.dll后缀）。在Windows PowerShell脚本中，如示例，可以将Get-Process cmdlet与start-sleep cmdlet结合起来，以便在定时的时间间隔查看某进程的内存使用情况。
+            示例7-4查看内存使用情况的详细信息
+                MemUsage.ps1:
+                get-process msdtc | format-table -property NonpagedSystemMemorySize,
+                PagedSystemMemorySize, VirtualMemorySize, PeakVirtualMemorySize,
+                MinWorkingSet, WorkingSet, PeakWorkingSet
+
+                start-sleep -seconds 600
+
+                get-process msdtc | format-table -property NonpagedSystemMemorySize,
+                PagedSystemMemorySize, VirtualMemorySize, PeakVirtualMemorySize,
+                MinWorkingSet, WorkingSet, PeakWorkingSet
+
+                start-sleep -seconds 600
+                get-process msdtc | format-table -property NonpagedSystemMemorySize,
+                PagedSystemMemorySize, VirtualMemorySize, PeakVirtualMemorySize,
+                MinWorkingSet, WorkingSet, PeakWorkingSet
+
+                Sample Output:
+                Nonpaged         PagedSystem    Virtual        Peak           Working       Peak
+                System           Memory         Memory         Virtual        Set           Wokring
+                MemorySize       Size           Size           MemorySize                   Set
+                ---------------  -------------  -------------  -------------  ------------  ----------
+                6304             70544           41766912       63631360       6287360       6344704
+
+                Nonpaged         PagedSystem    Virtual        Peak           Working       Peak
+                System           Memory         Memory         Virtual        Set           Wokring
+                MemorySize       Size           Size           MemorySize                   Set
+                ---------------  -------------  -------------  -------------  ------------  ----------
+                8123             96343          56243535       97423424       9147256       9348942
+
+                Nonpaged         PagedSystem    Virtual        Peak           Working       Peak
+                System           Memory         Memory         Virtual        Set           Wokring
+                MemorySize       Size           Size           MemorySize                   Set
+                ---------------  -------------  -------------  -------------  ------------  ----------
+                17564            129645          48934246       97423424       9987384       10344706
+        （注解  Windows PowerShell脚本文件的扩展名为.ps1，要在Windows PowerShell提示符中运行脚本，需要键入脚本名以及可选的扩展名，要注意的是，必须指定脚本文件的全路径，即便脚本文件在当前目录下。要指定当前目录，可以使用目录名或圆点符号（.）。比如，对于当前目录下的MemUsage.ps1文件，可以在Windows PowerShell提示符中键入.\memusage.ps1来运行该脚本。）
+        示例中，Get-Process提供了如下一些信息。
+        · NonPagedSystemMemorySize。展示了不能写入磁盘的已分配内存总量。
+        · PagedSystemMemorySize。展示了可以与磁盘进行页面交换的已分配内存总量。
+        · VirtualMemorySize。展示了为某进程分配与保留的虚拟内存总量。
+        · PeakVirtualMemorySize。展示了某进程使用的虚拟内存总量峰值。
+        · WorkingSetSize。展示了操作系统分配给进程的内存总量。
+        · PeakWorkingSet。展示了进程使用的内存总量峰值。
+        关注这些属性是，实际上是聚集于某个特定进程的内存使用情况。要监控的关键内容是working memory set，指的是操作系统为该进程分配的内存。如果该数值随时间增长，而最终不能回退到正常情况下的标准值，则该进程可能存在内存泄露问题。发生内存泄漏时，进程无法正常释放占用的内存，从而导致系统整体性能下降。
+        示例中，进程的内存使用随着采样间隔不断增加，最可能的原因是该进程正被用户或计算机本身活跃地使用。正常的话，该进程的内存使用会回归到一个标准值。如果不能，则说明该进程可能存在内存相关的问题。
+    7.2.3解决性能瓶颈
+        由于内存是工作站与服务器上的主要性能瓶颈，本章前面讨论的很多技术都有助于确定系统中存在的内存相关问题。在系统不能正常运行时，内存应该是第一个检查的目标。
+        然而，内存并不是唯一的性能瓶颈，处理器也可能会成为系统新能的瓶颈。比如，进程的多线程需要的CPU时间超过了可用的CPU资源。如果处理器成为系统性能瓶颈，则增加内存、驱动器或网络带宽都不能解决问题。只能对处理器密集型的应用程序转移到其他服务器上运行。
+        可用于检查处理器瓶颈的Typeperf计数器包括如下5个。
+        · System\Processor Queue Length。记录等待执行的线程数。这些进程在一块由系统中所有处理器共享的区域中排队等待执行，由于线程在执行之前必须等待。因此，处理器队列是逐渐增长的，从而导致系统响应变慢，甚至失去响应。为避免这种情况，需要对处理器进程升级（更快的主频），或者添加处理器，来提高服务器的性能上限。
+        · Processor(*)\% Processor Time。记录
