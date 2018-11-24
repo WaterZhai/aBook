@@ -42,4 +42,40 @@
                 /unicode:       |/uni: |将输出显示设置为Unicode或ASCII文本。设置为真时，代表Unicode；设置为假时，代表ASCII文本。默认设置为ASCII文本
                 --------------------------------------------------------------------------------------------------------------------------------------------------------------------
     8.1.2列出可用的日志与已注册的事件发布者
-        
+        前面第6章中曾经说过，系统中有哪些可用的事件日志取决于系统中已安装的角色与服务。对已注册的事件日志发布者来说同样如此，一般包括所有Windows服务以及配置为向事件日志中写入事件的组件。
+        通过在命令行中使用wevtutil el命令，可以列出计算机中所有可用过的日志。由于这种方式得到的日志列表太长，以至于无法在命令提示符中方便地显示。因此，你可能需要使用FIND命令对输出信息进行重定向，以便发现特定的日志，下面给出的就是这样一个实例：
+            wevtutil el | find /i "FindText"
+        其中，FindText是要搜索的文本，用于对输出信息进行查找和过滤，以便发现特定的日志。比如，如果希望确定某特定日志是否与加密文件系统（EFS）关联，就可以使用如下命令对输出信息进行过滤：
+            wevtutil el | find /i "efs"
+        由于使用了/l参数，FIND命令会忽略输出文本中字母的大小写。因而，包含EFS（大写、小写的任意组合）关键字的日志名都会被选中，比如：
+            Microsoft-Windows-EFS/Debug
+        通过在命令行中使用wevtutil ep命令，可以列出计算机中所有已注册的时间日志发布者。同样地，由于这种方式得到的输出列表太长，你可能需要使用FIND命令对输出信息进行过滤。比如，如果想确定Netlogon服务是否是一个已注册的事件日志发布者，就可以在命令提示符中输入如下命令：
+            wevtutil ep | find /i "netlogon"
+        由于Windows服务、系统组件以及其他附件软件都可能注册为事件日志发布者，你可能希望了解事件发布者向事件日志中写入事件的确切方式。为此，你可以使用Wevtutil gp命令并以如下的语法格式列出事件发布者的配置信息：
+            wevtutil gp Publisher
+        其中，Publisher为所要使用的、已注册的事件日志发布者的全名。比如，在确定Netlogon服务是已注册的事件日志发布者后，你可能希望进一步地确定其事件写入位置。为此，可以在命令行中使用wevtutil gp netlogon命令，其输出类似于如下格式：
+            name: netlogon
+            guid: 00000000-0000-0000-0000-000000000000
+            helpLink:http://go.microsoft.com/fwlink/events.asp?CoName=
+            Microsoft%20Corporation&ProdName=Microsoft%c2%ae%20Windows%c2
+            %ae%200perating%20System&ProdVer=6.0.6000.16386&FileName=netmsg.
+            dll&FileVer=6.0.6000.16386
+            parameterFileName: %SystemRoot%\System32\kernel132.dll
+            messageFileName: %SystemRoot%\System32\netmsg.dll
+            message:
+            channels:
+                channel:
+                    name: System
+                    id: 8
+                    flags: 1
+                    message:
+            levels:
+            opcodes:
+            tasks:
+            keywords:
+        上面的输出中，Channels详细资料中的名称值列出了事件发布者将要写入的日志或多个日志。有些情况下，需要获取所有事件的完整列表（事件发布者向事件日志中写入事件时会用到此列表）。为此，需要将/Ge参数设置为真，如下面实例所示：
+            wevtutil gp Microsoft-Windows-TaskScheduler /ge:true
+        如果事件发布者已经注册了特定的事件，Wevtutil会在标准的发布者配置信息后列出这些事件。另外，你可以指定远程计算机与登录凭据。比如，在下面的实例中，对FileServer25上的事件发布者Microsoft-Windows-TaskScheduler进行了检查：
+            wevtutil gp Microsoft-Windows-TaskScheduler /r:fileserver25 /u:cpand\williams /p: Cab!@#45898
+    8.1.3查看与改变日志配置
+        通过日志配置选项，可以控制事件日志的大小与时间日志的处理方式。默认情况下，事件日志设置为可以设置的最大值。
