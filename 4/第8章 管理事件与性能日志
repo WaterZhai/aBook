@@ -78,4 +78,111 @@
         如果事件发布者已经注册了特定的事件，Wevtutil会在标准的发布者配置信息后列出这些事件。另外，你可以指定远程计算机与登录凭据。比如，在下面的实例中，对FileServer25上的事件发布者Microsoft-Windows-TaskScheduler进行了检查：
             wevtutil gp Microsoft-Windows-TaskScheduler /r:fileserver25 /u:cpand\williams /p: Cab!@#45898
     8.1.3查看与改变日志配置
-        通过日志配置选项，可以控制事件日志的大小与时间日志的处理方式。默认情况下，事件日志设置为可以设置的最大值。
+        通过日志配置选项，可以控制事件日志的大小与时间日志的处理方式。默认情况下，事件日志设置为可以设置的最大值。当日志达到最大值时，最早存储的事件会被重写，以防止事件日志的溢出。你也可以将事件日志配置为autobackup与strict retention。激活autobackup时，如果事件日志达到最大值，Windows会自动地将事件日志的副本保存到默认的目录下，并创建新的事件日志以便存储最新事件。激活strict retention时，如果事件日志达到最大值，Windows会丢弃新事件，并生成错误消息宣称事件日志已满。
+        通过如下的语法格式使用Wevtutil gl命令，可以列出事件日志当前配置信息：
+            wevtutil gl LogName
+        其中，LogName为所要检查的事件日志名。比如，如果要查看应用程序日志的配置，可以在命令行中输入如下命令：
+            wevtutil gl application
+        该命令的输出类似于如下格式：
+            name: application
+            enabled: true
+            type: Admin
+            owningPublisher:
+            isolation: Application
+            channelAccess: 0:BAG:SYD:(A;;0xf0007;;;SY)(A;;0x7;;;BA)
+            logging:
+                logFileName: %SystemRoot%\System32\Winevt\Logs\application.evtx
+                retention: false
+                autoBackup: false
+                maxSize: 20971520
+            publishing:
+        查看日志的配置信息时，主要关注的是日志是否处于激活状态以及默认的日志设置。在上面的实例中，应用程序日志处于激活状态，该文件的全路径为%Syste,Root%\System32\Winevt\Logs\application.evtx，retention处于关闭状态，autobackup处于关闭状态，最大日志规模为20971520字节（20480KB）。
+        （真实场景  isolation属性提供了日志安全性相关的宝贵信息。如果将该属性设置为Application，则该日志与应用程序日志具备同样的安全许可权限。如果将该属性设置为System，则该日志与系统日志具备同样的安全许可权限。对这两种情况，除非通过组策略进行了相应设置，这两种日志的安全性没有过多的约束。如果将该属性设置为Custom，则该日志的安全性是自定义的，只有那些允许访问该日志的组成员才可以访问该日志。比如，安全日志的isolation属性为Custom，其相关的安全描述符对可以访问该日志的用户进行了限制，只有那些被赋予了Manage Auditing And The Security Log这一用户权限的用户才可以访问该日志。默认情况下，只有管理员才具备这一权限。由于安全日志的这种访问控制机制，要在命令行中操作本地计算机的安全日志，就必须使用一个增强的、管理员级的命令提示符。）
+        日志是否处于激活状态是重要的。处于关闭状态的日志是不能使用的，也无法获取关闭状态日志的详细状态信息。要了解激活状态日志的更多信息，可以使用Wevtutil gli命令。比如，如果在命令行中执行命令Wevtutil gli application，就会列出应用程序日志的状态信息，其输出信息中包含了类似于如下的信息：
+            creationTime: 2006-06-11T23:39:52.078Z
+            lastAccessTime: 2006-06-11T23:39:52.078Z
+            lastWriteTime: 2008-03-28T17:35:14.547Z
+            fileSize: 20975616
+            attributes: 32
+            numberOfLogRecords: 43293
+            oldestRecordNumber: 27607
+        其中，应该重点关注的关键信息包括如下5个。
+        · creationTime。列出了事件日志的创建日期与时间
+        · lastWriteTime。列出了事件写入该日志的最后日期与时间。
+        · fileSize。列出了日志当前大小（以字节计数）。
+        · numberOfLogRecords。列出了日志中事件的数量。
+        · oldestRecordNumber。列出了日志中最早的事件记录编号。
+        （注解  如果最早事件记录编号为1，则说明Windows尚未重写该日志中的事件。如果最早事件记录编号大于1，则说明Windows重写了日志中的事件，重写事件的数量即为最早事件记录的编号。比如，在上例中，最早事件记录的编号为27607，说明Windows已经重写了该日志中大量事件。）
+        如果需要修改日志的配置，可以使用Wevtutil sl命令。通过/Ms参数，可以设置日志最大值（以字节计数）。通过/E参数，可以激活或关闭日志。/e:true用于激活某日志，/e:false则用于关闭某日志。如果需要确保日志不被重写，可以使用/r:true参数来激活日志retention。激活后，如果事件日志达到最大值，Windows会丢弃新事件，并生成错误消息宣称事件日志已满。但如果同时也激活了autobackup，情况就会有所不同。如果希望体制达到最大值时自动备份，可以使用/ab:true参数来激活autobackup。要注意的是，激活autobackup的同时必须激活retention。
+        参考如下的一些实例，有助于了解如何配置事件日志。
+            将系统日志最大值设置为20971520字节（20480KB）：
+            Wevtutil sl System /ms:20971529
+            Wevtutil sl System /maxsize:20971529
+            关闭Windows RPS debug日志：
+            Wevtutil sl Microsoft-Windows-RPC/Debug /e:false
+            Wevtutil sl Microsoft-Windows-RPC/Debug /enabled:false
+            激活FileServer86上应用程序日志的retention：
+            Wevtutil sl application /s:FIleServer86 /rt:true
+            Wevtutil sl application /s:FIleServer86 /retention:true
+            激活DomainServer18上安全日志的retention与autobackup：
+            Wevtutil sl security /s:DomainServer18 /rt:true /ab:true
+            Wevtutil sl security /s:DomainServer18 /retention:true /autobackup:true
+        （注解  使用安全日志或远程系统时（或者使用远程系统上的安全日志时），你通常需要使用增强的管理员权限命令提示符对日志进行配置。对远程系统，也可以需要使用替代的登录凭据。）
+    8.1.4导出与操作事件日志
+        典型情况下，你可能需要为所有关键性的系统保存几个月的日志。但即便设置最大的日志大小，也不能完全满足这一需求，好在还有一些变通的方法。前面讲过，你可以通过Windows定期地对事件日志进行存档，也可以使用命令行或命令行脚本将事件日志导出并保存到特定的位置。
+        通过Wevtutil epl命令，可以以Windows事件日志格式（.evtx）将事件日志导出到文件中。其基本语法格式为：
+            wevtutil epl LogName SaveLocation
+        其中，LogName是待导出的事件日志名，SaveLocation是导出的事件日志保存文件的全路径。比如，通过如下命令，可以将应用程序日志导出为c:\Logs\AppLog092908.evtx文件：
+            wevtutil epl Application c:\Logs\AppLog092908.evtx
+        （注解  如果创建一个专用的日志存档目录，就可以更方便地定位事件日志，为方便起见，对存档的事件日志进行命名时，应该采用描述性较强的文件名，从文件名本身就可以容易地判断事件日志的类型以及日志存档时间、比如，如果对2009年6月的应用程序日志进行存档，建议使用的较好的存档文件名是APPLogJune2009.evtx。）
+        以这种方式导出事件日志时，Windows会将指定日志的全部内容导出到指定的存档文件，但并不会对事件日志进行清除操作。清楚事件日志是通过Wevtutil cl命令实现的，这一命令将在8.1.5节讲解。
+        如果需要导出事件日志中的一部分事件（而不是所有事件），则可以使用保存的XPath查询。在6.4节中，讨论了XPath查询的基础，以及如何使用XPath查询创建自定义视图。要使用XPath查询导出事件日志中的一部分事件，必须创建包含筛选器（而非自定义视图）的XPath查询。要完成这一任务，最简单的方式是使用事件查看器并遵循如下步骤。
+        （1）依次单击“开始”、“管理工具”、“事件查看器”来启动事件查看器。
+        （注解  如果需要处理某台计算机上的事件日志，但没有本地登录该系统，则可以鼠标右键单击事件查看器节点，选择“连接到其他计算机”。之后，在弹出的“选择计算机”对话框的“其他计算机”文本框中，输入主机名、IP地址或目标计算机的完全限定域名。必要的时候，可以使用替代的登录凭据来连接到远程计算机。要建立连接，单击“确定”。）
+        （2）选择需要筛选与处理的事件日志，在操作菜单，单击“筛选当前日志”。
+        （3）在图8-1所示的“筛选当前日志”对话框中，使用记录时间列表选择要包含的事件的时间帧。根据不同的应用需求，你可以选择包含任何时间，前一个小时、过去的12小时、过去的24小时、最后7天、最后30天等事件。
+        （4）使用事件级别复选框指定要包含的事件级别。选择“详细”，可以获取更多的详细资料。
+        （5）你可以为所有事件源创建筛选器，也可以为某特定的事件源子集创建筛选器。要选择需要包含的事件源，可以使用事件源列表。通过选定相应的复选框，可以选择多个事件源。要记住的是，选择某些特定的事件源后，所有其他事件源将被排除在外。
+        （6）可选地，使用用户与计算机对话框指定应该包含的用户与计算机。如果没有明确指定待包含的用户与计算机，则所有用户与计算机生成的事件都将默认包含。
+        （7）单击XML选项卡来显示相关的XPath查询，如图8-2所示。
+        （8）选中查询语句，按Ctrl+A全选，之后按Ctrl+C查询语句复制到剪切板。
+        （9）依次单击“开始”、“所有程序”、“附件”、“记事本”打开记事本。
+        （10）按Ctrl+V，将剪切的内容粘贴到记事本。
+        （11）在记事本的“文件”菜单中，选择“另存为”。在弹出的“另存为”对话框中，选择一个存储位置，在“文件名”文本框中。输入要保存的文件名。另外要注意确保文件扩展名为.xml。
+        （12）在“保存类型”列表中，选择“所有文件（*.*）”，防止记事本将.txt作为文件名的扩展名。
+        （13）单击“保存”，关闭“另存为”对话框。
+        （14）单击“确定”，关闭“过滤当前日志”对话框，并在事件查看器中预览筛选器。
+        下面给出一个XPath查询示例，其功能是过滤应用程序日志中最近的关键性事件、错误事件与警告事件：
+            <QueryList>
+                <Query Id="0" Path="Application">
+                    <Select Path="Application">*[System[(Level=1  or Level=2  or Level=3)
+                    and TimeCreated[timediff(@SystemTime) &lt;= 604800000]]]</Select>
+                </Query>
+            </QueryList>
+        通过将/Structuredquery（/Sq）设置为真，可以使得Wevtutil获知将要使用XPath查询。这种做法不再需要指定待导出的日志，因为筛选器中会对其进行定义，但必须使用如下的语法格式通知Wevtutil将要进行XPath查询：
+            wevtutil eql QueryPath SaveLocation /sq:true
+        其中，QueryPath为当前目录中的XPath查询名（或者是XPath查询的全文件路径），SaveLocation为待导出文件保存位置的全路径。比如，通过使用如下命令，你可以使用在文件c:\Queries\AppQuery.xml中定义的XPath查询将过滤后的应用程序日志导出为c:\Logs\AppLogFiltered092908.evtx文件：
+            wevtutil eql c:\Queries\AppQuery.xml C:\Logs\AppLogFiLogFiltered092908.evtx /sq:true
+        在事件查看器中，要打开保存的日志，可以先选择"事件查看器"节点，之后在操作菜单或操作面板中选择“打开保存的日志”，在弹出的“打开保存的日志”对话框中选择要打开的日志。通过Wevtutil，可以使用qe命令查看当前日志或存档日志的内容，其最佳语法格式如下所示：
+            wevtutil qe LogName /c:NumEvents /rd:true /f:text
+        其中，LogName为事件日志名（或存档日志的全文件路径），NumEvents为要读取的事件数量，/rd:true表明要处理的是最近的事件，/f:text将输出格式设置为文本，而非XML。比如，使用如下命令，可以读取应用程序日志中最近的50条事件：
+            wevtutil qe Application /c:50 /rd:true /f:text
+        你也可以使用XPath查询来过滤的日志。与wevtutil eql命令类似，通过将/Structuredquery（/Sq）参数设置为真，可以使得Wevtutil获知将要使用XPath查询，从而不再需要指定待导出的日志，因为筛选器中会对其进行定义。据此，使用XPath查询来筛选事件日志的语法格式为：
+            wevtutil qe QueryPath /sq:true
+        其中，QueryPath为当前目录中的XPath查询名，或者是XPath查询的全文件路径，比如：
+            wevtutil qe c:\Queries\AppQuery.xml /sq:true
+        你可以使用/c、/Rd、/F等参数来对输出信息进行约束，前面已经讨论，下面再给出一个实例：
+            wevtutil qe c:\Queries\AppQuery.xml /sq:true /c:50 /rd:true /f:text
+        你也可以使用/R、/U、/P等参数来查询远程计算机上的事件，前面已经讨论，下面再给出一个实例：
+            wevtutil qe c:\Queries\AppQuery.xml /sq:true /c:50 /rd:true /f:text /r:PrintServer23 /u:adatum\williames /p:Fiber
+    8.1.5清除事件日志
+        事件日志已满时，就需要对其进行清除。要完成这一任务，可以以如下的语法格式使用Wevtutil cl命令：
+            wevtutil 处理LogName
+        其中，LogName为待清楚地事件日志名，比如：
+            wevtutil cl Application
+        在清除日志文件之前，可能需要对其进行备份，以便保存事件日志内容的副本。通过使用/Backuo（/Bu）参数，其后跟随着备份文件名或文件路径，可以规定在清除事件日志前对其进行备份并将其保存到指定的位置。需要注意的是，必须包括文件扩展.evtx，如下面实例所示：
+            wevtutil cl Application /bu:c:\Logs\AppLogFil.evtx.
+8.2企业级集中化事件记录机制
+    在第6章与本章，已经讲解了可用于事件日志处理的很多技术。尽管你可以创建命令行脚本来检查多态计算机上的事件日志，并将这些信息复制到一个中央存储位置以便查阅，但这不是唯一的方法。通过配置事件转发机制，可以实现集中化事件记录。通过事件转发，可以将所有事件或特定类型事件转发到指定的、用于集中化事件记录的计算机。比如，你可能需要将组织内所有工作站与服务器配置为，将安全日志中的认证失败事件转发到用于集中化事件记录的计算机，以便对事件进行综合分析，并实时地检测出入侵企图。再如，对关键性的服务器，你可能需要将应用程序日志与系统日志中的关键性事件与错误事件转发到用于集中化事件记录的计算机，之后对事件进行综合分析，并实时地检测出应用程序错误与其他需要管理员注意的问题。配置集中化的时间记录机制是一个多步骤的过程。首先，要配置事件转发与事件收集机制。之后，在指定的、用于集中化事件记录的计算机上，必须创建订阅，其中指定要转发事件的类型与转发事件的日志源（以每台源计算机为基础）。在用于集中化事件记录的计算机上，默认情况下，转发的事件被收集到转发事件日志中。
+    8.2.1配置事件转发与收集
+        事件转发的体系结构是非常灵活的。
