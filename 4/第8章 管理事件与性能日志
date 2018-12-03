@@ -186,4 +186,214 @@
     在第6章与本章，已经讲解了可用于事件日志处理的很多技术。尽管你可以创建命令行脚本来检查多态计算机上的事件日志，并将这些信息复制到一个中央存储位置以便查阅，但这不是唯一的方法。通过配置事件转发机制，可以实现集中化事件记录。通过事件转发，可以将所有事件或特定类型事件转发到指定的、用于集中化事件记录的计算机。比如，你可能需要将组织内所有工作站与服务器配置为，将安全日志中的认证失败事件转发到用于集中化事件记录的计算机，以便对事件进行综合分析，并实时地检测出入侵企图。再如，对关键性的服务器，你可能需要将应用程序日志与系统日志中的关键性事件与错误事件转发到用于集中化事件记录的计算机，之后对事件进行综合分析，并实时地检测出应用程序错误与其他需要管理员注意的问题。配置集中化的时间记录机制是一个多步骤的过程。首先，要配置事件转发与事件收集机制。之后，在指定的、用于集中化事件记录的计算机上，必须创建订阅，其中指定要转发事件的类型与转发事件的日志源（以每台源计算机为基础）。在用于集中化事件记录的计算机上，默认情况下，转发的事件被收集到转发事件日志中。
     8.2.1配置事件转发与收集
         事件转发的体系结构是非常灵活的。比如，你可以将用于集中化事件记录的计算机配置为向其他用于集中化事件记录的计算机转发事件。由于转发协议（WS-Management）在底层上实际使用了超文本传输协议（HTTP）与安全HTTP协议（HTTPS），因此，只要相关的TCP端口是开放的，也可以使得转发事件顺利地通过防火墙。在标准的配置中，这意味着，如果使用HTTP协议，则TCP 80端口必须是开放的；如果使用HTTPS协议，则TCP 443端口必须是开放的。
-        要使用事件转发，需要配置与激活相关计算机上的事件转发功能，并在用于集中化事件记录的计算机或计算机上为转发事件创建订阅。在域中，通过如下步骤，可以为转发事件配置事件转发与收集
+        要使用事件转发，需要配置与激活相关计算机上的事件转发功能，并在用于集中化事件记录的计算机或计算机上为转发事件创建订阅。在域中，通过如下步骤，可以为转发事件配置事件转发与收集机制。
+        （1）要在运行Windows Vista或Windows Server 2008的计算机上配置事件转发功能，必须登录所有源计算机，并完成如下任务。
+            · 将Windows Remote Management Service（WinRM）服务的启动方式设置为自动（延迟的启动）。
+            · 启动WinRM服务。
+            · 创建WinRM侦听程序。
+            · 将WinRM服务设置为防火墙例外（如果防火墙处于打来状态）。
+        这些任务并不需要通过不同的操作分别完成，实际上，通过在一个增强的命令提示符中键入winrm quickconfig命令，就可以完成上面的配置任务，并在HTTP://*上创建一个WinRM侦听程序，以便在源计算机上接收到任意IP地址的WS-Management请求。执行该命令后，会弹出确认信息，选择"是"，
+        （2）要配置事件收集，登录用于集中化事件记录的计算机，在一个增强的命令提示符中，键入wecutil qc命令。该命令将启动Windows Event Collector服务，并将该服务的启动方式设置为手动启动。弹出确认信息后，选择"是"。
+        （3）在活动目录中，为事件收集计算机创建一个全局组，并将该计算机添加到该组中，在第15章15.2.1与15.2.2中，会对这一问题进行讨论。
+        （4）在每台源计算机上，将事件收集计算机的全局组加入到本地管理员组。为完成这一任务，可以在一个增强的命令提示符中使用net localgroup命令。其语法格式为：net localgroup Administrators CollectorGroup /add，其中CollectorGroup是为事件收集计算机创建的全局组名，比如net localgroup Administrators Collectors /add。
+    8.2.2创建订阅
+        要创建订阅，最简单的方法是使用事件查看器，并遵循如下步骤。
+        （1）依次单击"开始"、"管理工具"、"事件查看器"来启动事件查看器。如果尚未登录用于集中化事件收集的计算机，鼠标右击事件查看器节点，选择"连接到其他计算机"，在弹出的"选择计算机"对话框的"其他计算机"文本框中，输入主机名、IP地址或目标计算机的完全限定域名。必要的时候，可以使用替代的登录凭据来连接到远程计算机。要建立连接，单击"确定"。
+        （2）鼠标右击订阅节点，选择"创建订阅"。
+        （3）在图所示的"订阅属性"对话框中，为订阅键入名称，比如"所有文件服务器"，订阅名被设置为订阅标识符。可选地，还可以为其输入相应的描述信息。
+        （4）默认情况下，转发事件日志会被选择为目标日志。如果需要将事件转发到专门用于事件收集的计算机，就可能需要将事件转发到其他目标日志。要注意的是，这样做时，应该确保所创建的查询只对该特定日志有效，以便降低其他可能的混淆。
+        （5）事件收集计算机发起的事件转发是最容易配置的，也是缺省的设置。要制定将事件转发到服务器的计算机，单击"选择计算机"，在弹出的"计算机"对话框中，单击"添加域计算机"。在"选择计算机"对话框中，键入转发事件计算机的账号名，之后单击两次"确定"。如果需要，重复这一过程。
+        （6）单击"选择事件"，这将弹出"查询筛选器"对话框。
+        （7）使用事件级别检查复选框指定要包含的事件级别。选择"详细"，会获取更多的详细资料。
+        （8）大多数情况下，你可能需要为单一日志或多个日志创建一个筛选器。为此，要确保"按日志"被选定，之后使用事件日志列表选择要过滤的单一或多个日志。
+        （9）如果需要针对特定的事件源过滤选定的一个或多个日志，而不是针对所有事件源，则需要使用事件源列表来选择要包含的事件源。通过选定相应的复选框，可以选择多个事件源。要记住的是，选择某些特定的事件源后，所有其他事件源将被排除在外。另外，注意不要选择"按源"选项，因为这样会清楚所作的日志选定。
+        （10）默认情况下，Windows Event Collector服务使用集中化事件收集计算机的机器帐号来读取源日志。要使用其他登录凭据，可以单击"高级"。在弹出的"高级订阅设置"对话框中，选择"特定用户"，单击"用户和密码"按钮。在"订阅源的凭据"对话框中，输入要使用账号的用户名与密码，单击两次"确定"。你可以以域\用户的格式来指定用户的登录域，比如cpandl\williams。
+        （11）单击"确定"创建订阅，在创建了订阅并且选定的计算机开始转发事件后，就可以在目标日志中查看转发的事件。
+        上面讲解了如何使用事件查看器创建订阅及其具体步骤，下面讲述如何在命令行中完成这些复杂的任务。通过使用表中的Wecutil命令，可以在集中化事件收集计算机上对订阅进行创建与管理。与Wevtutil命令一样，Wecutil命令也有完整的长格式与缩略的短格式。
+            可用的Wecutil命令
+            --------------------------------------------------------------------------
+            长格式                       |短格式|描述
+            -----------------------------|-----|--------------------------------------
+            cnum-subscription            |Es   |列出计算机上现存的订阅
+            get-subscription             |Gs   |显示订阅配置的详细资料
+            get-subscriptionruntimestatus|Gr   |显示订阅运行时状态
+            set-subscription             |Ss   |修改订阅配置
+            create-subscription          |Cs   |创建新订阅
+            delete-subscription          |Ds   |删除订阅
+            retry-subscription           |Rs   |重试某订阅的所有源
+            quick-config                 |Qc   |激活并配置Windows Event Collector服务
+            --------------------------------------------------------------------------
+        要创建订阅，可以使用Wecutil cs命令与XML配置文件。配置文件中包含了XPath查询，XPath查询定义了要转发的事件与源计算机，并为订阅分配了订阅标识符。使用事件查看器创建订阅时，事件收集计算机发起的事件转发是最容易配置的，也是默认的设置。
+        通过在命令提示符中各使用wecutil cs/?命令，可以显示示例XML配置文件（可以将其复制与粘贴到文本编辑器）。XML配置文件具有类似于如下的格式：
+            <Subscription xmlns="http://schems.microsoft.com/2006/03/windows/events/subscription">
+                <Uri>http://schems.microsoft.com/wbem/wsman/1/windows/EventLog</Uri>
+                <!-- Use Normal (default), Custom, MinLatency, MinBandwidth -->
+                <ConfigurationMode>Normal</ConfigurationMode>
+                <Description>Forward Sample Subscription</Description>
+                <SubscriptionId>SampleSubscription</SubscriptionId>
+                <Query><![CDATA[
+                    <QueryList>
+                        <Query Path="Application">
+                            <Select>*</Select>
+                        </Query>
+                    </QueryList>
+                ]]></Query>
+                <EventSources>
+                    <EventSource Enabled="true">
+                        <Address>mySource.myDomain.com</Address>
+                        <UserName>myUserName</UserName>
+                        <Password>*</Password>
+                    </EventSource>
+                </EventSources>
+                <CredentialsType>Default</CredentialsType>
+                <Locale Language="EN-US"></Locale>
+            </Subscription>
+        在把XML配置文件复制并粘贴到文本编辑器中之后，就可以对其进行编辑。要编辑的关键字段包括描述、订阅标识符、XPath查询以及事件源。
+        描述部分提供了订阅的一些通常的描述信息，有助于管理员了解订阅如何使用。描述信息是使用Description元素定于的，必要的时候，可以对<Description>与</Description>标签中国的描述文本进行修改。下面给出一个实例：
+            <Description>Forwards important events from file servers</Description>
+        订阅标识符用于唯一地标识集中化事件收集计算机上的订阅，使用SubscriptionId元素进行描述。必要的时候，可以对<SubscriptionId>与</SubscriptionId>标签中国的标识符进行修改，下面给出一个实例：
+            <SubscriptionId>All File Servers</SubscriptionId>
+        元素Query之间的QueryList元素定义了XPath查询，你可以向其中复制与粘贴任意现存的XPath查询（定义了事件日志筛选器）。不过，由于事件转发是实时进行的，你可能需要移除XPath查询中根据事件创建时间进行过滤的部分。
+        与使用Wevtutil处理单条事件日志不同，通常希望创建单一的XPath查询来处理多个日志，因为这会降低需要创建的订阅数量。下面给出一个XPath查询实例，对应用程序日志，系统日志，DNS Server日志中的关键性事件、错误事件与警告事件进行过滤：
+            <QueryList>
+                <Query Id="0" Path="Application">
+                    <Select Path="Application">*[System[(Level=1 or Level=2 or Level=3)]]
+                    </Select>
+                    <Select Path="System">*[System[(Level=1 or Level=2 or Level=3)]]
+                    </Select>
+                    <Select Path="DNS Server">*[System[(Level=1 or Level=2 or Level=3)]]
+                    </Select>
+                </Query>
+            </QueryList>
+        元素EventSources之间的单独EventSource元素用于定义不同的源计算机。每台将要转发事件（基于此前定义的XPath查询）的计算机必须由自己的EventSource元素进行描述，包括该计算机的完全限定域名或IP地址。下面的实例中，激活了Cpandl.com域内的FileServer24、FileServer26、FileServer28等计算机的事件转发功能：
+            <EventSources>
+                <EventSource Enabled="true">
+                    <Address>fileseryer.cpandl.com</Address>
+                </EventSource>
+                <EventSource Enabled="true">
+                    <Address>fileseryer26.cpandl.com</Address>
+                </EventSource>
+                <EventSource Enabled="true">
+                    <Address>fileseryer28.cpandl.com</Address>
+                </EventSource>
+            </EventSources>
+        默认情况下，Windows Event Collector服务使用集中化事件收集计算机的机器帐号来读取源日志。要使用其他登录凭据，必须提供必要的登录信息。为此，一种做法是将其作为EventSource元素的一部分，如下面实例所示：
+            <EventSource Enabled="true">
+                <Address>fileseryer24.cpandl.com</Address>
+                <UserName>williams</UserName>
+                <Password>*</Password>
+            </EventSource>
+        上面实例中，指定了为计算机FileServer24使用的登录凭据。由于口令指定为*，在创建订阅时，会遇到提示信息要求输入登录凭据，所提供的登录凭据会与该订阅进行关联并安全存储。
+        （注解  在配置文件中定义其他登录凭据时，应该总是使用*作为口令，而不直接输入实际的口令。在配置文件中直接输入实际的口令是一种安全性较差的做法。）
+        上面的实力配置文件中没有出现，但实际上被赋予默认值的元素包括下面6个。
+        · ConfigurationMode。将事件传递优化方法设置为正常、最小化带宽或最小化滞后时间，包含在<ConfigurationMode>标签与</ConfigurationMode>标签之间。
+        · DeliveryMode。将传输方法设置为Push模式或Pull模式（默认情况下是Pull），包含在begin<DeliveryMode>标签与end</DeliveryMode>标签之间。
+        · ReadExistingEvents。用于指定是读取现存的事件还是只读取新事件，包含在begin<ReadExistingEvents>标签与end</ReadExistingEvents>标签之间。默认情况下，该元素取值为False，表示只读取新事件。
+        · LogFile。用于指定事件将要转发的目标日志，包含在begin<LogFile>标签与end</LogFile>标签之间。指定日志名时，注意要去除日志名中的空格。比如，要指定日志Forwarded Events，就应该将引用为ForwardedEvents。
+        · TransportName。用于指定使用的传输协议，或者为HTTP，或者为HTTPS，包含在begin<TransportName>标签与end</TransportName>标签之间。如果指定HTTPS作为传输协议，必须同时在源计算机上为HTTPS配置一个WinRM侦听程序。
+        · TransportPort。指定使用的传输端口，包含在begin<TransportPort>标签与end</TransportPort>标签之间。要注意的是，这里指定的端口应该与源计算机上配置WinRM侦听程序时使用的端口相同。典型情况下，HTTP协议对应80端口，HTTPS协议对应443端口。
+        示例8-1展示了一个用于Wecturil的配置文件，其中使用了上面讨论的元素与选项。
+            示例8-1  用于Wecutil的配置文件
+                <Subscription xmlns="http://schemsa.microsoft.com/2006/03/windows/events/subscription">
+                    <Uri>http://schemas.microsoft.com/wbem/wsman/1/windows/EventLog</Uri>
+                    <!-- Use Normal (default), Custom, MinLatency, MinBandwidth -->
+                    <ConfigurationMode>Normal</ConfigurationMode>
+                    <Description>Forwards events from file servers in the domain</Description>
+                    <SubscriptionId>All Servers</SubscriptionId>
+                    <DeliveryMode>Pull</DeliveryMode>
+                    <ReadExistingEvents>False</ReadExistingEvents>
+                    <LogFile>ForwardedEvents</LogFile>
+                    <TransportName>HTTP</TransportName>
+                    <TransportPort>443</TransportPort>
+                    <QueryList>
+                        <Query Id="0" Path="Application">
+                            <Select Path="Application">*[System[(Level=1 or Level=2 or Level=3)]]</Select>
+                            <Select Path="System">*[System[(Level=1 or Level=2 or Level=3)]]</Select>
+                            <Select Path="DNS Server">*[System[(Level=1 or Level=2 or Level=3)]]</Select>
+                        </Query>
+                    </QueryList>
+                    <EventSources>
+                        <EventSource Enabled="true">
+                            <Address>fileseryer24.cpandl.com</Address>
+                        </EventSource>
+                        <EventSource Enabled="true">
+                            <Address>fileseryer26.cpandl.com</Address>
+                        </EventSource>
+                        <EventSource Enabled="true">
+                            <Address>fileseryer28.cpandl.com</Address>
+                        </EventSource>
+                    </EventSources>
+                    <CredentialsType>Default</CredentialsType>
+                    <Locale Language="EN-US"></Locale>
+                </Subscription>
+        创建了XML配置文件之后，就可以以如下的语法格式使用Wecutil cs命令来创建订阅：
+            wecutil cs ConfigFile
+        其中，ConfigFile为当前目录中的配置文件名，或其他目录中配置文件的全文件路径。比如，如果需要使用文件c:\Evtforwarding\config1.xml来创建订阅，可以使用如下命令：
+            wecutil cs c:\evtforwarding\config1.xml
+        创建订阅时，可以指定共享的登录凭据，而不是必须使用/Cun与/Cup参数在配置文件中指定的登录凭据。/Cum参数用于设置用户名，/Cup参数用于设置口令，如下面实例所示：
+            wecutil cs c:\evtforwarding\config1.xml /cun:cpandl\williams /cup:Rover
+
+    8.2.3管理订阅
+        创建了订阅并且选定的计算机开始转发事件之后，就可以在目标日志中看到转发的事件。在事件查看器中选择订阅节点，就可以看到所创建的订阅。根据名称、状态、类型、源计算机数量、目标日志、描述信息等不同属性，事件查看器列出了每一个订阅。单击并选中某个订阅之后，就可以使用操作面板或操作菜单中国的如下一些选项对其进行管理。
+        · 属性。显示订阅属性对话框，通过该对话框，可以对订阅进行修改。可用的选项与前面讨论过的类似，但不能修改订阅名或类型。
+        · 禁用。禁用该订阅，使得时间不再被转发或手机。选定后，订阅状态将改变为禁用。
+        · 激活。激活该订阅，使得事件被转发或收集。选定后，订阅状态将改变为激活。
+        · 运行时状态。显示订阅的运行时状态，包括该订阅是激活的还是禁用的，以及源计算机上是否出现了事件收集错误等信息。如果源计算机上出现了错误状态，就可以选定该条目查看进一步的详细资料。选定了该源计算机条目后，还可以选择禁用或激活该源计算机的事件转发功能。
+        · 删除。永久性删除某订阅。
+        Wecutil提供了用于完成这些任务的命令。要根据名称列出某计算机上所有订阅，可以在命令提示符中使用wecutil es命令。要列出某订阅配置详细资料，可以使用wecutil gs命令，其后跟随订阅名。如果订阅名中包含空格，则需要使用引号对其进行封装，比如：
+            wecutil gs "All File Servers"
+        输出信息如下所示，展示了该订阅的配置详细资料：
+            Subscription Id： all servers
+            SubscriptionType： CollectorInitiated
+            Description： all servers in the domain
+            Enabled: false
+            Uri: http://schemas.microsoft.com/wbem/wsman/1/windows/EventLog
+            ConfigurationMode: Normal
+            DeliveryMaxLatencyTime: 900000
+            HeartbeatInteval:  900000
+            Query: <QueryList><Query Id="0"><Select Path="Application">* [System[(Level=1
+            or
+            Level=2 or Level=3)]]</Select><Select Path="System">* [System[(Level=1
+            or Level=2
+            or Level=3)]]</Select><Select Path="DNS Server">* [System[(Level=1 or
+            Level=2
+            or Level=3)]]</Select></Query></QueryList>
+            ReadExistingEvents: false
+            TransportName: HTTP
+            TransportPort: 80
+            ContentFormat: ReaderedText
+            Locale: en-US
+            LogFile: Microsoft-Windows-DateTimeControlPanel/Operational
+            PublisherName:
+            CredentialsType: Default
+
+            EventSource[0]:
+                Address: MAILSERVER84.cpandl.com
+                Enabled: true
+            EventSource[1]:
+                Address: ROOMS.cpandl.com
+                Enabled: true
+        你可以使用Wecutil ss命令来修改订阅的设置。使用该命令时，你可以使用可用的参数来修改订阅的配置。然而，要修改订阅，最简单的方法是创建一个新的配置文件，或直接在原始的配置文件中进行修改，之后以如下语法格式运行Wecutil ss命令：
+            wecutil ss SubscriptionName ConfigFile
+        其中，SubscriptionName为订阅名，ConfigFile是当前目录中的配置文件名，或者其他目录中配置文件的全文件路径。比如，如果需要使用文件c:\Evtforwarding\config1.xml来创建订阅，可以使用如下命令：
+            wecutil ss "All File Servers" c:\evtforwarding\config1.xml
+        创建订阅时，可以指定共享的登录凭据，而不是必须使用/Cun与/Cup参数在配置文件中指定的登录凭据。/Cun参数用于设置用户名，/Cup参数用于设置口令，如下面实例所示：
+            wecutil ss "All File Servers" c:\evtforwarding\config1.xml /cun:cpandl\williams /cup:Rover
+        你也可以使用Wecutil ss命令来激活或禁用订阅，这分别是通过将/E参数设置为True与False实现的。比如，下面实例中，禁用了All File Servers这一订阅：
+            wecutil ss “All File Servers” /e:false
+        要获取某订阅的运行时状态，可以在命令提示符中输入wecutil gr命令，其后跟随订阅名。其输出信息提供了近期错误信息与每台源计算机上事件转发处于激活或禁用状态的详细资料，下面给出一个实例：
+            Subscription: all servers
+                RunTimeStatus: Disabled
+                LastError: 0
+                EventSources:
+                    MAILSERVER84.cpandl.com
+                        RunTimeStatus: Disabled
+                        LastError: 0
+                    ROOM5.cpandl.com
+                        RunTimeStatus:Disabled
+                        LastError: 0
+        如果不再需要使用某订阅，就可以使用Wecutil ds命令对其进行永久性删除。在命令行中，输入wecutil ds，其后跟随要删除的订阅名，比如wecutil ds “all file servers”。
+8.3性能日志
+    Windows Vista与Windows Server 2008中使用了数据收集器集与报告。通过数据收集器集，可以指定需要追踪的性能对象集与计数器。创建了一个数据收集器集后，可以很方便地启动或终止对其中包含的性能对象与计数器的监控。在某种程度上，这使得数据收集器集类似于早起Windows版本中的性能日志。然而，实际上数据收集器集要比早起的性能日志复杂与灵活得多。
+    8.3.1开始使用数据收集器集
+    
