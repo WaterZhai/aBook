@@ -149,16 +149,123 @@ Schtask命令与任务计划程序可以互换使用，本章讨论如何使用�
         · 对于某个月份的具体几个星期，只能输入一个值，比如FIRST或LAST。
             表  可用于Schtasks /Create的调度类型
                 --------------------------------------------------------------------------------------
-                调度类型|描述|Modifier值
-                ------------------------------------------------------------------------------------
-                minute|任务在指定的时间间隔（以分钟为计数单位）运行，默认情况下是1分钟运行一次|/mo 1~1439，任务两次运行之间间隔的分钟数，默认值为1
-                hourly|任务在指定的时间间隔（以小时为计数单位）运行，默认情况下是1小时运行一次|/mo 1~23，任务两次运行之间间隔的小时数，默认值为1
-                daily|每天运行任务，或每隔n天运行任务，默认情况下是1天运行一次|/mo 1~365，任务两次运行之间间隔的图案书，默认值为1
-                weekly|每星期或每隔n个星期的某天运行任务，默认情况下是每星期的周一运行一次|/mo 1-52，任务两次运行之间间隔的星期数。可选地，还可以使用/d指定在某个星期的具体哪几天运行。mon、tue、wed、thu、fri、sat、sun分别指代周一到周日，*指代某星期中的每一天
+                调度类型|描述                                                        |Modifier值
+                -------|-----------------------------------------------------------------------------
+                minute |任务在指定的时间间隔（以分钟为计数单位）运行，默认情况下是1分钟运行一次|/mo 1~1439，任务两次运行之间间隔的分钟数，默认值为1
+                hourly |任务在指定的时间间隔（以小时为计数单位）运行，默认情况下是1小时运行一次|/mo 1~23，任务两次运行之间间隔的小时数，默认值为1
+                daily  |每天运行任务，或每隔n天运行任务，默认情况下是1天运行一次              |/mo 1~365，任务两次运行之间间隔的图案书，默认值为1
+                weekly |每星期或每隔n个星期的某天运行任务，默认情况下是每星期的周一运行一次    |/mo 1-52，任务两次运行之间间隔的星期数。可选地，还可以使用/d指定在某个星期的具体哪几天运行。mon、tue、wed、thu、fri、sat、sun分别指代周一到周日，*指代某星期中的每一天
                 monthly|1.每个月或每隔n个月的某天运行任务，默认情况下是每个月的第一天运行任务。。2.另一种月份变量，用于指定某个月的特定日期，包括/mo与/m，或/m与/d。。2.第三种月份变量，用于指定某个月的特定星期|1./mo 1~12，任务两次运行之间间隔的星期数。可选地，还可以使用/d mon-sun指定在某个月的星期几运行，*指代某月中的每一天。。2./mo lastday，代表某个月的最后一天。/m jav,feb,...,dec,设置具体哪一个月份。/d 1~31，设定某月的哪一天。。3./mo first|second|third|fourth|last,设置某月中的哪个星期。/d mon-sun，设置某星期的星期几。/m jan,feb,...,dec，设置具体哪一个月份
-                once|任务在指定的日期与时间运行一次|
-                onevent|指定的事件发生或指定的事件日志中有事件发生时运行任务|/mo XPathString，其中，XPathString为XPath时间查询字符串，用于标识触发任务的事件|
-                onstart|系统启动时运行任务|
-                onlogon|有用户登录时运行任务|
-                onidle|系统空闲了指定的时间间隔后运行任务|/i 1~999，任务启动前系统空闲的分钟数。
+                once   |任务在指定的日期与时间运行一次                                      |
+                onevent|指定的事件发生或指定的事件日志中有事件发生时运行任务                  |/mo XPathString，其中，XPathString为XPath时间查询字符串，用于标识触发任务的事件|
+                onstart|系统启动时运行任务                                                 |
+                onlogon|有用户登录时运行任务                                                |
+                onidle |系统空闲了指定的时间间隔后运行任务                                   |/i 1~999，任务启动前系统空闲的分钟数。
                 --------------------------------------------------------------------------------------------------------------------------------------------------
+        要进一步了解如何使用Schtasks /Create，参考下面给出的一些实例。
+        创建一个任务，该任务立即运行一次，之后不再运行：
+            schtasks /create /tn "SysChecks" /tr c:\scripts\sch.bat /sc once
+        创建一个任务，该任务在系统启动时运行：
+            schtasks /create /tn "SysChecks" /tr c:\scripts\sch.bat /sc onstart
+        创建一个任务，该任务在系统空闲时间超过10分钟后运行：
+            schtasks /create /tn "SysChecks" /tr c:\scripts\sch.bat /sc onidle /i 10
+        创建一个任务，该任务在本地计算机上每隔15分钟运行：
+            schtasks /create /tn "SysChecks" /tr c:\scripts\sch.bat /sc minute /mo 15
+        创建一个任务，该任务在本地计算机上每隔5小时运行：
+            schtasks /create /tn "SysChecks" /tr c:\scripts\sch.bat /sc hourly /mo 5
+        创建一个任务，该任务在本地计算机上每隔2天运行：
+            schtasks /create /tn "SysChecks" /tr c:\scripts\sch.bat /sc daily /mo 2
+        创建一个任务，该任务在每隔两个星期的星期一（默认的运行日期）运行：
+            schtasks /create /tn "SysChecks" /tr c:\scripts\sch.bat /sc weekly /mo 2
+        创建一个任务，该任务在每个星期的周一与周五运行：
+            schtasks /create /tn "SysChecks" /tr c:\scripts\sch.bat /sc weekly /d mon,fri 
+        创建一个任务，该任务在每个月的第1天运行：
+            schtasks /create /tn "SysChecks" /tr c:\scripts\sch.bat /sc monthly 
+        创建一个任务，该任务在每隔一个月的第5天运行：
+            schtasks /create /tn "SysChecks" /tr c:\scripts\sch.bat /sc monthly /mo 3 /d 5
+        创建一个任务，该任务在每个月的最后一天运行：
+            schtasks /create /tn "SysChecks" /tr c:\scripts\sysch.bat /sc monthly /mo lastday 
+        创建一个任务，该任务在4月、8月、12月的第一个星期一运行：
+            schtasks /create /tn "SysChecks" /tr c:\scripts\sysch.bat /sc monthly /mo first /d mon /m apr,aug,dec 
+        如果指定任务的文件路径中包含空格，要注意使用双引号对其进行封装，如下面实例所示：
+            schtasks /create /tn "SysChecks" /tr "c:\My Scripts\sch.bat" /sc onstart 
+        如果没有使用双引号进行封装，则Schtasks尝试运行该任务时会出错。进一步地，如果需要向任务指定的程序、工具、脚本传递参数，可以将其附加在指定该任务的文件路径之后。如果参数中包含空格，也应该使用双引号对其进行封装，以便该参数被正确解释为单一的参数，而非多个参数。下面给出了几个实例：
+            schtasks /create /tn "SysChecks" /tr c:\scripts\sch.bat 1 Y LAST /sc onstart 
+            schtasks /create /tn "SysChecks" /tr "c:\My Scripts\sch.bat" Y N /sc onstart 
+            schtasks /create /tn "SysChecks" /tr "c:\My Scripts\sch.bat" "Full Checks"
+        你可以对远程计算机上的任务进行调度，也可以调度那些需要不同用户许可权限的任务。对远程计算机上的任务进行调度时，要记住的关键一点是当前使用的计算机必须与远程计算机在同一个域内，或者在远程计算机所信任的域内。为此，必须使用扩展的语法格式，包含如下的一些参数：
+            /s Computer /u [Domain\]User [/p Password]
+        其中，Computer为远程计算机或IP地址，Domain为可选的域名，用户账号就存在于该域内，User为用户账号名（要使用的就是该用户账号的许可权限），Password为该用户账号的口令（可选）。如果没有指定域，则系统会假定当前域作为默认的域名。如果没有指定口令，则会弹出提示信息要求输入口令。
+        要了解如何添加计算机与用户信息，参考如下的实例。
+        在本地计算机上创建任务时，使用账号adatum\wrstanek：
+            schtasks /create /tn "SysChecks" /tr c:\scripts\sch.bat /sc onstart /u adatum\wrstanek /p RoverSays
+        创建任务时，将远程计算机设置为mailer01，使用的账号为adatum\wrtanek： 
+            schtasks /create /tn "SysChecks" /tr c:\scripts\sch.bat /sc onstart /s mailer01 /u adatum\wrstanek /p RoverSays
+        通过/Ru参数与/Rp参数，可以指定该任务运行时使用的用户账号的登录凭据。如果希望任务只有在特定用户登录时才运行，可以使用可选的/It参数，该参数规定任务应该以非交互方式运行，并且只有在该任务的创建者登录时才运行。对于只需要操作本地资源的任务，可以使用/Np参数，从而不需要为用户账号的登录凭据保存口令。要注意的是，没有保存口令的情况下，任务只能访问本地资源，并以非交互方式由指定的用户运行。
+        默认情况下，任务以标准用户权限运行。如果希望任务以指定用户的最高权限运行（比如要执行管理性任务），可以将/Rl参数设置为Highest，而不是默认的值Limited。
+        要了解如何添加可替换的登录凭据与特权，参考如下实例。
+        将任务配置为使用adatum\thomasv的登录凭据：
+            schtasks /create /tn "Cleanup" /tr c:\scripts\cleanup.bat /sc onlogon /ru adatum\thomasv /rp DingoE
+        将远程计算机设置为server18，用于创建该任务的账号为adatum\wrstanek，任务使用adatum\thomasv的登录凭据运行：
+            schtasks /create /tn "Cleanup" /tr c:\scripts\cleanup.bat /sc onlogon /s server18 /u adatum\wrstanek /p RoverSays /ru adatum\thomasv /rp DingoE 
+        使用账号adatum\wrstanek在server18上运行任务，不保存口令：
+            schtasks /create /tn "Cleanup" /tr c:\scripts\cleanup.bat /sc onlogon /s server18 /u adatum\wrstanek /np
+            以最高权限运行任务：
+            schtasks /create /tn "SysChecks" /tr c:\scripts\sch.bat /sc onlogon /rl highest 
+        最后，如果需要，可以为任务添加特定的启动时间与日期，以及结束时间与日期，如下所示。
+        · /st StartTime。其中StartTime为24小时制格式（HH：MM），比如，15：00代表下午3点。使用/sc once时，这一参数是需要的。
+        · /et EndTime。其中，EndTime为24小时制格式（HH：MM），比如，15：00代表下午3点。调度类型为onstart、onlogon、onidle、onevent时，这一参数是不适用的。
+        · /du Duration。其中，Duration为任务运行持续的小时数与分钟数，其格式为HHHH：MM。调度类型为ONSTART、ONLOGON、ONIDLE、ONEVENT时，这一参数是不适用的。
+        · /sd StartDate。其中，StartDate为任务的开始日期，采用默认的日志格式，比如MM/DD/YYYY。调度类型为ONCE、ONSTART、ONLOGON、ONIDLE、ONEVENT时，这一参数是不适用的。
+        · /ed EndDate。其中，EndDate为任务的结束日期，采用默认的系统日期格式，比如MM/DD/YYYY。调度类型为ONCE、ONSTART、ONLOGON、ONIDLE、ONEVENT时，这一参数是不适用的。
+        （提示  如果指定了终止日期或时间，你也可以指定/Z参数，该参数的作用是完成任务的计划运行后删除该任务。）
+        要了解如何指定特定的开始时间与日期，以及终止时间与日期，可以参考如下实例。
+        在午夜启动每小时执行一次的任务：
+            schtasks /create /tn "SysChecks" /tr c:\scripts\sch.bat /sc hourly /st 00:00
+        在上午三点启动每小时执行一次的任务，在上午七点结束：
+            schtasks /create /tn "SysChecks" /tr c:\scripts\sch.bat /sc hourly /st 03:00 /et 07:00
+        在2009年2月20日上午三点启动每星期执行一次的任务：
+            schtasks /create /tn "SysChecks" /tr c:\scripts\sch.bat /sc weekly /st 03:00 /sd 02/20/2009
+        在2009年2月20日上午三点启动每星期执行一次的任务，在2009年3月15日上午2：59终止该任务：
+            schtasks /create /tn "SysChecks" /tr c:\scripts\sch.bat /sc weekly /st 03:00 /sd 02/20/2009 /et 02:59 /ed 03/15/2009
+        （注解  日期与时间格式是由区域与语言选项的设置决定的。在上面的这些实例中，时区设置为English（United States）。）
+    9.3.2创建由Windows事件触发的计划任务
+        通过Schtasks /Create，可以创建操作系统或Windows组件向某个事件日志写入特定事件或特定类型事件时启动的任务。创建这种事件触及型任务的基本语法格式如下：
+            schtasks /create /tn TaskName /tr TaskToRun /sc ONEVENT /ec LogName /mo EventString 
+        其中，TaskName为字符串形式的任务名，TaskToRun指定了要运行的程序、命令行工具、脚本所在位置的文件路径，LogName设置了要监控的事件日志名，EventString设置了XPath事件查询字符串，该字符串用于识别触发任务的时间或事件集。
+        /sc ONEVENT的作用是将计划任务设置为由事件触发，/Ec参数则指定了在命令行中可以使用的待监控事件日志名。如第8章8.1.2节所讲述，你可以使用Wevtutil el命令列出计算机上所有可用的事件日志。/Mo参数用于指定XPath事件查询字符串，第8章中对XPath查询进行了深入讨论。
+        创建查询字符串时，并不是一定要完全重新创建。实际上，通过事件查看器创建过滤器，并由其识别待监控的事件或事件集是一个有效的方法。创建之后，参考第8章8.1.4节讲述的方法，将相关的XPath查询复制到记事本或其他文本编辑器中。复制到记事本中之后，保存该查询以便保留原始设置，之后从中提取必要的事件查询字符串。一般来说，需要的事件查询字符串存在于Query元素中的<Select>标签与</Select>标签之间。参考如下实例：
+            <QueryList>
+                <Query Id="0" Path="Application">
+                    <Select Path="Application">*[System[(Level=1 or Level=2 or Level=3)]]</Select>
+                </Query>
+            </QueryList>
+        在这一实例中，事件查询字符串为：
+            *[System[(Level=1 or Level=2 or Level=3)]]
+        这一查询字符串创建了一个过滤器，其作用是在可用的事件日志中搜索关键性事件、警告事件与错误事件。下面的实例中，使用这一查询创建了一个名为Track Application Issues的计划任务，该任务的作用是有关键性事件、警告事件与错误事件写入到可用的事件日志时运行事件查看器：
+            schtasks /create /tn "Track Application Issues" /tr wevtvwr.msc /sc /ONEVENT /ec Application /mo "*[System[(Level=1 or Level=2 or Level=3)]]"
+        要注意的是，由于任务名与查询字符串中包含空格，因此使用双引号对其进行封装。尽管这一查询字符串可能过于宽泛，但仍不失为一个了解查询字符串的参考实例。更有效的查询字符串用于识别特定事件（根据事件标识符），用于指定单独的事件标识符的事件查询字符串的语法格式如下：
+            *[System [ (EventID=EventNumber)]]
+        齐总，EventNumber为待监控事件的标识符。下面的实例中，创建了一个计划任务，使其在事件ID为3210的事件写入到系统日志时运行：
+            schtasks /create /tn "Computer Authentication Issues" /tr wevtvwe.msc /sc ONEVENT /ec System /mo "*[System[(EventID=3210)]]"
+        （真实场景  计算机无法在域内进行认证时，事件ID为3210的时间就会写入到系统日志。在计算机口令需要重置时，就会产生这一事件，第14章14.3.4节对此进行了讨论，此外，如果计算机名与网络中另一台计算机重名，也会产生这一错误。）
+        通过使用or语句对查询字符串进行扩展，可以输入多个事件标识符，扩展的语法格式如下：
+            *[System[(EventID=EventNumber or EventID=EventNumber or ...)]]
+        下面的实例中，创建了一个计划任务，使其在事件ID为3210或5722的时间写入到系统日志时运行：
+            schtasks /create /tn "Computer Authentication Issues" /tr wevtvwr.msc /sc ONEVENT /ec System /mo "*[System[(EventID=3210 or EventID=5722)]]"
+        （真实场景  计算机被拒绝访问某资源时，事件ID为5722的事件就会写入到系统日志，在计算机帐号被禁用或删除时就会产生这一错误。在第14章14.2.1与14.3.3两节中有关于这一主题更多的信息。）
+    9.3.3使用SchTasks /Change改变计划任务
+        你可以使用Schtasks /Change来改变与计划任务相关联的关键参数，其基本语法格式如下：
+            schtasks /change /tn TaskName ParametersToChange
+        其中，TaskName为想要改变参数的任务名，ParametersToChange为需要修改的参数，可以使用该命令操作的参数如下所示。
+        · /ru Domain\User。用于修改运行该任务的用户，比如，/ru adatum\wrstanek。对系统账号有效值包括“”、“NT AUTHORITY\SYSTEM”、“SYSTEM”。对配置为用于操作Windows Vista与Windows Server 2008的任务，也可以使用“NT AUTHORITY\LOCAL-SERVICE”、“NT AUTHORITY\NETWORKSERVICE”等账号。
+        · /rp Password。用于为以前指定的或新指定的用户账号设置口令。如果希望弹出输入口令的提示信息，此处可以使用“*”或空口令。对于系统账号，此处的口令是忽略的。只有在指定用户账号的同时，才可以为其设置口令。
+        · /tr TaskToRun。用于改变指定任务下运行的程序、命令行工具或脚本。
+        · /st StartTime。为每N分钟或每N小时运行的任务设置开始时间。其中，StartTime为24小时制格式（HH：MM），比如，15：00代表下午3点。在创建计划任务指定了/sc ONCE时，这一参数是需要的。
+        · /ri Interval。设置了以分钟为计数单位的循环时间间隔，有效取值范围为1~5999940.计划类型为MINUTE、HOURLY、ONSTART、ONLOGON、ONIDLE、ONEVENT时，这一参数是不适用的。如果指定了/Et参数或/Du参数，则本参数默认为10分钟。
+        · /et EndTime。为每N分钟或每N小时运行的任务设置结束时间。其中，EndTime为24小时制格式（HH：MM），比如，15：00代表下午3点。调度类型为ONSTART、ONLOGON、ONIDLE、ONEVENT时，这一参数是不适用的。
+        · /du Duration。设置了运行任务持续的小时数与分钟数，其格式为HHHH：MM。调度类型为ONSTART、ONLOGON、ONIDLE、ONEVENT时，或设置了/Et参数时，这一参数是不适用的。
+        · /sd StartDate。设置了任务的开始日期，采用默认的系统日期格式，比如MM/DD/YYYY。调度类型为ONCE、ONSTAART、ONLOGON、ONIDLE、ONEVENT时，这一参数是不适用的。
+        · /ed EndDate。设置了任务的结束日期，采用默认的系统日期格式，比如MM/DD/YYYY。调度类型为ONCE、ONSTAART、ONLOGON、ONIDLE、ONEVENT时，这一参数是不适用的。
+        · /k。当任务的结束时间或持续时间已到后，不应该再启动该任务。但如果任务已经在运行中，也不会强行终止该任务，而是等本次运行结束后不再启动。本参数生效的先决条件是必须已经指定了/Et参数或/Du参数。调度类型为ONSTART、ONLOGON、ONIDLE、ONEVENT时，这一参数是不适用的。
+        · /it。只有在任务所有者登录时才应该运行该任务。
