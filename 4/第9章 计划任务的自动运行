@@ -269,3 +269,43 @@ Schtask命令与任务计划程序可以互换使用，本章讨论如何使用�
         · /ed EndDate。设置了任务的结束日期，采用默认的系统日期格式，比如MM/DD/YYYY。调度类型为ONCE、ONSTAART、ONLOGON、ONIDLE、ONEVENT时，这一参数是不适用的。
         · /k。当任务的结束时间或持续时间已到后，不应该再启动该任务。但如果任务已经在运行中，也不会强行终止该任务，而是等本次运行结束后不再启动。本参数生效的先决条件是必须已经指定了/Et参数或/Du参数。调度类型为ONSTART、ONLOGON、ONIDLE、ONEVENT时，这一参数是不适用的。
         · /it。只有在任务所有者登录时才应该运行该任务。
+        · /rl Level。对标准用户权限，将任务运行界别设置为Limited。对runas用户的最高可能权限，将任务运行级别设置为Highest。
+        · /delay DelayTime。设置了任务出发到运行的时间延迟。DelayTime以mmmm:ss的形式进行设置，本参数只适用于ONSTART、ONLOGON、ONEVENT等调度类型。
+        · /enable。激活计划任务，使其可以根据调度计划运行。
+        · /disable。禁用计划任务，禁止其运行。
+        · /z。在任务最后一次调度运行后将其删除。
+        要了解如何改变任务，参考如下实例：
+        改变要运行的脚本：
+            schtasks /change /tn "SysChecks" /tr c:\scripts\systemchecks.bat 
+        改变用户账号与口令：
+            schtasks /change /tn "SysChecks" /ru adatum\hthomas .rp gophers
+        将任务改变为在2009年3月1日上午七点开始每星期运行一次，在2009年3月30日上午6：59结束：
+            schtasks /change /tn "SysChecks" /st 07:00 /sd 03/01/2009 /et 06:59 /ed 03/30/2009
+        （注解  与前面类似，日期与时间格式是由区域与语言的设置决定的，在上面的这些实例中，时区设置为English（United States）。）
+        对任务进行修改时，Schtasks会显示一条消息，并声明修改成功或失败，比如：
+            SUCCESS: The parameters of the scheduled task "SysChecks" have been changed.
+        如果操作的是远程计算机，或者当前登录的用户账号不具备修改任务的许可权限，则可以根据需要指定计算机与帐号信息。其语法格式为：
+            schtasks /change /tn TaskName /s Computer /u [Domain\]User [/p Password]
+        其中，Computer为远程计算机名或IP地址，Domain为可选的域名，用户账号就存在于该域内，User为用户账号名（要使用的就是该用户账号的许可权限），Password为该用户账号的口令（可选）。如果没有指定域，则系统会假定当前域作为默认的域名。如果没有指定口令，则会弹出提示信息要求输入口令。
+        下面的实例中，远程计算机为mailer01，有权限修改任务SysChecks的用户账号为adatum\wrstanek:
+            schtasks /change /tn "SysChecks" /tr c:\scripts\systemchecks.bat /s mailer01 /u adatum\wrstanek 
+        由于上面命令中没有指定口令，因此，执行时Schtasks会要求输入口令。
+        你可以根据任务名快速地对其进行激活或禁用，激活任务的语法格式如下：
+            schtasks /change /tn TaskName /enable 
+            禁用任务的语法格式如下：
+            schtasks /change /tn TaskName /disable 
+        其中，TaskName为要激活或禁用的任务名，比如：
+            schtasks /change /tn "Syschecks" /disable 
+    9.3.4使用Schtasks /Query查询已配置的任务
+        通过在命令提示符中键入schtasks /query命令，可以快速地确定计算机上配置了哪些任务。对远程计算机，可以指定必要的计算机与帐号信息，使用如下的语法格式：
+            schtasks /query /s Computer /u [Domain\]User [/p Password]
+        其中，Computer为远程计算机名或IP地址，Domain为可选的域名，用户账号就存在于该域内，User为用户账号名，该账号具备远程计算机上适当的访问许可权限，Password为该用户账号的口令（可选）。
+        下面的实例中，远程计算机为mailer01，用户账号为adatum\wrstanek：
+            schtasks /query /s mailer01 /u adatum\wrstanek
+        由于上面命令中没有指定口令，因此，执行时Schtasks会要求输入口令。
+        Schtasks /Query命令的基本输出信息以表格形式呈现，包括TaskName、Next Run Time、Status等列。通过分别使用/Fo List或/Fo Csv参数，也可以使得输出信息分别呈现为列表形式与逗号分隔的多行形式。使用列表格式输出时，最好同时使用/V（verbose）参数，该参数提供了所有任务属性的完整的详细资料，如下面的实例所示：
+            schtasks /query /s mailer01 /u adatum\wrstanek /fo list /v 
+        另一个有用的参数是/Nh，该参数规定表格形式或CSV格式的输出中不带头信息。
+        （提示  你可能会疑惑为什么要使用不同的输出格式，实际上不同的输出格式可以满足不同的需求，如果需要查看系统中已配置所有任务的详细资料，或者正在进行故障排除，建议使用详细列表格式（/Fo List /v）。如果需要将输出信息存储到一个文件中，并且日后可能会将其导出到电子表格或非关系型数据库，建议使用逗号分隔的形式。另外，也可以使用输出重定向符号（>或>>）将Schtasks的输出信息进行重定向。）
+    9.3.5使用XML配置文件创建任务
+        
