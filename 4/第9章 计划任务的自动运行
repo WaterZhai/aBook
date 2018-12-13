@@ -308,4 +308,20 @@ Schtask命令与任务计划程序可以互换使用，本章讨论如何使用�
         另一个有用的参数是/Nh，该参数规定表格形式或CSV格式的输出中不带头信息。
         （提示  你可能会疑惑为什么要使用不同的输出格式，实际上不同的输出格式可以满足不同的需求，如果需要查看系统中已配置所有任务的详细资料，或者正在进行故障排除，建议使用详细列表格式（/Fo List /v）。如果需要将输出信息存储到一个文件中，并且日后可能会将其导出到电子表格或非关系型数据库，建议使用逗号分隔的形式。另外，也可以使用输出重定向符号（>或>>）将Schtasks的输出信息进行重定向。）
     9.3.5使用XML配置文件创建任务
-        
+        在Schtasks /Create命令的讲解中，没有讨论/Xml参数。在使用Schtasks /Create命令时，通过/Xml参数，可以指定XML配置文件，其中定义了要创建的任务。其基本语法格式如下：
+            schtasks /create /tn TaskName /xml XmlFile
+        其中，TaskName为要创建的热无名，指定了XML配置文件名或全文件路径，XML配置文件中包含了任务的设置信息，比如：
+            schtakss /create /tn "Housekeeping Task" /xml housekeepingtask.xml 
+        与其他方式创建任务类似，这里也可以使用/S参数来指定远程计算机，/U参数指定创建该任务的用户的上下文，/P参数指定用户口令。尽管任务的XML配置文件中可以定义替换的登录凭据（用于运行该任务），但也可以使用/Ru参数与/Rp参数指定替换的登录凭据。
+        在XML配置文件汇总，一般不直接指定世界的用户口令，而是将其设置为空或*，之后在使用/Rp参数创建任务时指定的口令。
+        下面给出了一个XML配置文件实例，其中定义了一个计划任务及其设置信息：
+            <?xml version="1.0" encoding="UTF-16"?>
+            <Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2009/02/mit/task">
+                <RegistrationInfo>
+                    <Date>2009-10-01T1:10:12</Date>
+                    <Author>William5</Author>
+                </RegistrationInfo>
+                <Triggers>
+                    <></>
+                </Triggers>
+            </Task>
