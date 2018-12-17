@@ -1,0 +1,198 @@
+第三部分  使用命令行管理Windows文件系统和磁盘
+
+第10章  配置与维护磁盘
+第11章  对基本磁盘进行分区
+第12章  管理动态磁盘上的卷与RAID
+
+第10章  配置与维护磁盘
+
+本章将讲述关于磁盘配置与维护的技术，实际上这里涉及的内容比大多数人想象的要多得多。Windows Server 2008与Windows Vista支持硬盘驱动器与可移动存储设备。硬盘驱动器可以配置为基本的和动态的两种磁盘类型，以及主引导记录（MBR）与GUID分区表（GPT）两种磁盘分区类型；可移动存储设备的磁盘类型为可以动的。
+
+10.1使用DiskPart
+    要操作磁盘、磁盘分区和卷，DiskPart是首选的工具，它可以完成的主要任务包括转换磁盘类型、创建磁盘分区与卷、配置RAID等。比外，可以使用DiskPart对新磁盘的自动挂载进行配置，也可以通过它分配驱动器盘符与驱动器路径，还可以用它格式化磁盘。要格式化磁盘，可以使用FORMAT命令，该命令将在11.4节讨论。
+    10.1.1DiskPart基础
+        与本书中前面讲述的所有其他命令不同的是，DiskPart并不是一个可以使用命令行与参数调用的简单的命令行工具，而是一个文本模式的可调用的命令解释器，这样你可以使用一个单独的命令提示符与一些内部命令来管理磁盘、磁盘分区和卷。要调用DiskPart命令解释器，可以在命令窗口中键入diskpart，之后按Enter键。
+        DiskPart的作用是操作计算机上安装的物理硬盘，可以是内部的、外部的。也可以是混合的。尽管DiskPart也会列出其他类型的磁盘，比如CD/DVD驱动器、可移动存储介质以及连接在USB接口的闪存设备，也可以执行一些恶基本的任务，比如分配盘符，但DiskPart不能完成对这些设备的完全管理与操作。
+        在使用DiskPart命令之前，必须首先列出并选定待操作的磁盘、分区或卷。选定某个具体的磁盘、分区或卷之后，键入的DiskPart命令就会作用于该设备。
+        通过如下的list命令，可以分别列出系统中的磁盘、卷与分区。
+        · list disk。列出计算机上安装的所有物理硬盘。
+        · list volume。列出计算机上安装的所有卷（包括硬盘分区与逻辑驱动器）。
+        · list partition。列出选定的磁盘上的分区。
+        使用这些list命令后，星号会出现在选定的磁盘、卷、分区之后。磁盘或分区的选择是通过其编号实现的，卷的选择是通过其编号或盘符实现的，比如disk 0、partition 1、volume 2、volume D等。 
+        使用DiskPart解释器完成操作后，键入exit，就可以退出DiskPart提示符，并返回到标准的命令行。
+    10.1.2DiskPart：一个实例
+        要了解如何使用DiskPart，可以参考下面的实例，该实例调用了DiskPart，列出了可用的磁盘，并将焦点放置到disk 2。
+        （1） 在命令提示符中键入diskpart，调用DiskPart。
+        （2）执行后，命令提示符切换为
+            DISKPART>
+        （3）此时处于文本模式的DiskPart解释器中。要列出可用的磁盘，可以在命令提示符中键入list disk。 
+        （4）list disk的输出信息列出了计算机中可用的磁盘及其状态、大小与可用空间：
+            Disk###    Status    Size    Free    Dyn    Gpt    
+            -------    ------    ----    ----    ---    ---
+            Disk 0     Online    466GB   1528KB     
+            Disk 1     Online    466GB   1528KB 
+            Disk 2     Online    233GB   0B      *
+        （5）由于disk 2是需要操作的磁盘，因此，键入select disk 2命令，将焦点防止在其上。
+        （6）DiskPart报告：
+            “磁盘2现在是所选磁盘。”
+        （7）根据需要对该磁盘进行操作，完成后，键入exit，就可以退出DiskPart解释器。
+    10.1.3理解焦点及其内涵
+        选定了一个磁盘、分区或卷后，焦点自动放置在该设备，直到选择了另外的设备。前面的实例中，焦点防止在disk 2，但如果选择disk 0上的volume 2，则焦点会从disk 2转移到disk 0，volume 2。有些情况下，焦点会根据使用的命令自动变换。比如，黄建分区或卷后，焦点会自动切换到新的分区或卷。
+        要注意的是，只能将焦点防止到当前选定磁盘上的某个分区。当焦点转移到某个分区上之后，其相关的卷也相当于放置了焦点。卷放置了焦点之后，相关的磁盘与分区也相当于放置了焦点（如果该卷映射到单一的特定分区）。如果该卷没有映射到单一的特定分区，则只有该卷具备焦点。
+    10.1.4DiskPart命令与脚本
+        LIST命令与SELECT命令只是DiskPart命令提供的众多命令中的两个。表10-1展示了DiskPart命令的完整列表，其中的很多命令接收Noerr作为另外的参数。该参数可用于DiskPart脚本中，其作用是在发生错误时，告诉DiskPart继续处理脚本中的命令。如果没有指定Noerr参数，则发生错误时，DiskPart命令会退出并返回错误代码。使得脚本的执行中断。
+        · 可以使用Noerr参数并在退出时返回错误代码的命令包括ADD、ASSIGN、ATTRIBUTES、AUTOMOUNT、BREAK、CONVERT、CREATE、DELETE、EXTEND、IMPORT、OFFLINE、ONLINE、RECOVER、REMOVE、REPAIR、SAN、SETID、SHRINK、UNIQUEID。
+        · 不使用Noerr参数或者在退出时返回错误代码的命令包括ACTIVE、CLEAN、DETAIL、EXIT、FILESYSTEMS、GPT、HELP、INACTIVE、LIST、REM、RESCAN、RETAIN、SELECT。
+            表  DiskPart命令总结
+            -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            命令        |描述                                                                                                      |语法
+            -----------|----------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            ACTIVE     |在MBR磁盘上，将当前焦点所在分区标记为活跃的系统分区，意味着该分区包含了操作系统启动文件                           |active 
+            ADD        |在选定的动态磁盘上创建一个镜像卷                                                                             |add disk=n,其中n为包含镜像的磁盘编号;add disk=n[aligh=nn]
+            ASSIGN     |为选定的分区、逻辑驱动器或卷分配盘符或挂载点                                                                  |assign letter=x;assign mount=path
+            ATTRIBUTES |显示或管理磁盘或卷上的属性                                                                                  |attributes disk [set|clear] [readonly]（注意SP1版本前的Windows Vista不支持disk子命令）;attributes disk [set|clear] [hidden|readonly|nodefaultdriveletter|shadowcopy] （注意SP1版本前的Windows Vista不支持nodefaultdriveletter与shadowcopy子命令）
+            AUTOMOUNT  |用于控制是否自动挂载新加入到系统中的基本卷并为分配盘符                                                         |automount[enable|disable|scrub]
+            BREAK      |中断一个镜像集。添加nokeep，以便规定只保留一个卷，这意味着删除其他卷（只适用于Windows Server 2008）              |break disk=n;break disk=n nokeep
+            CLEAN      |移除焦点所在磁盘上所有格式化的分区或卷，使用CLEAN ALL时，所有磁盘删去被清零                                     |clean;clean[all]
+            CONVERT    |在不同的磁盘格式间转换                                                                                      |convert basic|dynamic;convert gpt |mbr 
+            CREATE     |创建特定类型的分区或卷                                                                                      |create partition efi | extended |logical |msr |primary;create volume simple|raid |stripe
+            DELETE     |删除焦点所在的磁盘、分区或卷                                                                                |delete disk |partiton |volume 
+            DETAIL     |提供焦点所在磁盘、分区或卷的详细资料                                                                         |detail disk |partition|volume 
+            EXIT       |退出DiskPart解释器                                                                                        |exit 
+            EXTEND     |扩展选定磁盘上的简单卷，或者跨越多个磁盘上的简单卷                                                            |extend size=n disk=n;extend filesystem
+            FILESYSTEMS|显示卷上当前的与支持的文件系统类型                                                                          |filesystems 
+            FORMAT     |对选定的卷进行格式化                                                                                       |format ;[[format fs=type][revision] | [recommended][label=label][unit=n][compress][override][nowait]]
+            GPT        |改变焦点所在分区的GPT属性                                                                                  |gpt attributes=n，其中，n为包含16个字符的16进制数值
+            HELP       |为指定的命令显示支持的命令列表或帮助信息                                                                     |help;help command name
+            IMPORT     |导入外部磁盘                                                                                              |import 
+            INACTIVE   |在MBR磁盘上，将当前焦点所在的分区标记为不活跃的分区，意味着计算机不会从该系统分区启动，而是从固件中选择下一个引导项|inactive 
+            LIST       |显示磁盘或卷的列表及其相关信息，或者焦点所在磁盘上的分区列表                                                   |list disk|partition|volume 
+            ONLINE     |将选定的磁盘或卷联机对焦点所在的镜像（或RAID-5）卷进行重新同步                                                |online disk ;online volume 
+            OFFLINE    |将选定的磁盘脱机（只适用于Windows Server 2008）                                                             |offline disk 
+            RECOVER    |尝试对选定的动态磁盘相关联的RAID-5卷进行恢复与重新同步（只适用于Windows Server 2008）                         |recover 
+            REM        |在DiskPart脚本中标记注释的开始                                                                             |rem comment
+            REMOVE     |从当前选定的卷上移除盘符或挂结点，可选的是，可以添加Diskmount参数                                             |remove letter=x;remove mount=path;remove all 
+            REPAIR     |修复焦点所在的RAID-5卷，其方法是使用指定的动态磁盘替换该卷（只适用于Windows Server 2008）                     |repair disk=n[align=nn]
+            RESCAN     |搜索可能已经添加到计算机上的新磁盘                                                                          |rescan 
+            RETAIN     |将选定的简单卷预备用于引导卷或系统卷                                                                        |retain 
+            SAN        |为当前引导的操作系统显示或设置存储区域网络（SAN）策略（Windows Vista SP1及后续版本或者Windows Server 2008）    |san ;san policy=value 
+            SELECT     |选定磁盘、分区或卷，并将焦点防止到其上                                                                      |select disk |partition volume 
+            SETID      |在选定的分区上设置分区类型                                                                                 |set id=value[override]
+            SHRINK     |降低选定卷的容量，其方法是，将空闲空间转变为卷尾部的未使用空间                                                |shrink [desired [desired=n][nowait]];shrink [minimun=n][nowait];shrink querymax
+            UNIQUEID   |为磁盘显示或设置GPT标识符或MBR签名（Windows Vista SP1及后续版本或者Windows Server 2008）                     |Uniqueid disk[id=value]
+            ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        说到DiskPart脚本，其使用方法与其他命令脚本有些差别。因为DiskPart是一个文本模式的解释器，而不是一个标准的命令行工具。调用DiskPart时（方法是在命令提示符中键入diskpart），要附加/S参数，以便DiskPart解释器获知要使用的脚本，如下所示：
+            diskpart /s ScriptName.txt
+        其中，ScriptName.txt为文本文件名，其中包含了要使用的脚本。默认情况下，DiskPart的输出写入到当前的命令提示符，但也可以对其进行重定向，如下所示：
+            diskpart /s ScriptName.txt > LogFile.log 
+            或
+            diskpart /s ScriptName.txt >>LogFile.log 
+        其中，LogFile.log是DiskPart输出将要写入的文件名。
+        （注解  重定向符号>用于创建或重写文件，>>用于创建文件或向现存文件添加内容。）
+        （提示  使用脚本而不是直接输入命令的好处是：可以将磁盘相关任务自动化，以便以完全相同的方式重复执行。在采用无人值守的安装模式部署Windows系统时，这种脚本化的磁盘管理任务也是有益的。）
+        使用DiskPart脚本时，要注意如下的一些错误代码。
+        · 0。表示没有错误发生，执行顺利。
+        · 1。发生致命以外，可能存在严重问题。
+        · 2。表示为命令指定的参数是错误的。
+        · 3。表示DiskPart无法打开指定的脚本或输出文件。
+        · 4。表示DiskPart使用的服务返回错误代码或报告错误。
+        · 5。表示发生了命令语法错误，典型的原因是错误地选择了磁盘、分区或卷，或者不适用于该命令。
+    10.1.5DiskPart：脚本实例
+        使用DiskPart脚本时，应该将所要指定的所有操作作为某一次会话的一部分。脚本中应该包含所有待执行的DiskPart命令，但没有必要包含EXIT命令，因为文本模式的解释器会在脚本指定到结尾时自动退出。命令清单10-1给出了一个DiskPart脚本实例：
+            命令清单10-1 DiskPart：脚本实例
+                rem Select disk 2
+                select disk 2
+
+                rem Create the primary partition on the disk and assign the drive letter 
+                create partition primary size=4096assign letter=s 
+                fomat fs=ntfs label="primary" 
+                rem Create extended partition with 2 logical drives 
+                create partition extended size=4096 
+                create partition logical size=2048 
+                assign letter=u 
+                format fs=ntfs label="extended1" create partition logocal size=2047 
+                assign letter=vformat fs=ntfs label="extended2"
+        上面的脚本实例中，在disk2上创建了主分区与扩展分区。主分区大小设置为4096MB，盘符设置为S，并使用NTFS文件系统进行格式化。扩展分区大小为4096MB，分为两个逻辑分区。第一个逻辑分区大小设置为2048MB，盘符为U，使用NTFS文件系统进行格式化；第二个逻辑分区大小设置为2048MB，盘符为U，使用NTFS文件系统进行格式化。这样设置逻辑分区大小的原因是分区过程会损失一些磁盘空间，如果不需要分为两个逻辑分区，也可以只创建一个大小为4096MB的逻辑分区。
+        （注解  按上面实例中这样创建分区并分配盘符之后，分区并不能直接使用，仍然需要使用DiskPart中的FORMAT命令对其进行格式化。要获取关于格式化分区与卷的更多信息，可以参考第11章11.4节。）
+        （提示  由于DiskPart命令对磁盘的变更到实际生效有一个过程，因此，不应该连续运行多个DiskPart脚本，而是应该在运行多个脚本之间（或处理单一的DiskPart会话的所有任务之间）间歇10~15秒。这样做不仅可以保证前一次DiskPart会话发布的最后一条命令执行完毕，还可以保证前一次DiskPart会话在下一次会话开始之前完成并关闭。）
+        要运行DiskPart脚本，可以键入diskpart /s ScriptName，比如diskpart /s disk2config.txt。运行该脚本时，应该有类似于如下的输出信息：
+            Disk 2 is now the selected disk.
+            DiskPart succeeded in creating the specified partition.
+            DiskPart successfully assigned the drive letter or mount point.
+            DiskPart successfully formatted the volume.
+            DiskPart succeeded is creating the specified partition.
+            DiskPart succeeded is creating the specified partition.
+            DiskPart successfully assigned the drive letter or mount point.
+            DiskPart successfully formatted the volume.
+            DiskPart succeeded in creating the specified partition.
+            DiskPart successfully assigned the drive letter or mount point.
+            DiskPart successfully formatted the volume.
+        从输出信息可以看出，对脚本运行的每一步骤，DiskPart都报告了成功或失败的结果。需要指出的是，DiskPart脚本也可以不保存在本地计算机上。如果DiskPart脚本保存在网络共享位置\\corpserver01\scripts处，则可以通过如下命令调用该脚本：
+            diskpart /s \\corpserver01\scripts\disk2config.txt 
+        上面命令可以成功执行的前提是从本地系统可以访问该网络共享位置。为确保这一点，也可以使用NET USE命令来映射网络驱动器，其格式为：
+            net use DriveLetter: \\ComputerName\ShareName 
+        比如，对上面的实例，可以使用如下命令来映射网络驱动器：
+            net use x: \\corpserver01\scripts 
+        （注解  使用NET USE命令时，可以以/USER:Domain\User的格式提供用户名与口令信息，也可以指定映射的驱动是否持久化的，也就是说，计算机重启都，网络共享映射是否仍然有效。其方法是使用参数/Persistent:Yes。如果需要删除持久化的网络共享，则可以键入net use \\ComputerName\ShareName /DELETE命令。）
+        默认情况下，如果DiskPart脚本在执行命令时遇到错误，就会停止执行该脚本，并返回宇哥错误代码。但如果为齐总的每一条命令都指定Noerr参数，则DiskPart脚本在执行命令出错后也会报错，但会继续执行后续命令。此外，并不是必须在命令行中直接键入命令，命令可以是大型脚本（可以称为master脚本）的一部分，命令清单10-2给出了一个master脚本实例。
+            命令清单10-2master脚本实例 
+                @echo off 
+                @if not "%OS%"=="Windows_NT" goto :EXIT 
+                @if "%1"=="" (set INFO=echo && set SEXIT) else (set INFO=rem && set SEXIT=0)
+
+                %INFO% ************************
+                %INFO% Script: Disk2Setup.bat
+                %INFO% Creation Date: 3/3/2008
+                %INFO% Last Modified: 3/15/2008
+                %INFO% Author: William R. Stank 
+                %INFO% Email: williamstanek@aol.com 
+                %INFO% ************************
+                %INFO% Description: Configures the standard Partitions on workstations
+                %INFO%            with a third hard drive. The script is configured so 
+                %INFO%           that it will only run if you pass in a parameter,
+                %INFO%           which can be any value.This is meant as a 
+                %INFO%           safeguard to help prevent accidental formatting
+                %INFO%           of disks.
+                %INFO% ***********************
+                @if "%SEXIT%"=="1" goto :EXIT 
+
+                @title "Configuring Disk 2..."
+                cls 
+                color 07
+
+                net use x: \\corpserver01\scripts 
+                diskpart /s x:\disk2config.txt 
+
+                rem perform other necessary tasks here 
+                :EXIT 
+                echo Exiting...
+        本章前面对DiskPart命令进行了一些介绍，下面将讨论如何使用DiskPart命令及其相关命令（比如CHKDSK与DEFRAG）来创建、维护磁盘、分区与卷。
+10.2安装与管理硬盘驱动器
+    使用DiskPart的一个重要原因是有助于配置与维护硬盘驱动器。关键的管理任务包括检查新驱动器、确定驱动器状态以及管理分区表风格等。
+    10.2.2检查驱动器状态与配置
+        通过在DiskPart提示符中键入list disk命令，可以检查驱动器的状态。该命令典型的输出信息类似于如下格式：
+            DISK###        Status       Size        Free         Dyn        Gpt        
+            -------        ------       ----        ----         ---        ---    
+            Disk 0         Online       466GB       1528KB    
+            Disk 1         Online       466GB       1528KB  
+            Disk 2         Offline      233GB        233GB       *
+        从上面的输出信息可以看出，list disk命令展示了系统中已配置磁盘如下一些要素。
+        · Disk ###。磁盘编号。
+        · Status。磁盘总容量。
+        · Free。可用于分区的磁盘空间（不是磁盘上实际可用空间的总量）。
+        · Dyn。如果本列中是*，则说明该磁盘是动态磁盘，否则是基本磁盘。
+        · Gpt。如果本列中是*，则说明该磁盘分区表类型是GPT，否则是MBR。
+        前面的实例中，输出信息表明该计算机上有3块使用MBR分区类型的基本磁盘。其中，disk 0与disk 1状态为联机，disk 2状态为脱机，但通过将焦点切换到disk 2（键入select disk 2，之后键入online），可以让disk 2状态由脱机变为联机。
+        可以看出，在安装新驱动器或排除驱动器问题时，获知驱动器状态是有用的，表10-2总结了常用的驱动器状态值。
+            表10-2常用驱动器状态值及其含义
+                ------------------------------------------------------------------------------------------
+                状态|描述|含义
+                ---------------------------------------------------------------------------------------------------
+                音频CD（AudioCD）|CD/DVD驱动器中放置了一个音频CD|驱动器一切正常
+                外部（Foreign）|动态磁盘以移动到计算机中，但尚未导入并使用。有时候，失效的驱动器重新联机后也可能标记为外部磁盘|需要使用IMPORT命令将磁盘添加到系统中
+                初始化（Initializing）|将基本磁盘转换为动态磁盘时经历的一个临时状态|初始化完成时，状态应该自动变化为联机
+                丢失（Missing）|动态磁盘损坏、关闭或失去连接，该值出现在磁盘标识符中，而非状态列|重新连接或打开失去连接的磁盘，之后使用RESCAN命令来定位卷。如果不再使用该磁盘，可以使用DELETE DISK命令从磁盘列表中删除该磁盘
+                没有介质（NoMedia）|CD-ROM或可移动驱动器中尚未防止存储介质，只有CD-ROM或可移动磁盘类型才会显示这一状态|插入CD-ROM、软盘或可移动存储介质，以便使得磁盘状态变为联机
+                尚未初始化（Not Initialized）|磁盘不包括含有效的签名。在通过新磁盘检测向导第一次启动磁盘管理时，Windows会为磁盘赋予MBR或GPT类型。囚取消了该向导，就会出现这一状态|如果尚未启动磁盘管理，启动它，之后使用初始化磁盘向导写入磁盘签名。否则，在磁盘管理中右击某磁盘，之后选择初始化磁盘
+                脱机（offline）|动态磁盘不可访问，可能是因为损坏或暂时不可用。如果磁盘名变为丢失，则系统可能无法再定位或识别该磁盘|检查驱动器及其控制器与缆线的问题，确认驱动器电路及线路是否正确连接。如果可能的话，使用ONLINE命令将磁盘状态变为联机
+                联机（Online）|正常的磁盘状态

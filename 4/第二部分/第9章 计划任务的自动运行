@@ -322,6 +322,150 @@ Schtask命令与任务计划程序可以互换使用，本章讨论如何使用�
                     <Author>William5</Author>
                 </RegistrationInfo>
                 <Triggers>
-                    <></>
+                    <EventTrigger>
+                        <StartBoundary>2009-10-01T18:10:00</StartBoundary>
+                        <Enabled>true</Enabled>
+                        <Subscription>&lt;QueryList&gt;&lt;Query&gt;&lt;Select Path='system'&gt;* [System [(Level=1 or Level=2 or Level=3)]]&lt;/Select&gt;&lt;/Query&gt;&lt;/QueryList&gt;</Subscription>
+                    </EventTrigger>
                 </Triggers>
+                <Settings>
+                    <IdleSettings>
+                        <Duration>PT10M</Duration>
+                        <WaitTimeout>PT1H</WaitTimeout>
+                        <StopOnIdleEnd>false</StopOnIdleEnd>
+                        <RestartOnIdle>false</RestartOnIdle>
+                    </IdleSettings>
+                    <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
+                    <DisallowStartIfOnBatteries>true</DisallowStartIfOnBatteries>
+                    <StopIfGoingOnBatteries>true</StopIfGoingOnBatteries>
+                    <AllowHardTerminate>true</AllowHardTerminate>
+                    <StartWhenAvailable>false</StartWhenAvailable>
+                    <RunOnlyIfNetworkAvaianle>false</RunOnlyIfNetworkAvaianle>
+                    <AllowStartOnDemand>true</AllowStartOnDemand>
+                    <Enabled>true</Enabled>
+                    <Hidden>false</Hidden>
+                    <RunOnlyIfIdle>false</RunOnlyIfIdle>
+                    <WakeToRun>false</WakeToRun>
+                    <ExecutionTimeLimit>PT72H</ExecutionTimeLimit>
+                    <Priority>7</Priority>
+                </Settings>
+                <Actions Context="Author">
+                    <Exec>
+                        <Command>wevtvwr.msc</Command>
+                    </Exec>
+                </Actions>
+                <Principals>
+                    <Principal id="Author">
+                        <UserId>ADATUM\WILLIAMS</UserId>
+                        <LogonType>InteractiveToken</LogonType>
+                    </Principal>
+                </Principals>
             </Task>
+        从上面的文件可以看出，XML配置文件是相当复杂的。当然，并不是必须从头开始创建XML配置文件，通过9.2.5节中的讲述，你可以将现存任务的设置信息导出到XML配置文件中，之后使用这一文件在其他计算机上创建同样的任务。
+        在命令行中，可以使用Schtasks /Query命令来显示任务的状态及其XML配置文件。其中，/Tn参数后面跟随要操作的任务名，/XML参数用于显示XML配置文件及任务状态。下面的实例显示了任务Computer Authentication的状态及其配置文件：
+            schtasks /query /tn "Computer Authentication" /xml 
+        如果将上面命令的输出重定向到.xml文件，之后对其进行编辑，去除其中状态相关的详细资料，就获得了一个完整的XML配置文件，可以用于创建任务。下面的实例中，任务Computer Authentication的配置信息被写入到一个名为ComputerAuthTask.xml的文件中：
+            schtasks /query /tn "Computer Authentication" /xml > ComputerAuthTask.xml 
+        操作远程计算机时，可以使用/S参数指定远程计算机，/U参数指定创建任务的用户的上下文，/P参数指定用户口令。
+        了解了如何操作XML配置文件后，就可以在需要的时候人工编辑XML配置文件。进行编辑时，要记住应该先在测试或开发系统上对所作的修改进行测试，而不要直接在运营系统上进行操作。对于XML配置文件，要注意如下讲述的一些要点。
+            RegistrationInfo元素指定了任务的创建时间与创建者：
+                <RegistrationInfo>
+                    <Date>2009-10-01T18:10:12</Date>
+                    <Author>WilliamS</Author>
+                </RegistrationInfo>
+            Triggers元素指定了任务运行的条件，这一元素包含了如下的一些元素。
+            · EventTrigger元素。用于定义由特定事件触发的任务。
+            · TimeTrigger元素。用于定义由时间触发的一次性任务或周期执行的任务。
+            · BootTrigger元素。用于定义系统启动时触发的任务。
+            · IdleTrigger元素。用于定义计算机处理资源空闲时触发的任务。
+            · RegistrationTrigger元素。用于定义在任务被创建或修改时触发的任务。
+            Boot、Idle以及registration是最易于定义的处罚类型，因为这些类型的任务或者是激活的，或者是禁用的，如下面实例所示：
+            <Triggers>
+                <BootTrigger>
+                    <Enabled>true</Enabled>
+                </BootTrigger>
+            </Triggers>
+            Actions元素用于定义待运行的命令、待发送的电子邮件，或者待显示的消息等。待运行的命令是在Exec元素内定义的。下面的实例中，运行了一个名为CleanUp.bat的脚本：
+            <Actions Context="Author">
+                <Exec>
+                    <Command>c:\scripts\cleanup.bat</Command>
+                </Exec>
+            </Actions>
+            待发送的电子邮件是在SendEmail元素中定义的。下面的实力定义了一条经由邮件服务器mailer15.adatum.com发送给admins@adatum.com的电子邮件：
+            <Actions Context="Author">
+                <SendEmail>
+                    <Server>mialer15.adatum.com</Server>
+                    <Subject>Possible Database Outage</Subject>
+                    <To>admins@adatum.com</To>
+                    <From>williams@adatum.com</From>
+                    <Body>The CRM Database appears to be down.</Body>
+                    <HeaderFields />
+                </SendEmail>
+            </Actions>
+            显示在桌面的消息是在ShowMessage元素中定义的。下面的实例显示了一条告警消息，提示了可能的应用程序终端：
+            <Actions Context="Author">
+                <ShowMessage>
+                    <Title>Application Outage Warning</Title>
+                    <Body>The CRMComms application is having write errors.</Body>
+                </ShowMessage>
+            </Actions>
+            最后，Principals元素定义了运行该任务的用户的上下文，包括该任务是否以非交互模式运行、运行级别等。下面的实例中，任务以用户账号WilliamS的最低权限非交互地运行：
+            <Principals>
+                <Principal id="Author">
+                    <UserId>CPANDL\williams</UserId>
+                    <LogonType>InteractiveToken</LogonType>
+                    <RunLevel>LeastPrivilege</RunLevel>
+                </Principal>
+            </Principals>
+            你可以将任务配置为根据用户是否登录运行，其方法是将LogonType设置为Password。也可以将任务配置为以最高权限运行，方法是将RunLevel设置为HighestAvailable。下面给出了应用这些选项的一个实例：
+            <Principals>
+                <Principal id="Author">
+                    <UserId>CPANDL\williams</UserId>
+                    <LogonType>Password</LogonType>
+                    <RunLevel>HighestAvailable</RunLevel>
+                </Principal>
+            </Principals>
+            如果不希望任务计划程序为用户账号存储口令，可以将LogonType设置为S4U，如下面实例所示：
+            <Principals>
+                <Principal id="Author">
+                    <UserId>CPANDL\williams</UserId>
+                    <LogonType>S4U</LogonType>
+                    <RunLevel>HighestAvailable</RunLevel>
+                </Principal>
+            </Principals>
+    9.3.6使用Schtasks /Run立即运行任务
+        通过如下的语法格式，可以在任意时刻立即运行任务：
+            schtasks /run /tn TaskName 
+        其中，TaskName为所要运行的任务名，比如：
+            schtasks /run /tn "SysChecks"
+        使用schtasks /run运行命令并不会影响该任务的调度计划，也不会影响该任务下一次运行的时间。如果该任务可以成功启动，你会看到一条消息说明这一点。此外，你可以指定远程计算机名（任务在其上配置）。必要的时候，还可以指定运行该任务的账号以及可选的口令，如下面实例所示：
+            schtasks /run /tn "SysChecks" /s 192.168.1.100
+            schtasks /run /tn "SysChecks" /s 192.168.1.100 /u adatum\wrstanek 
+        （注解  如果指定用户账号但没提供口令，则会立即看到信息要求输入口令。）
+    9.3.7使用Schtasks /End终止运行中的任务
+        通过如下的语法格式，可以在任意时刻终止任务：
+            schtasks /end /tn TaskName 
+        其中，TaskName为正在运行的、需要终止的任务名，比如：
+            schtasks /end /tn "SysChecks"
+        如果该任务本来正处于运行状态，则执行上面命令后，该任务被终止。成功执行后，会看到类似于如下的输出信息：
+            SUCCESS" The scheduled task "SysChecks" has been terminated successfully.
+        你可以指定远程计算机名（任务在其上配置），必要的时候，还可以指定有权限终止该任务的账号以及可选的口令，如下面实例所示：
+            schtasks /end /tn "SysChecks" /s 192.168.1.100
+            或：
+            schtasks /end /tn "SysChecks" /s 192.168.1.100 /u adatum\wrstanek 
+        由于没有指定口令，Schtasks会弹出提示信息要求输入口令。
+    9.3.8使用Schtasks /Delete删除任务 
+        你可以根据任务名删除本地或远程计算机上的任务，采用如下的语法格式：
+            schtasks /delete /tn /TaskName [/s Computer /u [Domain\]User [/p Password]]
+        其中，TaskName为待删除的任务名，其后的参数是可选的，用于标识远程计算机、删除任务时使用的用户账号以及删除的口令，比如：
+            schtasks /delete /tn "SysChecks"
+            或： 
+            schtasks /delete /tn "SysChecks" /s 192.168.1.100 /u adatum/wrstanek /p frutS
+        （注解  如果指定用户账号但没提供口令，则会立即看到提示信息要求输入口令。）
+        输入Schtasks /Delete命令之后，会看到一条警告消息，询问是否确认删除该任务，此时根据需要键入适当的字母即可。如果不希望看到提示消息，可以使用/F参数，比如：
+            schtasks /delete /tn "SysChecks" /f 
+        通过上面的命令，就可以直接删除该任务，而不会看到警告消息。
+        此外，如果需要删除本地计算机或指定的远程计算机上的所有任务，可以输入*作为任务名，比如：
+            schtasks /delete /tn *
+            弹出提示信息时，确认。
+        
