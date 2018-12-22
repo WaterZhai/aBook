@@ -173,5 +173,83 @@
 
             Type          :FAT32(Default)
             Allocation Unit Sizes : 512, 1024, 2048, 4096, 8192, 16K, 32K(Default), 64K 
-        本实例中，当前文件系统类型为FAT32，分配单元大小为32KB。对该卷，可以使用FAT、FAT32、NTFS等文件系统类型进行格式化，分
+        本实例中，当前文件系统类型为FAT32，分配单元大小为32KB。对该卷，可以使用FAT、FAT32、NTFS等文件系统类型进行格式化，分配单元大小则可以设置为上面列出的任意值。如果采用FAT，默认的分配单元大小为64KB；如果采用FAT32，默认的分配单元大小为32KB；如果采用NTFS，默认的分配单元大小为4096字节。
+        Windows Vista SP1及其后续版本与Windows Server 2008中，对大多数类型的可移动存储设备，exFAT被作为一种附加的格式化选项，而标准的FAT（FAT 12/16）则不再作为一个可用的选项。下面给出的是对可移动存储设备使用FILESYSTEMS命令时获取的输出：
+            Current File System 
 
+            Type                     : FAT32 
+            Allocation Unit Size     : 4096
+
+            File Systems Supported for Formatting 
+
+            Type                     : NTFS 
+            Allocation Unit Sizes    : 512, 1024, 4096(Default), 8192, 16K, 32K, 64K 
+
+            Type                     : FAT32(Default)
+            Allocation Unit Sizes    : 512, 1024, 2048, 4096(Default), 8192, 16K, 32K, 64K 
+
+            Type                     : exFAT
+            Allocation Unit Sizes    : 512, 1024, 2048, 4096, 8192, 16K, 32K(Default), 64K, 128K, 256K, 1024K, 2048K, 4096K, 8192K, 16384K, 32768K
+        Windows Vista SP1及其后续版本与Windows Server 2008中，可以使用DiskPart来格式化空白的CD与DVD，下面给出的是对空白DVD使用FILESYSTEMS命令时获取的输出：
+            Current File System 
+
+            Type                  : RAW 
+            Allocation Unit Size  : 2048 
+            File Systems Supported for Formatting 
+
+            Type                  : UDF [Revision 1.50]
+            Allocation Unit Sizes : 2048(Default)
+
+            Type                  : UDF [Revision 2.00]
+            Allocation Unit Sizes : 2048(Default)
+
+            Type                  : UDF [Revision 2.01](Default)
+            Allocation Unit Sizes : 2048(Default)
+
+            Type                  : UDF [Rsvision 2.50]
+            Allocation Unit Sizes : 2048(Default)
+        在这一实例中，类型RAW表示该介质尚未格式化。进行格式化后，会发现文件系统类型变为UDF。UDF已经取代了以前使用的CD文件系统（CDFS），尽管你也可以继续使用CDFS，但UDF有很多优势。UDF是一种新兴的文件系统，其操作与使用其他类型的可移动存储类型，比如USB闪存或移动硬盘。你可以直接向其上复制数据--复制与粘贴（或者选中并拖放），而不需要进行刻录等操作。如果磁盘是可重复刻录的，还可以直接选中并删除文件。从系统中移除磁盘后，还可以根据需要再将其插入到CD/DVD驱动器中，就像可移动存储器一样使用。另外，尽管兼容的计算机都可以读取UDF磁盘，但大多数家庭和汽车上的CD/DVD播放器还不能读取UDF磁盘。
+        Windows Vista与Windows Server 2008支持的UDF版本如下。
+        · UDF 1.50。一种与Windows 2000及其后续Windows版本兼容的格式，但可能与Windows 98以及苹果机不兼容。
+        · UDF 2.00。一种与Windows XP及其后续Windows版本兼容的格式，但可能与Windows 98、Windows 2000以及苹果计算机不兼容。
+        · UDF 2.01。默认格式，包含了大多数场景下你所需要利用的重要更新，与Windows XP及其后续Windows版本兼容，但可能与Windows 98、Windows 2000以及苹果计算机不兼容。
+        · UDF 2.50。Windows Vista中优化的格式，可能与Windows早起版本与苹果机不兼容。
+        在对空白的CD/DVD进行格式化时，可以使用Revision参数来设置需要的UDF版本。要记住必须使用单引号或双引号将版本号包含起来，如下面一些实例所示：
+            format fs=udf revision='1.50'
+            format fs=udf revision='2.00'
+            format fs=udf revision='2.01'
+            format fs=udf revision='2.50'
+        你应该总是使用上面所示的完整的版本标识符。
+    11.4.3格式化：一个实例
+        你可以使用FORMAT命令对焦点所在卷进行格式化，遵循如下步骤。
+        （1）在命令提示符中键入diskpart，调用DiskPart。 
+        （2）使用list volume命令列出计算机上可用卷，注意每个卷的类型、状态与文件系统。分区的卷类型为Partition，可移动存储设备的卷类型为Removable，CD设备的卷类型为CD-ROM，CD/DVD设备卷类型为DVD-ROM。如果尚未向可移动存储设备或CD、DVD驱动器中插入存储介质，则卷状态一般会报告为没有介质。
+        （3）键入select volume命令，其后跟随卷的标号，选择要操作的卷。如果此时再次键入list volume命令，其后带有星号的卷就是所选择的卷。在继续下一步之前，进行这种确认是有意义的。
+        （4）键入format命令，其后跟随需要的参数与参数值，比如format fs=ntfs label='secondary data' unit=4096
+            接下来，DiskPart会展示格式化进程。格式化完毕后，其输出信息类似于如下：
+                “全部完成DiskPart成功格式化卷。”
+            如果格式化过程中发生错误导致DiskPart无法完成格式化，则会报告如下的错误信息：
+                “DiskPart遇到意外错误。检查系统时间日志获取关于失败的更多信息。”
+            发生错误的原因可能有多种，你可以使用FILESYSTEMS命令确认文件系统设置是否正确。有些情况下，可能需要使用OVERRIDE，以便在格式化之前强制卸载该卷。
+11.5管理分区
+    常见的分区管理任务包括将FAT与FAT32分区转换为NTFS、修改卷标、收缩分区、扩展分区、删除分区等，本节将对这些分区管理任务进行讨论。
+    11.5.1将分区或卷转换为NTFS
+        如果使用FAT与FAT32创建了分区或卷，则可以直接将其转换为NTFS格式，而不需要再进行格式化。所带来的好处是原有的文件与目录结构得以完整保留，没有数据丢失。要进行这种转换，可以在命令行中使用CONVERT命令。（注意，DiskPart CONVERT命令用于完全不同的目标。）
+        1.转换：预检查
+            在实际使用CONVERT命令之前，应该进行如下一些操作。
+            · 对分区进行检查，判断其是否当前正被用作包含操作系统的活跃的引导分区或系统分区。对MBR磁盘上的系统，可以将活跃的引导分区转换为NTFS。但这样做的前提是CONVERT对该分区具有排他性的访问权限，这种权限只有在系统启动时才可以具备。因此，在将活跃的引导分区或系统分区转换为NTFS时，会看到提示信息询问是否在系统下次重启时进行转换。如果选择“是”，就可以在下次重启时开始转换过程。此外，要完全转换活跃的引导分区，通常需要几次重启。
+            · 检查硬盘驱动器是否具备足够的空闲空间进行转换。要进行转换，需要一块大小约为该分区或卷使用总空间大小25%的空闲空间。比如，如果300GB的分区存储了200GB的数据，则CONVERT需要大约500GB的空闲空间。在运行之前，CONVERT会检查空闲空间大小，并且在没有足够空闲空间时停止运行。
+            （警告  没有可以将NTFS转换为FAT的工具。将NTFS转换为FAT或FAT32的唯一途径是删除该分区或卷，之后将其重新创建为FAT或FAT32卷。）
+        2.进行基本转换
+            CONVERT命令是在命令提示符中运行的。如果需要对硬盘驱动器格式进行转换，可以使用如下的语法格式：
+                convert volume /FS:NTFS 
+            其中，volume为卷标识符，其后跟随分号、驱动器路径或卷名。比如，如果需要将D盘转换为NTFS格式，可以使用如下命令：
+                convert d:/FS:NTFS 
+            （提示  对由FAT或FAT32转换我NTFS格式的卷，主文件表（MFT）的创建位置与直接用NTFS进行格式化的卷中所在的位置是不同的，这会导致性能的下降。为对性能进行优化，你可以使用一块指定的转换区域，下面会对其进行讨论。）
+            在转换后的引导卷与系统卷上，CONVERT应用同样的默认安全设置（Windows安装时使用过的设置）。在其他卷上，CONVERT需要对安全策略进行适当设置，以便Users组具备对其的访问权限，但不会对Everyone组进行授权。如果需要Everyone组成员访问磁盘上的数据，可以使用/NoSecurity参数删除其上的安全设置，比如：
+                convert d: /FS:NTFS /noscrurity
+            （警告  /NoSecurity参数会删除所有安全属性，使得该磁盘上的所有问价与目录都可以被Everyone组成员访问。）
+            CONVERT命令还有几个附加的参数。比如，你可以使用verbose开关（/V参数），用来在转换时获取更为详尽的信息。你也可以使用dismount开关（/X参数），用来在转换之前强制性地卸载分区或卷（如果必须）。在转换之前卸载驱动器的主要原因是确保在分区转换过程中没有应用程序或进程对其进行访问，但不能下载引导盘或系统盘，这些驱动器只能在系统下次重启时进行转换。
+            对大多数类型的磁盘，基本转换过程都可以起到良好的作用。但有些时候，基本转换过程不能提供理想的结果。比如，转换之后，磁盘性能降低而不是增强。要克服基本转换过程存在的不足，可以使用/CvtArea参数，该参数的作用将根目录中临近文件的文件名设置为NTFS系统文件的占位符。
+        3.使用/CvtArea参数
+            理想情况下，对
