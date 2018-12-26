@@ -1,0 +1,122 @@
+第四部分  使用命令行管理Windows活动目录
+
+第13章  核心目录服务管理
+第14章  管理计算机帐号与域控制器
+第15章  管理活动目录用户与组
+
+
+第13章  核心目录服务管理
+
+活动目录域服务是Windows网络的一个重要领域。活动目录是一种可扩展的目录服务，提供统一的方式，以便对资源信息进行命名、描述、定位、管理以及安全维护。也就是说，可以使用活动目录方便地操作用户、组、计算机帐号，就像操作应用程序、文件、打印机以及其他资源一样简单。可以使用活动目录来管理网络基础设置、执行系统管理任务，并对用户环境进行控制。
+只有在包含域控制器的Windows域中，活动目录才是可用的。域控制器是一台Windows服务器，其上安装了活动目录服务这一角色。活动目录充当了确保安全的中枢，但与安全账号管理者（SAM）不同的是，活动目录同时还充当了不同系统整合点的作用。活动目录将各种管理任务整合到一个基于Windows的管理工具集中，其中对应的目录服务命令行工具将在本章后面分别进行讨论。
+（注解  要从运行Business版、Enterprise版或Ultimate版Windows Vista上管理活动目录，必须为其安装微软远程服务器管理工具，具体信息可参考1.2.1节。）
+
+13.1从命令行控制活动目录
+    要有效使用那些勇于管理活动目录的命令行工具，需要对活动目录及其结构有一个基本的理解。在设计活动目录时，微软使用域名系统（DNS）作为命令机制。通过DNS，使用一种层次化的结构对网络资源进行组织，这种层次化结构与对网络资源的管理层面相对应。域层次结构，或者称之为域树，是活动目录环境的骨架，形式上与文件系统中使用的目录结构类似，这种层次结构也可以称之为命令空间。每个使用活动目录域的组织都有自己的活动目录层次化结构或命名空间。
+    13.1.1理解域、容器与对象
+        你所创建的第一个活动目录域称为域树的根域，或者称为其下所有子域的父域，根域下的所有域称为子域。比如，假定所创建的根域为cpandl.com。对于其下子域的划分，可以根据地理位置划分或根据功能划分。如果根据地理位置划分，可以设置seattle.cpandl.com、ny.cpandl.com、la.cpandl.com等子域；如果根据功能划分，则可以设置sales.cpandl.com、support.cpandl.com、tech.cpandl.com等子域。这里的关键是，子域名必须从父域名扩展而来。如果某个域名不是从父域名扩展而来，则该域名位于另外的命令空间。比如microsoft.com、msn.com、hotmail.com等域名都不与cpandl.com在同一个命名空间。
+        如果需要，也可以在命令空间内创建附加的层次。比如，在子域la.cpandl.com内，可以创建sales.la.cpandl.com、tech.la.cpandl.com、support.cpandl.com等子域。如果这些还不够，你还可以在命名空间中创建更多的子域层次。要记住的是，活动目录会对域树内的关系进行管理，并为域创建爱你适当的信任关系。
+        在活动目录中，信任关系是双向的、传递的。简单地创建一个子域，比如tech.la.cpandl.com，就自动地在tech.la.cpandl.com与la.cpandl.com之间建立了双向的信任关系，并且这种信任关系还可以在域树内传递。也就是说，由于la.cpandl.com信任cpandl.com，tech.la.cpandl.com与cpandl.com之间自动地建立了双向的信任关系，同时也自动地与该命令空间内的所有其他子域建立了信任关系。
+        活动目录使用对象来表示网络资源，比如用户、组、计算机等。还使用一种称之为容器的专门对象来对网络资源进行组织，进行组织的依据可以是地理位置、商业、功能需求等。典型请款修改，容器用于将具有相似属性的对象组合在一起。比如，你可能需要为所有工程师赋予一组特定的许可权限，为此，将所有这些用户放置到一个容器中是一个简单易行的方法。
+        每个容器代表一组对象，每个单独的资源由一个独一无二的活动目录对象进行表示。最常见的活动目录容器类型为组织单元，或称之为OU。放置到同一个OU中的对象只能来自相关的域，比如，与tech.la.cpandl.com相关联的多个OU只能包含来自该域的对象。也就是说，你不能向这些容器中添加来自support.la.cpandl.com、la.cpandl.com或tech.ny.cpandl.com等域的对象。
+        每个活动目录对象类，比如容器、用户、组、打印机等，都分配了一组属性，用于描述单独的资源。比如，用户对象包含了用于描述用户账号的属性，包括联系信息、许可权限、特权等。也就是说，用户对象属性与首名、尾名、显示名、电话号码、电子邮件地址、口令等相关。
+        由于活动目录内的每个对象实质上是数据库内的一条记录，因此可以对属性集进行扩展，来满足不同组织的需要。也就是说，可以为其添加自定义属性，来更好地描述对象。比如，你可以添加一个属性，用于描述雇员的身份代码。
+    13.1.2理解活动目录中的逻辑结构与物理结构
+        到这里为止，对活动目录结构的讨论主要是目录数据逻辑上的组织结构，包括域、子域、OU等。根据商业或功能需求，你可以使用这些结构对活动目录进行组织。你也可以按照地理位置进行组织，比如seattle.cpandl.com、ny.cpandl.com、la.cpandl.com等子域。 
+        然而，对域、子域、OU等逻辑结构都可能跨越几个物理区域。不管是某个建筑物的不同层、不同建筑物、或者不同的城市，都统一看做不同的物理位置。要想使得活动目录理解这些不同的位置，必须定义子网与站点。子网是一些计算机和网络设备的集合，这些计算机和网络设备的IP地址位于某个特定的区域，并有一个子网掩码。站点则是一个或多个子网的组合，映射了网络的物理结构。由于站点映射独立于逻辑域结构，因此，网络的物理结构与其逻辑域结构没有必然的联系。
+        你可以在单一域内创建多个站点，也可以创建一个站点为几个域所用。比如，如果根据地理位置对子域进行分组，你可以创建seattle.cpandl.com、nycpandl.com、la.cpandl.com等几个子域，分别对应Seattle-Site、NY-Site、LA-Site等站点；如果你所在组织只有一个办公室，并根据功能进行子域划分，就可以创建sales.la.cpandl.com、tech.la.cpandl.com、support.la.cpandl.com等几个子域，并建立一个站点Main-Site。
+    13.1.3理解区分名
+        活动目录中的每个对象都有相关联的区分名，即DN。根据对象的通常名及其在响应命令空间中的位置，DN唯一标识了该对象。对象的通常名是在创建对象时赋予该对象的，以明文的英文形式呈现。通过CN=Name，可以标识对象的通常名，其中，Name就是对象的通常名，比如：
+            CN=William Stanek
+        对象的通常名也是该对象的相对DN（RDN）。也就是说，对象全名的这一部分代表了该对象在活动目录中的位置。对象的位置是由包含该对象的容器对象与域名决定的。你可以使用OU=来便是OU容器，使用DC=来标识域组件，域树内的每一层次都可以分解为单独的域组件，参考如下实例：
+            OU=Engineering,DC=ny, DC=tech, DC=cpandl, DC=com 
+        上面的实例中，为ny.tech.cpandl.com域内的Engineering OU指定了DN，每个名组件使用逗号分隔开，名组件从域树的最底层到最顶层。也就是说，从包含待操作具体对象的OU，到子域、到父域，直至最后到根域。
+        DN之所以如此重要，是因为DN指定了对象的确切位置。活动目录使用DN来搜索、取回、管理数据库内的对象，获知某对象的DN后，就可以执行这些任务。
+        所有对象都有相关联的容器与域组件。尽管典型情况下，用户、计算机、组以及其他类型对象都是OU，但也并非总是如此。因为活动目录还包含了几个默认的容器，其中可以存储对象。通过CN=语句，这些默认的容器使用其通用名进行标识，包括下面4个。
+        · Builtin。用于内置安全组的容器。
+        · Computers。用于域内成员服务器与工作站的默认容器。
+        · ForeignSecurityPrincipals。用于来自可信外部域的对象的容器。
+        · Users。用户的默认容器。
+        （注解  域控制器容器创建为一个OU。也就是说，你可以使用OU=Domain Controller作为名标识符。）
+        以这些信息为基础，可以对这些容器内的对象进行标识和识别。比如，如果需要对tech.cpandl.com域内的Users容器中的对象进行标识，可以使用如下语句：
+            CN=Users, DC=tech, DC=cpandl, DC=com 
+            如果该对象是William Stanek的用户账号，则完整的DN为：
+            CN=William Stanek, CN=Users, DC=tech, DC=cpandl, DC=com 
+            如果用户账号后来移动到Engineering OU，其DN为：
+            CN=William Stanek, OU=Engineering, DC=tech, DC=cpandl, DC=com 
+    13.1.4使用活动目录命令行工具
+        获知了活动目录的基本结构、并可以识别待操作对象的DN后，就可以从命令行控制活动目录。从命令行对活动目录进行控制和操作的关键优势在于其更多的灵活性。实际上，你可以在命令行中方便地执行很多任务，而在图形用户界面中，执行这些任务或者非常复杂，或者无法执行。比如，你可以搜索那些处于不活跃状态超过一个星期的计算机帐号，之后禁用它，或者你可以在的那一命令中同时修改多个用户账号的属性。
+        在操作Windows域时，Windows Server 2008包含了一组命令行工具，可以对活动目录进行管理。对于Business版、Enterprise版或Ultimate版的Windows Vista，要使用活动目录工具，需要先安装Windows Server 2008管理工具包，这些工具包含下面列举的。
+        · DSADD。向活动目录中添加对象。
+        · DSGET。显示活动目录中注册对象的属性。
+        · DSMOD。修改侯东目录中对象的属性。
+        · DSMOVE。在单一域内将单一对象移动到新位置，或者对其重命名而不移动。
+        · DSQUERY。使用特定搜索标准寻找活动目录中的对象。
+        · DSRM。从活动目录中移除对象。
+        上面每个命令行工具都可以用于操作活动目录中一组特定的对象，表13-1总结了这些工具可以操作的对象。
+            表13-1活动目录命令行工具及其可操作的对象
+            ------------------------------------
+            对象      |Dsquery|Dsget|Dsadd|Dsmod 
+            ---------|--------|-----|-----|-----
+            Computer |是      |是   |是   |是
+            Contact  |是      |是   |是   |是
+            Group    |是      |是   |是   |是
+            Partition|是      |是   |否×  |是
+            Quota    |是      |是   |是   |是
+            Server   |是      |是   |否×  |是
+            Site     |是      |是   |否×  |否×
+            Subnet   |是      |是   |否×  |否×
+            User     |是      |是   |是   |是
+            OU       |是      |是   |是   |是
+            -----------------------------------
+        大多数情况下，对活动对象的操作需要使用一些特定于待操作类型的参数，用于访问这些参数的子命令名则与待操作对象名相同。比如，如果需要向域中添加一台计算机，则可以使用DSADD COMPUTER命令以及相关的参数。如果需要向域中添加一个用户账号，则可以使用DSADD USER命令以及相关的参数。
+        （注解  表13-1中没有列出DSMOVE命令与DSRM命令，因为这两条命令可以操作活动目录中的任意对象，你可以根据对象的DN来移动或删除对象。此外，通过使用*作为DSQUERY操作的对象名，可以在目录中查找任意符合查询标准的对象。）
+13.2使用DSQUERY命令进行目录查询
+    你可以使用DSQUERY命令在活动目录中进行查询，以便搜索符合特定标准的对象。比如，你可以搜索所有以D引导的计算机帐号，或者所有处于禁用状态的计算机帐号，DSQUERY会返回符合查询标准的对象列表。
+    13.2.1DSQUERY子命令及语法
+        你可以使用如下一些子命令及其相应语法来查询活动目录。
+        · DSQUERY COMPUTER。搜索符合指定标准的计算机帐号。
+            dsquery computer [{StartNode | forestroot | domainroot}] [-o {dn | rdn |samid}] [-scope {subtree | oneleve | base}] [-name Name] [-desc Description] [-samid SAMName] [-inactive NumberIfWeeks] [-stalepwd NumberOfDays] [-disabled] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-q] [-r] [-gc] [-limit NumberOfObjects] [{-uc | -uco | -uci}]
+        · DSQUERY CONTACT。搜索符合制定标准的联系人。
+            dsquery contact [{StartNode | forestroot | domainroot}] [-o {dn | rdn}] [-scope {subtree |onelevel | base}] [-name Name] [-desc Description] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-q] [-r] [-gc] [-limit NumberOfObjects] [{-uc | -uco |-uci}]
+        · DSQUERY GROUP。搜索符合指定标准的组。
+            dsquery group [{StartNode | forestroot | domainroot}] [-o {dn | rdn | samid}] [-scope {subtree | onelevel | base}] [-name Name] [-desc Description] [-samid SAMName] [{-s Server |-d Domian}] [-u UserName] [-p {Password | *}] [-q] [-r] [-gc] [-limit NumberOfObjects] [{-uc | -uco |-uci}]
+        · DSQUERY OU。搜索符合指定标准的OU。
+            dsquery ou [{StartNode | forestroot | domainroot}] [-o {dn | rdn}] [-scope {subtree | onelevel | base}] [-name Name] [-desc Description] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-q] [-r] [-gc] [-limit NumberOfObjects] [{-uc | -uco | -uci}]
+        · DSQUERY PARTITION。搜索符合指定标准的活动目录分区。
+            dsquery partition [-o {dn | rdn}] [-part Filter] [-desc Description] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-q] [-r] [-limit NumberOfObjects] [{-uc | -uco | -uci}]
+        · DSQUERY QUOTA。搜索符合指定标准的对象配额。
+            dsuqery quota {domainroot | ObjectDN} [-o {dn | rdn}] [-acct Name] [-qlimit Filter] [-dest Description] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-q] [-r] [-limit NumberOfObjects] [{-uc | -uco |-uci}]
+        · DSQUERY SERVER。搜索符合指定标准的域控制器。
+            dsquery server [-o {dn | rdn}] [-forest] [-domain DomainName] [-site SiteName] [-name Name] [-desc Description] [-hasfsmo {schema | name | infr | pdc | rid}] [-isgc] [-isreadonly] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-q] [-r] [-gc] [-limit NumberOfObjects] [{-uc | -uco | -uci}]
+        · DSQUERY SITE。搜索符合指定标准的活动目录站点。
+            dsquery site [-o {dn | rdn}] [-name Name] [-desc Description] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-q] [-r] [-gc] [-limit NumberOffObjects] [{-uc | -uco |-uci}]
+        · DSQUERY SUBNET。搜索符合指定标准的子网对象。
+            dsquery subnet [-o {dn | rdn}] [-name Name] [-desc Description] [-log Location] [-site SiteName] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-q] [-r] [-gc] [-limit NumberOfObjects] [{-uc | -uco | -uci}]
+        · DSQUERY USER。搜索符合指定标准的用户账号。
+            dsquery user [{StartNode | forestroot | domainroot}] [-o {dn | rdn | upn | samid}] [-scope {subtree | onelevel | base}] [-name Name] [-namep namephonetic] [-desc Description] [-upn UPN] [-samid SAMName] [-inactive NumberOfWeeks] [-stalepwd NumberOfDays] [-disabled] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-q] [-r] [-gc] [-limit NumberOfObjects] [{-uc | -uco | -uci}]
+        · DSQUERY *。搜索符合指定标准的任意活动目录对象。
+            dsquery * [{StartNode | forestroot | domainroot}] [-scope {subtree | onelevel | base}] [-filter LDAPFilter] [-attr {AttributeList | *}] [-attrsonly] [-l] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-q] [-r] [-gc] [-limit NumberOfObjects] [{-uc | -uco | -uci}]
+        一瞥之下，会感觉这些命令的语法格式太过复杂了。但实际上并非如此，大多数DSQUERY子命令都使用一种标准的语法格式，只是在针对操作的具体对象时加上一些特定的扩展。学习DSQUERY子命令的最佳途径是区实践它，下面将通过实例来讲解这些子命令。
+    13.2.2使用名称、描述、SAM帐号名进行搜索
+        撇开使用的其他参数不谈，DSQUERY的搜索语法应该包含名称、描述、或带搜索的SAM账号名。使用-Name参数时，DSQUERY将搜索指定类型的对象，这些对象名与给定值匹配。你可以使用*作为通配符，用于对部分名进行搜索与匹配。比如，使用参数-Name Will*将会匹配William Stanek。对名进行简单搜索时，可以使用类似于如下的语法格式：
+            dsquery user -name Will*
+        这一命令的输出信息中包含了与指定搜索标准匹配的任意用户账号的DN，比如：
+            "CN=william R. Stanek, CN=Users, DC=cpandl, DC=com"
+        上面给出的就是进行简单搜索时的操作方法，只使用了一个参数，就获得了想要的结果。
+        （注解  对于用户对象，-Name参数搜索的是用户属性对话框中的显示名。在上面的实例中，显示名为William R.Stanek。对于其他类型的对象，-Name参数指定的是该对象属性对话框的“常规”选项卡中的名称字段。）
+        星号（*）可以出现在搜索标准中的任意位置。如果已知某用户的尾名，而不知该用户的首名，则可以根据尾名进行搜索，比如：
+            dsquery user - name *Stanek 
+        你也可以用部分首名、尾名进行搜索，比如：
+            dsquery user - name W*Stanek 
+        使用-desc参数时，搜索的是特定类型的对象，这些对象的描述信息与该参数指定匹配。使用星号作为通配符，可以使用部分SAM帐号名进行匹配，比如，-samid wr*可以用于配置wrstanek。
+        （注解  在用户的属性对话框中，SAM帐号名是在“帐号”选项卡中列出的用户登录名，对计算机与组，SAM账号名与相关的账号相同。）
+    13.2.3设定搜索的登录域与Run As许可权限
+        默认情况下，使用DSQUERY时，将连接到登录域内的某个域控制器。通过使用-S参数，并在其后跟随服务器的DNS名，也可以连接到任意域内的特定域控制器，比如：
+            -s corpdc01.cpandl.com 
+        这一实例中，连接到cpandl.com内的域控制器corpdc01。
+        （注解  技术上讲，不需要指定服务器的完全限定域名（DNS名），可以只是使用服务器名。然而，这种做法会降低搜索速度，因为活动目录必须先进行DNS查询来获取完整名，之后才能进行具体的查询。）
+        你也可以连接到某个域内任意可用的域控制器，而不是局限于某个特定的域控制器。这是通过使用-D参数实现的，其后跟随该域的DNS名，比如：
+            -d tech.cpandl.com 
+        通过这一语法，你可以连接到tech.cpandl.com域内的任意可用的域控制器。要注意的是，不能同时使用-S参数与-D参数。也就是说，你或者可以连接到某个特定的域控制器，或者可以连接到给定域内任意可用的域控制器。
+        
