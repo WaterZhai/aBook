@@ -1,0 +1,56 @@
+第14章  管理计算机账号与域控制器
+
+本章将讨论对域计算机帐号（用于对网路及其自身资源进行访问控制）的管理。与用户账号一样，域计算机帐号也包含了一些可以管理的属性，包括名、组成员关系等。可以将计算机帐号添加到活动目录内的任意容器与OU，但可以使用的最佳容器是计算机、域控制器以及所创建的OU。用于操作计算机帐号的标准微软工具是活动目录用户和计算机。在命令行中，有很多可用的命令，每个命令有其特定的用途。不管你使用的是Windows Vista系统还是Windows Server 2008系统，均可使用本章讲述的技术管理计算机帐号与域控制器。
+
+14.1从命令行管理计算机帐号概览
+    有两组工具可用于管理计算机帐号。一组可用于任意类型的计算机账号，包括工作站、成员服务器以及域控制器；另一组则只能用于域控制器，主要作用是对其附加功能与属性进行管理。
+    除前面讨论的DSQUERY COMPUTER命令之外，通常的计算机帐号管理命令还包括下面列举的。
+    · DSADD COMPUTER。在活动目录中创建一个计算机账号。
+        dsadd computer ComputerDN [-samid SAMName] [-desc Description] [-loc Location] [-memberof GroupDN ...] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-q] [{-uc | -uco | -uci}]
+    · DSGET COMPUTER。显示计算机账号的属性，有两种命令语法。
+    用于查看多态计算机属性的语法如下：
+        dsget computer ComputerDN ... [-dn] [-samdi] [-sid] [-desc] [-loc] [-disabled] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-c] [-q] [-l] [{-uc | -uco | -uci}] [-part PartitionDN] [-qlimit] [-qused]
+    用于查看单一计算机成员信息的语法如下：
+        dsget computer ComputerDN [-memberof] [-expand] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-c] [-q] [-l] [{-uc | -uco | -uci}]
+    · DSMOD COMPUTER。对活动目录中一个或多个计算机帐号的属性进行修改，其语法格式如下：
+        dsmod computer ComputerDN ... [-desc Description] [-loc Location] [-disabled {yes | no}] [-reset] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-c] [-q] [{-uc | -uco | -uci}]
+    （提示  对任意计算机与服务器命令，都可以使用来自DSQUERY的输入信息，来指定待操作的对象。如果需要为待操作的每个对象键入区分名（DN），可以用空格对多个DN进行分隔。）
+    出前面讨论的DSQUEYR SERVER命令之外，可用于对域控制器附加功能进行管理的工具还包括：
+    · DSGET SERVER。显示域控制器的多种属性，有3种语法。
+        用于显示域控制器通常属性的语法如下：
+        dsget server ServerDN ... [-dn] [-desc] [-dnsname] [-site] [-isgc] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-c] [-q] [-l] [{-uc | -uco | -uci}]
+        用于显示安全主题列表，这些安全主体拥有指定域控制器内最大数量的目录对象，其语法为：
+        dsget server ServerDN ... [{-s Server  | -d Domain}] [-u UserName] [-p {Password | *}] [-c] [-q] [-l] [{-uc | -uco | -uci}] [-topobjowner NumbertoDisplay]
+        用于指定服务器上目录分区的DN，语法为：
+        dsget server ServerDN ... [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-c] [-q] [-l] [{-uc | -uco | -uci}] [-part]
+    · DSMOD SERVER。用于修改域控制器的属性，语法如下：
+        dsmod server ServerDN ... [-desc Description] [-isgc {yes | no}] [{-s Server | -d Domain}] [-u UserName] [-p Password | *] [-c] [-q] [{-uc | -uco |-uci}]
+    （注解  另一个用于操作域控制器与活动目录的有用命令是NTDSUtil。NTDSUtil是一个文本模式的可调用的命令解释器，可以在其中使用单独的命令提示符与子命令来管理目录服务。要调用NTDSUtil，可以在命令窗口中键入ntdsutil，之后按Enter键。）
+14.2在活动目录域内创建计算机帐号
+    通过DSADD COMPUTER命令，可以为工作站或服务器创建计算机帐号，并将其添加到域中。一般要预先创建计算机帐号，以便在该计算机需要加入到域中时直接使用。要创建计算机帐号，必须具备适当的许可权限。大多数用户可以在其登录域内创建计算机帐号，但组策略与其他许可权限也可能改变这种情况。
+    14.2.1创建计算机帐号
+        创建计算机帐号时，唯一需要的信息就是该账号的DN。第13章已经讲过，DN指定了活动目录中某对象的玩证明，并包含了该对象位置的访问路径。有鉴于此，在为计算机帐号提供DN时，你需要指定计算机帐号名以及该账号所在容器。参考如下实例：
+            dsadd computer "CN=CORPSERVER05,OU=Domain Controllers,DC=cpandl,DC=com"
+        （提示  DN指定了在域层次结构内，计算机帐号应该创建的位置。你可以在森林中的任意域内创建计算机帐号，前提是具备适当的访问许可权限。有些情况下，你需要直接登录待操作域的域控制器。通过-S Server参数，可以连接到森林中任意域内的特定域控制器；通过-D Domain参数，可以连接到指定域内任意可用的域控制器。）
+        上面的命令中，在活动目录内的Domain Controllers容器内创建了计算机帐号CORPSERVER05。如果创建成功，则DSADD COMPUTER会报告如下信息：
+            dsadd成功：CN=CORPSERVER05，OU=Domain Controllers，DC=cpandl，DC=com 
+        使用-U UserName与-P Password可以设置以哪种许可权限运行。
+        帐号创建并不能保证总是成功，导致帐号失败最常见的原因是指定了错误的DN。比如，如果使用如下命令：
+            dsadd computer "CN=CORPSERVER05,CN=Domain Controllers,DC=cpandl,DC=com"
+        则DSADD COMPUTER会报告如下信息：
+            dsadd 失败：CN=CORPSERVER05,CN=Domain Controllers,DC=cpandl,DC=com：无法找到目录对象
+        之所以产生这一错误，是因为Domain Controllers创建为一个组织单元（OU），而非通过容器。也就是说，CN=Domain Controllers是错误的，正确的应该是OU=Domain Controllers。 
+        导致帐号创建失败的另一个常见的原因是，要使用的账号名已存在。在这种情况下，就要尝试使用另外的计算机账号名。
+    14.2.2定制计算机帐号属性与组成员关系
+        如果只提供一个DN，则其他一些参数将自动设置。组成员关系会进行设置，以便该计算机成为Domain Computers的成员。SAM账号名将从计算机DN中使用的常用名属性中推导得出。基本上，DSADD COMPUTER命令会在常用名后面加上一个美元符号($)作为后缀。前面的实例中，常用名为CORPSERVER05，因此，其对应的SAM帐号名为CORPSERVER05$。
+        在创建计算机帐号时，如果需要对计算机帐号属性进行定制，可以使用如下一些附加的参数。
+        · -Samid。用于设置SAM帐号，必须以$结尾，比如，-samid CORPSERVER05$。
+        · -Desc。用于设置待添加计算机的描述信息，比如，-desc “CNMember Server”。
+        · -Loc。用于设置待添加计算机的描述信息。典型情况下，位置信息应该是计算机所在办公室或建筑。比如，如果计算机所在物理位置是建筑物E的110办公室，则可以键入-loc“E/110”。
+        如果需要为新计算机帐号设置组成员关系，可以使用-Memberof参数。这一参数可以接受空格分隔开的DN（代表新计算机帐号所属的组）列表。比如，如果需要将新计算机帐号作为Engineering组的成员，该组的DN为CN=Engineering,OU=Eng,DC=cpandl,DC=com,则可以使用类似于如下的命令：
+            dsadd computer "CN=CORPSERVEDR05,OU=Domain Controllers,DC=cpandl,DC=com" -memberof "CN=Engineering,OU=Eng,DC=cpandl,DC=com"
+        如果需要将新计算机帐号作为Engineering组与Tech组的成员，两个组的DN分别为CN=Engineering,OU=Eng,DC=cpandl,DC=com与CN=Tech,CN=Users,DC=cpandl,DC=com,则可以使用类似于如下的命令：
+            dsadd computer "CN=CORPSERVER05,OU=Domain Controllers,DC=com" -memberof "CN=Engineering,OU=Eng,DC=cpandl,DC=com" "CN=Tech,CN=Users,DC=cpandl,DC=com"
+        （注解  没有必要指定Domain Computers作为组，新计算机帐号会自动成为该组（以及其他指定组）的成员。）
+14.3管理计算机帐号属性
+    与使用活动目录用户和计算机相比，

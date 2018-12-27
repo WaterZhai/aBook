@@ -119,4 +119,124 @@
         你也可以连接到某个域内任意可用的域控制器，而不是局限于某个特定的域控制器。这是通过使用-D参数实现的，其后跟随该域的DNS名，比如：
             -d tech.cpandl.com 
         通过这一语法，你可以连接到tech.cpandl.com域内的任意可用的域控制器。要注意的是，不能同时使用-S参数与-D参数。也就是说，你或者可以连接到某个特定的域控制器，或者可以连接到给定域内任意可用的域控制器。
-        
+        与很多其他类型，必要的时候，你可以使用用户名与口令进行身份认证，使用如下的语法格式：
+            -u [Domain\]User  [-p Password]
+        其中，Domain为可选的域名，用户账号就存在于该域内，User为用户账号名（要使用的就是该用户账号的许可权限），Password为该用户账号的口令（可选）。如果没有指定域，则系统会假定当前域作为默认的域名；如果没有指定口令，则会弹出信息要求输入口令。
+        要了解如何结合使用这些参数，参考如下实例。
+        使用cpandl logon域内的Wrstanek用户账号，连接到tech.cpandl.com域内的corpsvr02域控制器，搜索显示名为Stanek结尾的用户账号：
+            dsquery user -name *Stanek -s corpsvr02.tech.cpandl.com -u cpandl\wrstanek 
+        使用cpandl logon域内的Wrstanek用户账号，连接到tech.cpandl.com域内任意可用的域控制器，搜索显示名以Will开始的用户账号：
+            dsquery user -name Will* -d tech.cpandl.com -u cpandl\wrstanek 
+    13.2.4设定开始节点、搜索范围与对象限制
+        在命令语法中，开始节点是使用{StartNode | forestroot | domainroot}定义的，也可能包含ObjectDN。开始节点的主要作用是规定搜索的起点。你可以指定森林根（键入forestroot）、域根（键入domainroot）、节点DN（StartNode）等信息，比如“CN=Users,DC=cpandl,DC=com”。如果指定的是forestroot，则搜索会使用全局编目。但默认值为domainroot，即搜索是从当前用户账号登录域的顶级域的顶级容器开始的。有些子命令还可以传送代操作对象的实际DN（ObjectDN），比如“CN=William Stanek,CN=Users,DC=cpandl,DC=com”
+        （注解  你可能已经注意到，我使用双引号封装了对象DN，这种做法是有益的，因为如果DN中包含空格（如上面第2个对象DN），就必须使用双引号。）
+        如果需要进行彻底的搜索，你可能需要指定节点的DN，如果希望返回完整的对象集，这种做法的价值就会体现出来。比如，通过指定开始节点（而不需要指定-Name、-Desc、-Samid等参数），就可以返回某特定容器内特定类型的所有对象列表。
+        要了解如何使用开始节点，可以参考如下实例。
+        返回某个域内的所有计算机帐号列表：
+            dsquery computer "DC=cpandl,DC=com"
+        返回Computer容器内所有计算机帐号列表：
+            dsquery computer "CN=Computers,DC=cpandl,DC=com"
+        返回Domain Controller OU内的所有计算机列表：
+            dsquery computer "OU=Domain Controllers,DC=cpandl,DC=com"
+        返回某个域内的所有用户列表：
+            dsquery user "DC=cpandl,DC=com"
+        返回Users容器内所有用户列表：
+            dsquery user "CN=Users,DC=cpandl,DC=com"
+        返回Tech OU内的所有用户列表：
+            dsquery user "OU=Tech,DC=cpandl,DC=com"
+        除了指定开始节点外，你也可以指定搜索范围。在命令语法中，搜索范围是使用{-scope subtree | onelevel | base}指定的。默认情况下，使用的搜索范围是subtree，表示搜索范围以来时节点为根节点的subtree。如果使用subtree，对domainroot而言，搜索范围是整个域：对forestroot而言，搜索范围是整个森林；对特定的容器而言，搜索范围是指定的容器与任意子容器。比如，如果开始节点设置为“OU=Tech,DC=cpandl,DC=com”，则活动目录将搜索Tech OU以及其内的任意OU。
+        你可以使用onelevel来为指定的开始节点及其直接子节点设置范围。比如，对domainroot而言，这种做法意味着包含该域及其顶层容器与OU。然而，如果某些OU包含了附加的（子）OU，就不会被列入搜索范围。
+        如果使用base设置范围，则仅对开始节点代表的单一对象进行搜索。比如，只搜索指定的OU，不搜索其子OU。
+        （注解  在forestroot被设置为开始节点时，subtree是唯一有效的搜索范围。）
+        要了解如何使用搜索范围，参考如下实例。
+        搜索Tech OU及其下子OU内的计算机帐号：
+            dsquery computer "OU=Tech,DC=cpandl,DC=com"
+        （注解  默认的搜索范围是subtree，即-scope subtree是自动隐含的。）
+        只搜索Tech OU内的计算机帐号：
+            dsquery computer "OU=Tech,DC=cpandl,DC=com" -scope base 
+        搜索Tech OU及其下直系子OU内的计算机帐号：
+            dsquery computer "OU=Tech,DC=cpandl,DC=com" -scope onelevel 
+        另一个可选的参数是-Limit，用于设置搜索结果中返回对象数的最大值。默认情况下，如果没有指定这一数值，则前100个结果会显示出来。如果需要设定不同的范围，可以在该参数后跟随要返回的对象数。比如，如果只需要显示前10个结果，就可以键入-limit 10.要去除对象限制，显示所有匹配结果，可以使用值0，比如，-limit 0。
+        （提示  在可能包含数千个对象的大型组织中，不应该去除对象限制，而应该设定返回对象的限定值，或者使用默认的设置。这将确保所作的查询不会给正在操作的域控制器造成过大的负载。）
+    13.2.5设定名的输出格式
+        通过DSQUERY，可以设置返回名值的输出格式以及单个字符的格式。在命令语法中，名的输出格式是使用-o定义的，其后跟随下列元素中的一个：{dn | rdn | upn | samid}。默认情况下，输出格式是DN（使用-o dn指定），比如“CN=William R.Stanek,CN=Users,DC=cpandl,DC=com”。你也可以将输出格式指定为相对DN（使用-o rdn指定）、用户主要名（使用-o upn指定）或SAM账号名（使用-o sanid指定）。
+        RDN是对象的常用名，取自DN的底层名部分。对用户而言，RDN与相关联的属性对话框中的显示名是相同的。对其他类型对象，RDN是该对象属性对话框的“常规”选项卡中的名称字段。下面给初二了几个RDN示例：
+        · “William R.Stanek”；
+        · “CORPSVR01”；
+        · “Administrators”。
+        UPN只适用于用户账号。在活动目录中，存在一个与UPN对应的实际字段，用于登录与认证。在用户的属性对话框中，你可以在“帐号”选项卡中发现用户的登录名与登录域。比如：wrstanek@cpandl.com就是一个UPN实例。其中，wrstanek是登录名，@cpandl.com是登录域信息。
+        SAM账号名适用于用户、计算机、组。在活动目录中，也存在与SAM帐号名对应的实际字段，你可以在属性对话框中浏览并找到。对用户而言，SAM账号名就是Windows 2000以前系统的账号名，该值在相关属性对话框的“帐号”选项卡中指定；对组而言，SAM账号名与“常规”选项卡中的名称字段是相同的；对计算机，SAM账号名与“常规”选项卡中国的命长字段是相同的，但其后带了一个美元符号($)作为后缀。
+        （注解  美元符号($)是实际的计算机账号名的一部分，但通常是隐含的，使用时也不需引用。活动目录使用$的目的是使得同名的用户账号与计算机帐号可以同时存在，但又不至于混淆造成错误。比如，用户JAMESW可以一个名为JAMESW的计算机，这种做法在Windows 2000之前的操作系统中是无法做到的。）
+        要了解关于名格式的更多信息，参考如下一些实例。
+        返回符合搜索标准的计算机的RDN：
+            dsquery computer -name corp* -o rdn 
+        返回符合搜索标准的用户的SAM账号名：
+            dsquery user -name Wi* -o samid 
+        返回符合搜索标准的用户的UPN：
+            dsquery user "OU=Tech,DC=cpandl,DC=com" -o upn 
+        返回符合搜索标准的用户的DN：
+            dsquery user "CN=Users,DC=cpandl,DC=com"
+        （注解  默认的格式是DN，也就是说，-o dn是自动隐含的。）
+    13.2.6结合使用DSQUERY与其他活动目录命令行工具
+        由于DSQUERY返回的是匹配对象的DN，这些结果是有用的，可以通过管道作为其他活动目录命令行工具的输入信息。下面的实例中，搜索所有名称以Willia引导的用户账号：
+            dsquery user -name Willia* 
+        这以命令的输出信息包含了任意符合搜索标准的账号的DN，比如：
+            "CN=William R.Stanek,CN=Users,DC=cpandl,DC=com"
+        你可以将上述输出信息通过管道提供给DSQUERY USER命令，用来显示一个组列表，这些组成员中包含了这一用户：
+            dsquery user -name Willia* | dsget user -memberof -expand 
+        这一命令的输出信息将根据DN展示组成员，如下：
+            "CN=Domain Admins,CN=Users,DC=cpandl,DC=com"
+            "CN=Enterprise Admins,CN=Users,DC=cpandl,DC=com"
+            "CN=Administrators,CN=Builtin,DC=cpandl,DC=com"
+            "CN=Domain Users,CN=Users,DC=cpandl,DC=com"
+            "CN=Users,CN=Builtin,DC=cpandl,DC=com"
+13.3搜索问题用户与计算机帐号
+    DSQUERY USER与DSQUERY COMPUTER包含了一些扩展的语法格式，用于搜索那些存在问题的账号。比如，你可以使用-Disabled参数寻找那些已被禁用的账号。如果需要在整个域内搜索禁用的用户账号，可以使用命令dsquery user -disababled。这一命令的输出信息中包含了所有已禁用的计算机帐号，并分别列出其DN，比如：
+        "CN=Guest,CN=Users,DC=cpandl,DC=com"
+        "CN=SUPPORT_456945a0，CN=Users,DC=cpandl,DC=com"
+        "CN=krbtgt,CN=Users,DC=cpandl,DC=com"
+    另一个很有用的命令选项是-Stalepwd，用于搜索那些已经超过指定最多天数而未更改口令的账号。比如，要搜索那些至少15天没有更改口令的用户账号，可以使用命令dsquery user -stalepwd 15。其输出信息中包含了符合这一标准的用户，并分别列出其DN，比如：
+        "CN=Administrator,CN=Users,DC=cpandl,DC=com"
+        "CN=Guest,CN=Users,DC=cpandl,DC=com"
+        "CN=SUPPORT_456945a0，CN=Users,DC=cpandl,DC=com"
+        "CN=krbtgt,CN=Users,DC=cpandl,DC=com"
+        "CN=William R.Stanek,CN=Users,DC=cpandl,DC=com"
+        "CN=Howard Smith,CN=Users,DC=cpandl,DC=com"
+    （真实场景  你可以设置口令策略，并在其中要求用户定期更改口令，Windows Server 2008 Administrator's Pocket Consultant（Microsoft Press，2008）一书的第10章讨论了这一主题，只有在用户登录域后，这些口令策略才是适用的。如果某用户休假，或者不再可用，则可能会超过这一更改口令过的最后期限（但通常在用户下次登录时，将不得不修改口令）。大多数禁用的账号也将在口令过期账号列表中呈现。）
+    最后，你可能也需要搜索那些处于不活跃状态已经超过指定的最少几星期的计算机或用户账号。不活跃的账号是指在指定的时间间隔内没有登录域的账号。比如，如果需要搜索那些至少两个星期没有登录域的用户账号，可以使用dsquery user -inactive 2命令。
+    通常，用户很长时间没有登录域是因为该用户已不在该办公室，比如去休假、生病或者在家工作。对计算机帐号，不活跃状态意味着该计算机已关机或断网。比如，某用户休假，随身携带了笔记本，但没有远程连接到办公室，则相关计算机帐号在该段时间内将处于不活跃状态。
+13.4对象的重命名与移动
+    在域内，对象的重命名与移动是使用DSMOVE命令实现的。之所以会使用同一命令完成这两个任务，是因为在对对象进行重命名时，实际上同时也将该对象从当前DN移动到新DN。要记住的是，DN包含两部分：通常名、RDN和位置。
+        DSMOVE命令的语法格式如下：
+            dsmove ObjectDN [-newname NewName] [-newparent ParentDN] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-q] [{-uc | -uco | -uci}]
+    要对用户、计算机、组或其他活动目录对象重命名，必须指定该对象的DN，并使用-Newname参数指定新的相对名。比如，如果需要将用户对象William Stanek重命名为William R.Stanek，可以使用命令dsmove "CN=William Stanek,OU=Tech,DC=cpandl,DC=com" -newname "William R.Stanek"
+    要在某个域内移动用户、计算机、组或其他活动目录对象，必须指定该对象的当前DN，并使用Engineering OU，该对象的DN为"CN=William Stanek,OU=Tech,DC=cpandl,DC=com"，新位置的DN为"OU=Engineering,DC=cpandl,DC=com"，则相关的命令语法格式如下：
+        dsmove "CN=William Stanek,OU=Tech,DC=cpandl,DC=com" -newparent OU=Engineering,DC=cpandl,DC=com 
+    如果需要在移动某个对象的同时对其重命名，只需要使用-Newname参数为该对象赋予一个新名，参考如下实例：
+        dsmove "CN=William Stanek,OU=Tech,DC=cpandl,DC=com" -newparent OU=Engineering,DC=cpandl,DC=com -newname "William R.Stanek"
+    上面的命令中，将用户账号William Stanek移动到Engineering OU，并将其重命名为William R.Stanek。 
+    在上面这些实例中，都是假定先通过DSQUERY获取了对象DN。实际上，可以将DSQUERY的输出信息通过管道传递给DSMOVE命令，如下所示：
+        dsquery user -name "William Stanek" | dsmove -newname "William R.Stanek"
+    其中，对象的DN"CN=William Stanek,OU=Tech,DC=cpandl,DC=com"是通过DSQUERY USER命令获取的，并用作DSMOVE输入信息，最终实现对用户对象的重命名。
+    （提示  需要在不同域间移动对象么？如果需要，可以使用活动目录迁移工具，在微软下载站点（http://downloads.microsoft.com）可以获取该工具，要确保获取与Windows Server 2008兼容的版本。）
+13.5从活动目录中移除对象
+    如果某对象不再需要存在于活动目录中，可以使用DSRM命令永久性地删除该目录，DSRM的语法格式如下：
+        dsrm ObjectDN ... [-subtree [-exclude]] [-noprompt] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-c] [-q] [{-uc | -uco | -uci}]
+    （警告  使用DSRM命令之前，应该先在独立的测试域内对其进行实验。这一命令功能强大，可以删除提交给他的任意对象，包括对象容器。）
+    使用DSRM的最佳方法是提交一个待删除的特定对象。在下面的实例中，从cpandl.com域内的Eng OU中删除了计算机帐号engcomp18：
+        dsrm "CN=engcomp18，OU=eng,DC=cpandl,DC=com"
+    默认情况下，DSRM会弹出提示信息，询问是否确定删除：
+        确认删除CN=engcomp18,OU=Eng,DC=cpandl,DC=com（是/否）?
+    你可以使用-noprompt参数禁用这种确认提示，如下所示：
+        dsrm "CN=engcomp18，OU=Eng,DC=cpandl,DC=com" -noprompt 
+    然而，只有在确信DSRM删除的确实是需要删除的对象时，才可以这样做。
+    DSRM可以用于删除容器或OU内的对象，也可以用于删除容器或OU本身。如果容器或OU是空的，可以根据其DN删除，比如：
+        dsrm "OU=Eng,DC=cpandl,DC=com"
+    如果容器或OU非空，则不能按照上面的方法删除，DSRM会报告错误信息：
+        "失败：操作无法进行，因为存在于对象。该操作只能在叶子对象上进行。"
+    要删除容器及其包含的所有对象，可以使用-Suntree参数，参考如下实例：
+        dsrm= "OU=Eng,DC=cpandl,DC=com" -subtree 
+    其中，-subtree参数的作用是从Eng OU中删除所有对象（而不管其类型）以及该容器本身。要删除所有对象，但不删除容器本身，可以结合使用-Subtree参数与-Exclude参数，参考如下实例：
+        dsrm "OU=Eng,DC=cpandl,DC=com" -subtree -exclude 
+    其中，-Subtree参数的作用是从Eng OU中删除所有对象（而不管其类型），-Exclude参数的作用是将Eng OU排除在删除范围之外。
+    
