@@ -53,4 +53,221 @@
             dsadd computer "CN=CORPSERVER05,OU=Domain Controllers,DC=com" -memberof "CN=Engineering,OU=Eng,DC=cpandl,DC=com" "CN=Tech,CN=Users,DC=cpandl,DC=com"
         （注解  没有必要指定Domain Computers作为组，新计算机帐号会自动成为该组（以及其他指定组）的成员。）
 14.3管理计算机帐号属性
-    与使用活动目录用户和计算机相比，
+    与使用活动目录用户和计算机相比，在命令行中对计算机帐号进行管理有些微不同，主要是因为又更多的选项，尤其是涉及到同时操作对个计算机帐号时。
+    14.3.1查看与寻找计算机帐号
+        第13章曾经讲解过，你可以使用DSQUERY COMPUTER命令搜索计算机。不仅可以根据活动目录账号名、SAM账号名、描述信息等进行搜索，还可以在这些字段中使用通配符帮助匹配。DSQUERY COMPUTER命令的输出信息中包含符合标准的计算机的DN，并可以通过管道传递给其他命令，包括DSGET COMPUTER等，并可用于显示计算机帐号相关属性。
+        DSGET COMPUTER最适合与DSQUERY COMPUTER结合使用。其中，DSQUERY COMPUTER用于获取一台或多台计算机的DN，之后使用DSGET COMPUTER显示相关帐号的属性，可以显示的属性是使用搜索参数设置的。
+        · -Dn。在输出信息中显示匹配的计算机帐号的DN。
+        · -Samid。在输出信息中显示匹配的计算机帐号的SAM账号名。
+        · -Sid。在输出信息中显示匹配的计算机帐号的安全标识符。
+        · -Desc。在输出信息中显示匹配的计算机帐号的描述信息。
+        · -Loc。在输出信息中显示匹配的计算机帐号的位置属性。
+        · -Disabled。显示Yes/No，表示计算机帐号是否禁用。
+        DSGET COMPUTER以表格形式显示输出信息。一般来说，总是要使用-Dn、-Samid、-Sid等参数，以便清晰地理解与识别输出信息中的计算机。比如，如果需要搜索所有已禁用的engineering计算机，可以使用如下命令：
+            dsquery computer -name engcomp* | dsget computer -dn -disabled 
+            这一命令将显示DN与禁用状态：
+            dn                                       disabled 
+            CN=engcomp18,OU=Eng,DC=cpandl,DC=com     yes
+            CN=engcomp19,OU=Eng,DC=cpandl,DC=com     yes 
+            CN=engcomp20,OU=Eng,DC=cpandl,DC=com     no 
+            CN=engcomp21,OU=Eng,DC=cpandl,DC=com     no 
+            CN=engcomp22,OU=Eng,DC=cpandl,DC=com     no 
+            CN=engcomp22,OU=Eng,DC=cpandl,DC=com     no 
+            dsget succeeded
+            你也可以显示SAM帐号名，如下所示：
+            dsquery computer -name engcomp* | dsget computer -samid -disabled 
+            samid                         disabled 
+            RNGCOMP18$                    yes 
+            ENGCOMP19$                    yes   
+            ENGCOMP20$                    no 
+            ENGCOMP21$                    no 
+            ENGCOMP22$                    no 
+            dsget succeeded 
+        或者显示安全标识符：
+            dsquery computer -name engcomp* | dsget computer -sid -disabled 
+
+            sid                                                           disabled 
+            s-5-21-4087030303-3274042965-2323426166-1119                  yes 
+            s-5-21-4087030303-3274042965-2323426166-1120                  yes 
+            s-5-21-4087030303-3274042965-2323426166-1122                  no 
+            s-5-21-4087030303-3274042965-2323426166-1123                  no 
+            s-5-21-4087030303-3274042965-2323426166-1124                  no
+            dsget succeeded 
+        无论哪种方式们都可以获取区分计算机帐号条目的标识符。你也可以使用DSGET COMPUTER命令的第2中语法格式，来获取计算机帐号的组成员关系。比如，如果想了解ENGCOMP8属于哪一个组，你可以键入如下命令：
+            dsquery computer -name engcomp18 | dsget computer -memberof 
+        或
+            dsget computer "CN=engcomp18,OU=Eng,DC=cpandl,DC=com" -memberof 
+        上面两条命令的工作方式是一样的。第一个实例中，使用DSQUERY COMPUTER获取计算机帐号的DN。第二个实例中，直接指定计算机帐号的DN。不管哪一条命令，其输出信息都应该展示组成员关系，比如：
+            "CN=Tech,CN=Users,DC=cpandl,DC=com"
+            "CN=Engineering,OU=Eng,DC=cpandl,DC=com"
+            "CN=Domain Computers,CN=Users,DC=cpandl,DC=com"
+        输出信息表明，该计算机帐号是Tech、Engineering、Domain Computers等组的成员。
+        虽然这一技术可以用于显示多台计算机的组成员关系，但无法显示相关联的计算机的DN或SAM账号名。因而，你可以获取一个组成员关系列表，但唯一用于表明这些组成员关系适用于不同计算机的表示是输出信息中的空白行。比如，使用如下查询：
+            dsquery computer -name engcomp* | dsget computer -memberof 
+        其输出信息类似于如下：
+            "CN=Domain Computers,CN=Users,DC=cpandl,DC=com"
+
+            "CN=Engineering,OU=Eng,DC=cpandl,DC=com"
+            "CN=Domain Computers,CN=Users,DC=cpandl,DC=com"
+
+            "CN=Domain Computers,CN=Users,DC=cpandl,DC=com"
+
+            "CN=Domain Computers,CN=Users,DC=cpandl,DC=com"
+
+            "CN=Tech,CN=Users,DC=cpandl,DC=com"
+            "CN=Engineering,OU=Eng,DC=cpandl,DC=com"
+            "CN=Domain Computers,CN=Users,DC=cpandl,DC=com"
+        这里，显示了5个计算机帐号的输出信息（输出信息中包含了5个空白行，用于分割不同的组），但不能显示不同条目相关的具体计算机帐号。
+        （真实场景  不要忽略使用DSQUERY COMPUTER总结当前计算机帐号配置信息的重要性。下面给出了一个用于总结计算机帐号配置信息的命令实例：
+            dsquery computer "DC=cpandl.DC=com" | dsget computer -dn -samid -sid -desc -loc -disabled > domaincomputers.txt
+            该命令用于列出cpandl.com域内的所有计算机帐号以及属性，并将其存储到文件中。）
+        
+    14.3.2设置或修改计算机的位置与描述信息属性
+        在命令行中，使用DSMOD COMPUTER命令可以快速而方便地设置或修改计算机帐号的位置与描述信息。实际上，你可以同时为1台、10台、100台或更多的计算机设置位置或描述信息。假定对Engineering OU内的所有500台计算机，希望其描述信息均为Engineering Computer，位置均为Engineering Dept，则可以使用如下命令：
+            dsquery computer "OU=Engineering,DC=cpandl,DC=com" | dsmod computer -loc "Engineering Dept." -desc "Engineering Computer"
+
+        DSMOD COMPUTER将逐一报告每一变更的成功或失败：
+            dsmod succeeded:CN=ENgineeringcomp01,OU=Engineering,DC=cpandl,DC=com
+            dsmod succeeded:CN=ENgineeringcomp02,OU=Engineering,DC=cpandl,DC=com
+            dsmod succeeded:CN=ENgineeringcomp03,OU=Engineering,DC=cpandl,DC=com
+            ...
+            dsmod succeeded:CN=ENgineeringcomp499,OU=Engineering,DC=cpandl,DC=com
+            dsmod succeeded:CN=ENgineeringcomp500,OU=Engineering,DC=cpandl,DC=com
+        在GUI中，做这些修改可能会花费数小时的时间，但在命令行中则只需要几分钟，只要键入正确的命令，DSMOD COMPUTER将为你完成一切工作。
+    14.3.3禁用与激活计算机帐号
+        在命令行中，你可以使用DSMOD COMPUTER命令与-Disabled参数来激活或禁用计算机帐号。键入-disabled yes用于禁用计算机帐号；-disabled no则用于激活计算机帐号。
+        下面的实例中，禁用了TestLab OU中的所有计算机帐号：
+            dsquery computer "OU=TestLab,DC=cpandl,DC=com" | dsmod computer -disabled yes 
+        DSMOD COMPUTER命令会逐一报告每个计算机帐号变更的成功或失败：
+            dsmod succeeded:CN=TestLabcomp01,OU=TestLab,DC=cpandl,DC=com
+            dsmod succeeded:CN=TestLabcomp02,OU=TestLab,DC=cpandl,DC=com
+            dsmod succeeded:CN=TestLabcomp03,OU=TestLab,DC=cpandl,DC=com
+    14.3.4重置锁定的计算机帐号
+        与用户帐号类似的是，计算机帐号也有相应的口令。与用户账号不同的是，计算机帐号的口令是自动管理与维护的。计算机帐号有两个口令：一个标准口令，默认情况下每隔30天改变一次；一个私钥口令，用于与域控制器建立安全通信，默认情况下也是每隔30天改变一次。
+        这两个口令必须同步。如果私钥口令与计算机帐号口令之间的同步消失，则该计算机将不被允许登录该域，Netlogon服务也将产生域认证错误消息，事件ID为3210或5722.如果出现这种抢矿，则计算机帐号口令会被认为陈旧的。此时，你可能需要重置该账号，来保持口令同步。
+        对工作站与服务器，使用的技术是不同的。要重置工作站上失去同步的口令，可以使用DSMOD COMPUTER命令与-Reset参数，参考如下实例：
+            dsmod computer "CN=Engineeringcomp01,OU=Engineering,DC=cpandl,DC=com" -reset 
+        这一命令对cpandl.com域内的Engineering组织单元中的计算机Engineering01的口令进行了重置。你也可以方便地重置Engineering OU中所有计算机帐号的口令。为此，可以结合使用DSQUERY COMPUTER与DSMOD COMPUTER命令，前者用于获取域内所有计算机列表，后者用于重置口令，比如：
+            dsquery computer "OU=Engineering,DC=cpandl,DC=com" | dsmod computer --reset 
+        （真实场景  要确定计算机帐号是否包含陈旧口令，可以使用DSQUERY COMPUTER命令与-Stalepwd参数。如果使用的是默认的30天改变一次口令，则可以通过如下命令寻找陈旧口令，如下所示：
+            dsquery computer -stalepwd 30
+            输出信息中将展示超过30天未修改口令的计算机列表。也就是说，口令是陈旧的，或者计算机处于不活跃状态。）
+        对成员服务器与域控制器，应该使用NETDOM RESERPWD命令，而非DSMOD COMPUTER -RESET命令。通过如下步骤，可以实现对成员服务器或域控制器的计算机帐号口令进行重置。
+        （1）本地登录服务器。如果需要重置域控制器的口令，必须停止Kerberos Key Distribution Center服务，并将其启动方式设置为手动。
+        （2）在增强的命令提示符中，键入命令netdom resetpwd /s: ComputerName /ud:domain\user/pd:*。其中，ComputerName为该计算机帐号登录域内的与控制其名，domain\user为管理员账号名，具备修改计算机帐号口令的权限，*的作用是使得NETDOM在继续执行之前弹出提示信息（要求输入帐号口令）。
+        （3）输入口令后，NETDOM会在本地与适当的域控制器上修改计算机帐号口令。该域控制器会想其他域控制器分发口令变更情况。
+        （4）NETDOM完成任务后，重启计算机并确认口令已成功重置。如果重置的是域控制器的口令，则需要重启Kerberos Key Distribution Center服务，并将其启动方式设置为自动。
+        （真实场景  作为故障排除过程的一部分，你应该总是注意对活动目录中的计算机帐号状态进行检查，包括计算机的存储位置及其组成员关系。与用户账号类似，计算机帐号被放置到活动目录的特定容器中，也可以被添加为特定组的成员。计算机帐号所在容器决定了活动目录策略设置如何作用域该计算机。将计算机移动到不同的容器或OU后，组策略设置作用于该计算机的方式也将有所改变。
+        你也应该检查组成员关系。计算机的组成员关系决定了该计算机的多种许可权限，比如安全性与资源访问等。改变组成员关系也会影响计算机的许可权限。如果使用Kerberos认证方式，计算机的系统时间对认证也会有影响。如果计算机的系统时间偏离了组策略中允许范围内的值，则该计算机的认证将会失败。）
+    14.3.5将计算机帐号添加到某域中
+        认证后的任意用户都可以将计算机添加到某个域中，这需要使用NETDOM JOIN命令。如果相关的计算机帐号尚未创建，运行这一命令将创建该账号。计算机添加到某个域后，就与该域建立了信任关系。计算机的安全标识符也将被修改，以便于活动目录中相关计算机帐号匹配，该计算机也将成为活动目录中某个适当组的成员。典型情况下，计算机会成为Domain Computers组的成员。如果该计算机后来呗用作域控制器，则该计算机会变更为Domain Controllers组的成员。
+        （注解 NETDOM在Windows Server 2008上是可用的，但在Windows Vista上是不可用的（除非自己安装）。在将计算机添加到域之前，应该检查计算机的网络配置。如果网络配置不正确，在添加到域之前，应该修正它。此外，如果该计算机帐号是以前创建的，则只有具备专门许可权限的用户或管理员才可以将该计算机添加到某个域中。用户必须具备本地计算机上的本地管理员权限。）
+        你可以通过两种方式将计算机添加到某个域中。
+        · 登录到需要添加到某个域的计算机，之后运行NETDOM JOIN命令。
+        · 从其他计算机上运行NETDOM JOIN命令，连接到需要添加某个域的计算机。
+        登录到需要添加到某个域的计算机后，可以使用NETDOM JOIN命令将计算机添加到某个域，同时在该域内创建计算机帐号，这是使用如下的命令语法实现的：
+            netdom join ComputerName /Domain:DomianName /UserD:DomainUser /PasswordD:UserPasswrod 
+        其中，ComputerName为计算机名，DomainName为要加入的活动目录域名，DomainUser为将计算机加入到该域的授权的域用户账号（如果必要，还要创建相关的计算机帐号），UserPassword为该用户账号的口令。域用户账号应该以DOMAIN\UserName的形式指定，比如CPANDL\WilliamS。参考如下实例：
+            netdom join corpsvr32 /domain:cpandl.com /userd:CPANDL\williams /Passwordd:2892389383234 
+        上面的命令中，将CorpSvr32添加到cpandl.com域中，并在默认的Computers容器内创建了相关的计算机帐号。该计算机对象的全路径为CN=CorpSvr32,CN=Computers,DC=cpandl,DC=com。 
+        此外，你也可以用使/Ou参数指定OU的区分名（计算机应该放置到该OU中）。如果需要关机，并在加入到域后重启计算机，则可以使用/Reboot参数。参考如下实例：
+            netdom join corpsvr32 /domain:cpandl.com /ou:OU=Engineering,DC=cpandl,DC=com /userd:CPANDL\williams /passwordd:2892389383234 /reboot 
+        上面的命令中，将CorpSvr32添加到cpandl.com域中，并在Engineering OU内创建了相关的计算机帐号，之后重新引导计算机。该计算机对象的全路径为CN=CorpSvr32,OU=Engineering,DC=cpandl,DC=com。 
+        从其他计算机运行NETDOM JOIN并连接到待加入域的计算机时，可以使用如下命令语法格式：
+            netdom join ComputerName /Domain:DomainName /UserD:DomainUser /PasswordD: UserPassword /User0:ComputerUser /Password0: ComputerPassword 
+        其中，ComputerUser为要加入域内的计算机上的内地用户账号名，ComputerPassword为该用户账号的密码。和前面的其他命令类似，这一命令也将创建相关的计算机帐号（如果必要）。此外，你还可以使用/Ou参数（可选地），用来指定该计算机将放置进去的OU的区分名。
+            参考如下实例：
+            netdom join desktop267 /domain:cpandl.com /ou:OU=Services,DC=cpandl,DC=com /userd:CPANDL\williams /passwordd:2892389383234 /usero:sammiep /passwordo:383478478722 
+        上面的命令中，将Desktop267添加到cpandl.com域中，并在Server OU内创建了相关的计算机帐号。该计算机对象的全路径为CN=Desktop267,OU=Services,DC=cpandl,DC=com。 
+    14.3.6对计算机与计算机帐号进行重命名
+        通过NETDOM  RENAMECOMPUTER命令，可以很方便地对工作站与成员服务器进行重命名。如果工作站或成员服务器加入到了域中，则相关的计算机帐号也会重命名。然而，你不能使用NETDOM RENAMECOMPUTER命令对如下一些计算机进行重命名，包括域控制器，运行证书服务的服务器，运行其他需要特定的，固定的服务器名的服务器。
+        本地登录后，可以使用如下的命令语法对工作站或成员服务器进行重命名：
+            netdom renamecomputer ComputerName /NewName:NewName /UserD:DomainUser /PasswordD:UserPassword 
+        其中，ComputerName为计算机的当前名，NewName为计算机的新名，DomainUser为将计算机进行重命名的授权的域用户帐号，UserPassword为该用户账号的口令。域用户帐号应该以DOMAIN\UserName的形式指定，比如CPANDL\WilliamsS。参考如下实例：
+            netdom renamecomputer desktop16 /newname:wkstn75 /userd:CPANDL\williams /passwordd:2892389383234 
+        上面的命令中，将Desktop16重命名为Wkstn75，这是使用Williams账号完成的。如果需要关机，并在重命名后重启计算机，则可以使用/Reboot参数。参考如下实例：
+        从其他计算机运行NETDOM  RENAMECOMPUTER命令并连接到欲重命名的计算机时，可以使用如下的命令语法格式：
+            netdom renamecomputer ComputerName /NewName:NewName /UserD:DomainUser /Password:UserPassword /UserO:ComputerUser /PasswordO:ComputerPassword 
+        其中，COmputerUser为授权连接到待重命名计算机的用户账号名，ComputerPassword为该计算机帐号的口令。参考如下实例：
+            netdom renamecomputer desktop143 /newname:wkstn76 /userd:CPANDL\williams /passwordd:2892389383234 /usero:sammiep /passwordo:383478478722 
+        上面的命令中，将Desktop143重命名为Wkstn76，这是使用WilliamS帐号完成的。如果需要关机，并使用Sam灭P帐号连接到待重命名的计算机。
+    14.3.7移动计算机账号
+        计算机帐号通常放置在Computers、Domain Controllers或自定义的OU容器中。通过DSMOVE命令，可以将计算机帐号移动到当前域内的其他位置或OU中。指定计算机帐号的当前DN，之后使用-Newparent参数指定该计算机帐号的新位置或父DN。如果需要将计算机帐号CORPSVR03从Tech OU移动到Engineering OU，你需要指定该计算机帐号的DN，比如"CN=CORPSVR03,OU=Tech,DC=cpandl,DC=com"。并提供新位置的父DN，比如"OU=Engineering,DC=cpandl,DC=com"，相关命令类似于如下的格式：
+            dsmove "CN=CORPSVR03,OU=Tech,DC=cpandl,DC=com" -newparent "OU=Engineering,DC=cpandl,DC=com"
+        这里假定已经使用DSQUERY COMPUTER命令获取了计算机帐号DN，可以将DSQUERY COMPUTER的输出通过管道传递给DSMOVE，如下面实例所示：
+            dsmove computer -name "CORPSVR03" | dsmove -newparent "OU=Engineering,DC=cpandl,DC=com"
+        其中，计算机帐号DN"CN=CORPSVR03,OU=Tech,DC=cpandl,DC=com"是通过DSQUERY COMPUTER命令获取的，并用作DSMOVE的输入信息。不管计算机帐号是工作站、成员服务器还是域控制器，上面的命令都是有效的。
+    14.3.8删除计算机帐号
+        如果不再需要某个计算机帐号，可以使用DSRM命令将其从活动目录中永久删除。大多数情况下，你可能需要删除某个特定的计算机帐号，比如Corpserver03.如果是这种情况，你可以将该计算机帐号的DN传递给DSRM命令，比如：
+            dsrm "CN=corpserver03,OU=Eng,DC=cpandl,DC=com"
+        默认情况下，DSRM会弹出提示信息询问是否确认删除。如果不希望看到提示信息，可以使用-Noprompt参数，比如：
+            dsrm "CN=corpserver03,OU=Eng,DC=cpandl,DC=com" -noprompt 
+14.4操作域控制器
+    运行Windows Server 2008的计算机可以充当成员服务器或域控制器。本章前面讲述的技术和方法适用于任意类型的计算机帐号，但本节讲述的内容只适用于域控制器。
+    14.4.1安装与降级域控制器
+        Windows Server 2008支持两种类型的域控制器，可读写的域控制器（RWDC）与只读的域控制器（RODC）。RWDC存储活动目录中可写的复制数据，RODC存储活动目录中只读的复制数据。
+        在活动目录域中，域控制器执行很多重要的任务。通过使用servermanagercmd -installadds-domain-controller安装Active Directory Domain Services角色，之后运行DCPROMO命令，可以安装目录服务，并将成员服务器升级为域控制器。如果再一次运行DCPROMO命令，就会对该域控制器进行降级，使其再一次只是充当成员服务器的角色。
+        （真实场景  DCPROMO命令会启动一个图形界面工具，但也可以接受几个命令行参数，包括/Answer:FileName与/Adv。通过/Answer参数，可以提供一个应答文件，用于脚本化目录服务安装。如果需要对整个服务器进行自动安装，则应该在Unattend.txt文件中添加一个GUIRunOnce条目，以便于在无人值守安装后启动DCPROMO。通过/Adv参数，DCPROMO会以高级模式运行，该模式下提供了很多选项，可以在安装时创建域控制器，或者从安装介质备份中创建。对这两种方式，要复制域信息，首先都需要为运行Windows Server 2008的域控制器（运行在同一域内，是待升级的成员服务器）创建安装介质或介质备份，之后使用DCPROMO启动活动目录的高级安装。）
+    14.4.2在活动目录中发现域控制器
+        如果需要操作域控制器，而不是所有计算机帐号，可以使用DSQUERY SERVER命令与DSGET SERVER命令。默认情况下，使用DSQUERY SERVER命令时，搜索的是所在的登录域。实际上，只键入dsquery server命令并按Enter键后，会返回一个列表，其中包含了所在登录域内的所有域控制器。如果必要可以使用-Domain参数指定待搜索的域，参考如下实例：
+            dsquery server -domain tech.cpandl.com 
+        这一命令执行后，会获取tech.cpandl.com域内的所有域控制器列表。如果需要获取的是整个森林内的所有域控制器列表，可以使用命令dsquery server -forest。
+        在所有这些实例中，输出信息都是域控制器DN列表。但与前面讲述的DN不同的是，这里的DN还包含了站点配置信息，比如：
+            "CN=CORPSVR02,CD=Servers,CD=Default-First-Site-Name,CN=Sites,CN=Configuration,DC=cpandl,DC=com"
+        这些附加的信息是由DSQUERY SERVER命令提供的，用于指定与服务器相关联的站点。要记住的是，域可以跨越不止一个物理位置，而告知活动目录这一点的方法是使用站点与子网。上面的实例中，相关联的站点配置容器中的Default-First-Site-Name。 
+        有时候，你可能需要发现特定站点中的域控制器，为此可以使用-site参数指定站点。下面的实例中试图发现Seattle-First-Site站点中的所有域控制器：
+            dsquery server -site Seattle-First-Site 
+        （注解  DSQUERY SERVER命令有一些附加的参数，可以用于搜索全局编目、操作主机以及只读的域控制器。这些参数将分别在14.5.1、14.6.1、14.7等节进行讨论。）
+        与其他计算机相关的命令类似，DSQUERY SERVER命令与DSGET SERVER命令适合于一起使用。DSQUERY SERVEDR命令用于获取一个或多个域控制器的DN，DSGET SERVER命令用于显示相关帐号的属性，可以显示的属性是使用如下参数指定的。
+        · -Dn。显示输出信息中匹配域控制器的DN。
+        · -Desc。显示输出信息中匹配域控制器的描述信息。
+        · -Dnsname。显示域控制器的完全限定域名。
+        · -lsgc。显示Yes/No值，用于表示域控制器是否同时还是一个全局编目服务器。
+        比如，如果需要获取森林中所有域控制器的详细摘要，可以键入如下命令：
+            dsquery server -format | dsget server -desc -dnsname -isgc 
+        要保存这些信息，可以将其重定向到文件中，比如：
+            dsquery server -format | dsget server  -desc -dnsname -isgc > forest-dcs.txt 
+14.5指定全局编目服务器
+    指定为全局编目服务器的域控制器中存储了活动目录中所有对象的完全副本（用于其主机域）以及域森林中所有其他域的部分副本。全局编目用于登录与信息搜索。实际上，如果全局编目服务不可用，则正常用户也将无法登录到相应域。要防止这种情况，唯一的方法是在本地域控制器上缓存通常的组成员关系信息。默认情况下，域内安装的第一个域控制器将被指定为全局编目服务器。你也可以向域中添加全局编目服务，来提高登录域查询请求的响应速度。建议为域内每个站点都配置一个全局编目服务器。
+    任意提供全局编目的域控制器都应该与网络以及充当架构主机的域控制器建立稳定的连接，架构主机是可以为域控制器指定的5种操作主机之一。其作用是负责对象引用信息的更新，这是通过将数据与全局编目中的数据进行比较实现的。如果架构主机发现陈旧数据，就会从全局编目中请求陈旧数据，之后向域内的其他域控制器服务质量数据所做的更改。
+    （提示  如果域中只有一个域控制器，可以为同一个域控制器同时制定架构主机角色与全局编目服务，如果域中有两个或多个域控制器，架构主机角色与全局编目服务就不应该制定在同一台域控制器上，因为这会影响基础设置主机判断目录数据是否过期的准确性。）
+    14.5.1发现全局编目服务器
+        如果需要了解全局编目服务的部署位置，对当前（登录）域，只需键入dsquery server -isgc命令，输出信息中将包含全局编目的DN，比如：
+
+        （缺页）
+
+
+    命名主机负责域森林中域的添加与移除。由于在域森林中，这两个角色都是唯一的，因此只能指定一台架构主机与一台域命名主机。
+    另外几种必须指定的域角色是相对ID主机、PDC模拟器主机与基础结构主机。从名字可以看出，相对ID主机为域控制器分配相对ID。创建用户、组或计算机对象时，域控制器会为相关对象指定一个唯一性的安全ID。安全ID包含了域安全ID前缀以及一个唯一的相对ID，后者就是由相对ID主机进行分配的。PDC模拟器主机负责处理用户、计算机、trusts的口令更改。基础结构主机负责对对象索引进行更新，这是通过对目录数据与全局编目中的数据进行比较实现的。如果基础结构主机发现陈旧数据，就会从全局编目中请求陈旧数据，之后向域内的其他域控制器复制数据所做的更改。在每个域中，这些作用于域森林范围的角色必须是独一无二的。也就是说，在每个域内，只可以指定一台相对ID主机、一台PDC模拟器主机、一台基础结构主机。
+    14.5.1发现操作主机
+        安装新网络时，第一个域内的第一个域控制器会被指定为所有的操作主机角色。如果后来在新树中创建子域或根域，其中的第一个域控制器也将会被自动地指定为这些操作主机角色。在一个新的域森林中，域控制器会被指定为所有操作主机角色。如果新建域在原有的域森林中，则指定的角色包括相对ID主机、PDC模拟器主机与基础结构主机。架构主机与域命名主机则仍保留在森林的第一个域内。如果必要，管理员可以变更操作主机角色。
+        通过如下命令，可以确定所在登录域内的当前操作主机：
+            netdom query fsmo
+        输出信息中列出了每个角色的属主，且以完全限定域名描述：
+        Schema master               CorpServer18.cpandl.com 
+        Domain Nameing master       CorpServer35.cpandl.com 
+        PDC                         CorpServer23.eng.cpandl.com 
+        RID pool master             CorpServer23.eng.cpandl.com 
+        Infrastructure master       CorpServer49.eng.cpandl.com 
+        从输出信息中可以确定，森林根域为cpandl.com，当前登录域为eng.cpandl.com。如果需要确定某个特定域的操作主机，可以使用如下命令：
+            netdom query fsmo /d:DomainName 
+        其中，DomainName为域名，比如eng.cpandl.com。 
+        通过在DSQUERY SERVER命令中使用-Hasfsmo参数，可以确定森林中的哪个域控制器或域指定了操作主机角色。这一参数有如下一些取值。
+        · scheme。返回森林的架构主机DN。
+        · name。返回森林的域命名主机的DN。
+        · infr。返回森林的架构主机DN。如果没有使用-Domain参数指定域，则默认使用当前域。
+        · pdc。返回森林的PDC模拟器主机DN。如果没有使用-Domain参数指定域，则默认使用当前域。 
+        · rid。返回森轮的相对ID主机DN。如果没有使用-Domain参数指定域，则默认使用当前域。 
+        架构主机与域命名主机是森林范围的角色。键入dsquery server -hasfsmo scheme或dsquery server -hasfrmo name命令时，总是会获取活动目录森林内相关操作主机的DN。
+        相对ID主机、PDC模拟器主机与基础结构主机是域范围的角色。键入dsquery server -hasfrmo infr、dsquery server -hasfsmo pdc或dsquery server -hasfrmo rid命令时，总是会获取登录域内相关操作主机的DN。如果需要获取其他域内操作主机的DN，则可以使用-Domain参数指定待搜索的域，参考如下实例：
+            dsquery server -hasfrmo rid -domain tech.cpandl.com 
+        上面的命令将获取tech.cpandl.com域内相对ID主机的DN。如果森林中包含了多个域，你可能需要获取所有域控制器列表，其中每个域控制器都具备一个以该域为基础的特定角色。为此，可以使用-Forest参数，比如：
+            dsquery server -hasfsmo rid -forest 
+    14.6.2使用命令行配置操作主机角色
+        尽管可以使用目录服务命令检查操作主机所在位置，但不能用于对操作主机角色进行配置。如果需要对操作主机角色进行配置，比如使用NTDSUtil，NTDSUtil是一个文本模式的命令解释器，通过调用NTDSUtil，可以使用单独的命令提示符与内部命令对目录服务进行管理。要调用NTDSUtil解释器，可以在命令窗口中键入ntfsutil，之后按Enter键。
+        通过NTDSUtil，可以将操作主机角色从一个域控制器迁移到另外的的域控制器，也可以在角色不能正擦很难过迁移时对其进行查封。比如，充当基础结构主机的域控制器发生了磁盘失效，使得整个服务器不可用。如果无法使得该服务器联机，就可能需要查封这一基础结构主机角色并将该角色赋予其他域控制器。对于以后还需要联机的域控制器，切记永远不要查封其角色。一旦查封了角色，则服务器将再也无法恢复服务。要使得原始服务器主机联机，唯一的方法是格式化引导磁盘，并重装Windows Server 2008.因此，对角色进行查封要慎之又慎，通常是万不得已的选择。
+        在对角色进行插灯并强制迁移之前，应该确定接管该角色的域控制器相对于角色原属主的更新程度。活动目录使用更新序号（USN）对数据变更情况进行追踪。由于数据复制存在延迟，因此不是所有域控制器上都保持了最新数据。如果将域控制器的USN与域内其他服务器进行比较，就可以确定域控制器与角色原属主相比，数据是否是最新的。如果域控制器是最新的，就可以安全地迁移角色。如果域控制器数据不是最新的，就需要等待数据复制的进行，之后将角色迁移到该域控制器。
+        Windows Server 2008包含了REPADMIN命令，用于操作活动目录复制。如果需要显示指定域控制器中每个复制方特定命令上下文中的最大序列号，可以使用如下命令：
+            repadmin /showutdvec DomainControllerName NamingContext 
+        其中，DomainControllerName是域控制器的完全限定域名，NameingContext为服务器所在域的区分名，比如：
+            repadmin /
