@@ -233,11 +233,56 @@
     （提示  如果域中只有一个域控制器，可以为同一个域控制器同时制定架构主机角色与全局编目服务，如果域中有两个或多个域控制器，架构主机角色与全局编目服务就不应该制定在同一台域控制器上，因为这会影响基础设置主机判断目录数据是否过期的准确性。）
     14.5.1发现全局编目服务器
         如果需要了解全局编目服务的部署位置，对当前（登录）域，只需键入dsquery server -isgc命令，输出信息中将包含全局编目的DN，比如：
-
-        （缺页）
-
-
-    命名主机负责域森林中域的添加与移除。由于在域森林中，这两个角色都是唯一的，因此只能指定一台架构主机与一台域命名主机。
+            "CN=CORPSVR02,CN=Servers,CN=Default-First-Site-Name,CN=Sites,CN=Configuration,dc=cpandl,dc=com"
+        DSQUERY SERVER也可以用于定位特定域中的全局编目。要做到这一点，需要使用-Domain参数，比如键入命令dsquery server -domain tech.cpandl.com -isgc。
+        这一命令对tech.cpandl.com域内的全局编目服务器进行搜索。如果需要对整个森林内的全局编目服务器进行搜索，可以使用命令dsquery server -forest -isgc。
+        你也可以根据站点搜索全局编目服务器，但要做到这一点，必须知道完整的站点名，而不能使用通配符。比如，如果需要发现Default-First-Site-Name的所有全局编目服务器，可以键入命令dsquery server -site Default-First-Site-Name。
+        （注解  可以根据站点搜索全局编目服务器是一项重要的功能，因为典型情况下每个站点都有一台全局编目服务器。如果搜索一个站点但未能发现全局编目服务，则可以考虑添加一个。）
+    14.5.2添加或移除全局编目服务器
+        通过DSMOD SERVER命令，其后跟随待操作服务器的DN，之后使用-isgc yes参数，就可以将域控制器指定为全局编目服务器，比如：
+            dsmod server "CN=corpdcos,OU=Eng,DC=cpandl,DC=com" -isgc yes 
+        完成这一任务的另一种方式是使用DSQUERY SERVER命令获取待操作服务器的列表。假定tech.cpandl.com域包含3台域控制器，现在需要将其全部指定为全局编目，则可以使用如下命令：
+            dsquery server -domain tech.cpandl.com | dsmod server -isgc yes 
+        上面的命令中，使用DSQUERY SERVER命令获取tech.cpandl.com域内所有域控制器的DN，之后将这些信息床底给DSMOD SERVER命令，之后该命令将其全部指定为全局编目。
+        如果后来需要某台服务器停止全局编目服务，可以使用-isgc no参数。下面的实例中，不再需要tech.cpandl.com域内的corpdc04服务器提供全局编目服务：
+            dsmod server "CN=corpdc04,OU=Tech,DC=cpandl,DC=com" -isgc no 
+    14.5.3检查缓存与优先的全局编目设置
+        域与域森林的不同功能层级依赖于网络配置。如果域或域森林内所有域控制器运行的至少是Windows 2000 Server以上版本，功能层级设置为Windows 2000本原模式，则组织可以充分利用活动目录很多附加的功能，但不再能使用Windows NT的主域控制器（PDC）与备份域控制器（BDC）。Windows 2000本原模式下激活的一个功能是通常组成员关系信息缓存。
+        如果用户尝试登录但域内不存在全局编目，就可能导致无法登录，但通过通常组成员关系信息缓存，就可以解决这一问题。这种缓存功能的禁用或激活是以每个站点为基础的，要确定某个站点的这种缓存功能是否激活，可以使用DSGET SITE命令，将待操作站点DN传递给该命令，其后跟随-Cachegroup参数，如下面实例所示：
+            dsget site "CN=Default-First-Site-Name,CN=Sites,CN=Configuration,DC=cpandl,DC=com" -cachegroup 
+        如果通常组成员关系信息缓存是激活的，则输出信息类似于如下的格式：
+            cachegroups
+            是 
+            dsget 成功
+        如果通常组成员关系信息缓存是禁用的，则输出信息类似于如下的格式：
+            cachegroups 
+            否
+            dsget 成功
+        完成这一搜索的另一种方式是使用DSQUERY SITEI命令。在命令行中键入dsquery site命令，不带任何参数，则该命令会返回一个列表，包含了域森林内所有站点。要对返回的结果集进行限制，可以使用-Name参数指定站点的通常名，或使用通配符指定部分名，比如：
+            dsquery site -name *First* 
+        这以命令搜索通常名中包含First的所有站点。
+        将上面的方法结合在一起，你可以使用如下命令确定域森林中所有站点的缓存设置：
+            dsquery site | dsget site -cachegroups 
+        这一命令的输出信息中包含了一些“是”或“否”的应答信息，类似于如下格式：
+            cachegroups 
+            是
+            是 
+            否 
+            否 
+            是 
+            dsget 成功
+        如果希望输出信息具有更丰富的含义，可以使用-Dn参数，来显示相关站点的DN，比如：
+            dn                                                                       cachegroups 
+            CN=Seattle-Site-Name,CN=Sites,Cn=Configuration,DC=cpandl,DC=com  是 
+            CN=LA-Site-Name,CN=Sites,CN=Configuration,DC=cpandl,DC=com       是 
+            CN=NY-Site-Name,CN=Sites,CN=Configuration,DC=cpandl,DC=com       是 
+            CN=Chicago-Site-Name,CN=Sites,CN=Configuration,DC=cpandl,DC=com  是 
+            CN=Detroit-Site-Name,CN=Sites,CN=Configuration,DC=cpandl,DC=com  是 
+            dsget 成功
+        如果通常组成员关系信息缓存是激活的，则带有多个全局编目服务（每个站点一个）的域可以有优先的全局编目。这一优先的全局编目专门用于为站点的域控制器刷新通常组成员关系信息缓存。你可以使用-Prefgcsite参数来确定优先的全局编目。比如，键入dsquery site | dsget site -cache groups -prefgcsite命令，就可以获取域森林中所有全局编目的完整缓存配置信息。如果已经配置了优先的全局编目，会在返回信息中看到“是”或“否”等值。如果没有配置，则在返回信息中看到“未配置”值。
+14.6指定操作主机
+    活动目录中，定义了5中操作主机角色，每一种角色都在确保网络正常运行中发挥关键作用。其中有些角色可以只在域森林中指定，其他角色则必须在每个域中指定。
+    作用于域森林范围的角色包括架构主机与域命名主机，架构主机负责目录架构的更新与修改，域命名主机负责域森林中域的添加与移除。由于在域森林中，这两个角色都是唯一的，因此只能指定一台架构主机与一台域命名主机。
     另外几种必须指定的域角色是相对ID主机、PDC模拟器主机与基础结构主机。从名字可以看出，相对ID主机为域控制器分配相对ID。创建用户、组或计算机对象时，域控制器会为相关对象指定一个唯一性的安全ID。安全ID包含了域安全ID前缀以及一个唯一的相对ID，后者就是由相对ID主机进行分配的。PDC模拟器主机负责处理用户、计算机、trusts的口令更改。基础结构主机负责对对象索引进行更新，这是通过对目录数据与全局编目中的数据进行比较实现的。如果基础结构主机发现陈旧数据，就会从全局编目中请求陈旧数据，之后向域内的其他域控制器复制数据所做的更改。在每个域中，这些作用于域森林范围的角色必须是独一无二的。也就是说，在每个域内，只可以指定一台相对ID主机、一台PDC模拟器主机、一台基础结构主机。
     14.5.1发现操作主机
         安装新网络时，第一个域内的第一个域控制器会被指定为所有的操作主机角色。如果后来在新树中创建子域或根域，其中的第一个域控制器也将会被自动地指定为这些操作主机角色。在一个新的域森林中，域控制器会被指定为所有操作主机角色。如果新建域在原有的域森林中，则指定的角色包括相对ID主机、PDC模拟器主机与基础结构主机。架构主机与域命名主机则仍保留在森林的第一个域内。如果必要，管理员可以变更操作主机角色。
@@ -270,4 +315,45 @@
         Windows Server 2008包含了REPADMIN命令，用于操作活动目录复制。如果需要显示指定域控制器中每个复制方特定命令上下文中的最大序列号，可以使用如下命令：
             repadmin /showutdvec DomainControllerName NamingContext 
         其中，DomainControllerName是域控制器的完全限定域名，NameingContext为服务器所在域的区分名，比如：
-            repadmin /
+            repadmin /showutdvec corpserver45 dc=cpandl,dc=com 
+        上面的命令的输出信息将会展示域分区中复制方的最大USN：
+            Main-Site\corpserver18  @ USN  967382 @ Time 2008-05-15 10:12:22 
+            Main-Site\corpserver92  @ USN  970043 @ Time 2008-05-15 10:12:25 
+        这一实例中，如果CorpServer18是以前的角色属主，并且正在检查的域控制器的USN大于或等于CorpServer18的USN，则说明域控制器是最近更新的；如果CorpServer18是以前的角色属主，并且正在检查的域控制器的USN小于CorpServer18的USN，则说明域控制器不是最新更新的。对这种情况，在对角色进行查封之前，应该等待数据复制的进行。你可以使用REPADMIN/SYNCALL强制最近更新的域控制器（与以前的角色属主相比）对所有肤质方进行数据复制操作。
+        在命令行中，通过如下步骤，可以实现角色的迁移。
+        （1）登录将要指定新操作主机角色的服务器，启动命令提示符。
+        （2）在命令提示符中，键入ntdsutil，调用文本模式的命令解释器NTDSUtil。
+        （3）在ntdsutil提示符中，键入roles。这将使得该工具进入操作主机维护模式，提示符也将变为：
+            fsmo maintenance: 
+        （4）在fsmo maintenance提示符中，键入connections，以便进入server  connections提示符，之后键入connect to server，其后跟随该角色的当前架构主机的完全限定域名，比如：
+            connect to server corpdc01.eng.cpandl.com 
+        （5）成功建立连接后，键入quit，退出server connections提示符，之后在fsmo maintenance提示符中键入transfer，之后再键入待迁移角色的标识符，标识符包括下面5个。
+            · pdc-用于PDC模拟主机角色。
+            · rid-用于相对ID主机角色。
+            · infrastructure master-用于基础结构主机角色。
+            · scheme master-用于架构主机角色。
+            · naming master-用于域命名主机角色。
+        （6）角色迁移完成。在fsmo maintenance提示符中键入quit，之后在ntdsutil提示符中，键入quit。
+        如果不能顺利地实现角色迁移，比如充当该角色的服务器当前处于脱机，或不可用，则可以通过如下步骤查封该角色。
+        （1）确信充当待查封角色的当前域控制器已经永久性脱机。如果该服务器还可以联机，不要执行下面的步骤，除非已经计划完全重装该服务器。
+        （2）登录将要指定新操作主机角色的服务器，启动命令提示符。
+        （3）在命令提示符中，键入ntdsutil，调用文本模式的命令解释器NTDSUtil。
+        （4）在ntdsutil提示符中，键入roles。这将使得该工具进入操作主机维护模式，提示符也将变为：
+            fsmo maintenance:
+        （5）在fsmo maintenance提示符中，键入connections，之后在server connections提示符中键入connect to server，其后跟随该角色的当前架构主机的完全限定于明，比如：
+            connect to server corpdc01.eng.cpandl.com 
+        （6）成功建立连接后，键入quit，退出server connections提示符，之后再fsmo maintenance提示符中键入seize，之后再键入待查封角色的标识符，标识符包括下面5个。
+            · pdc-用于PDC模拟主机角色。 
+            · rid-用于相对ID主机角色。 
+            · infrastructure master-用于基础结构主机角色。 
+            · scheme master-用于架构主机角色。
+            · naming master-用于域命名主机角色。
+        （7）角色查封完成。在fsmo maintenance提示符中键入quit，之后在ntdsutil提示符中，键入quit。
+14.7发现只读的域控制器
+    想要确定只读域控制器所在位置？对当前（登录）域，键入dsquery server -isreadonly，其输出信息中包含了只读域控制器的DN列表，比如：
+        "CN=CORPSVR48,CN=Servers,CN=Default-First-Site-Name,CN=Sites,CN=Configuration,DC=cpandl,DC=com"
+    DSQUERY SERVER命令也可以用于在特定域内定位只读的域控制器。要做到这一点，需要使用-Domain参数，比如：
+        dsquery server  -domain seattle.cpandl.com -isreadonly 
+    上面的命令对seattle.cpandl.com域内的只读域控制器进行搜索。如果需要对整个森林进行搜索，则需要键入dsquery server -forest -isreadonly。
+    你也可以以站点为基础搜索只读域控制器，但要做到这一点，必须知道完整的站点名，而不能使用通配符。比如，如果需要发现Default-First-Site-Name的所有只读域控制器，可以键入命令dsquery server -site Default-First-Site-Name -isreadonly。
+    

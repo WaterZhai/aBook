@@ -1,0 +1,137 @@
+第15章  管理活动目录用户与组
+
+创建并管理用户与组帐号是管理员的核心任务之一。本章首先讲述了如何在命令行中创建并管理用户账号，之后讲述了如何在命令行中创建并管理组帐号。操作活动目录用户与组是本章的核心内容。
+
+15.1从命令行中管理用户账号概览
+    在Windows Server 2008中，定义了下面两种类型的用户账号。
+    · 域用户帐号。在活动目录中定义，可以访问整个域内的资源。可以使用目录服务网命令创建并管理用户账号。
+    · 本地用户账号。在本地计算机上定义，在访问网络资源之前必须通过认证。可以使用网络服务命令创建并管理本地用户账号。
+    （注解  本地机器帐号主要用户工作组配置，而非Windows域。网络删过的每台计算机都包含了一个或多个本地机器帐号。唯一例外的是域控制器，域控制器上没有配置本地机器帐号。如果需要操作本地机器帐号，可以使用网络服务命令。）
+    可用于管理域用户账号的目录服务命令包括下面列举的。
+    · DSADD USER。在活动目录中创建用户账号，其语法格式如下：
+        dsadd user UserDN [-samid SAMName] [-upn UPN] [-fn FirstName] [-m Initial] [-in LastName] [-display DisplayName] [-empid EmployeeID] [-pwd {Password | *}] [-desc Description] [-memberof Group ...] [-office Office] [-tel PhoneNumber] [-email EmailAddress] [-hometel HomePhoneNumber] [-pager PagerNumber] [-mobile CelIPhoneNumber] [-fax FaxNumber] [-iptel IPPhoneNumber] [-webpg WebPage] [-title Title] [-dept Department] [-company Company] [-mgr Manager] [-hmdir HomeDirectory] [-hmdrv DriveLetter:] [-profile ProfilePath] [-loscr ScriptPath] [-mustchpwd {yes no}] [-pwdneverexpires {yes | no}] [-acctexpires NumberOfDays] [-disabled {yes | no}] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-q] [{-uc | -uco |-uci}] [-fnp FirstNamePhonetic] [-lnp LastNamePhonetic] [-displayp DisplayNamePhonetic]
+    · DSGET USER。显示用户账号的属性，有两种语法。
+        显示多个用户账号的语法格式如下：
+            dsget user UserDN ... [-dn] [-samid] [-sid] [-upn] [-fn] [-mi] [-ln] [-display] [-fnp] [-lnp] [-displayp] [-effectivepso] [-empid] [-desc] [-office] [-tel] [-email] [-hometel] [-pager] [-mobile] [-fax] [-iptel] [-webpg] [-title] [-dept] [-company] [-mgr] [-hmdir] [-hmdrv] [-profile] [-loscr] [-mustchpwd] [-canchpwd] [-pwdneverexpires] [-disabled] [-acctexpires] [-reversiblepwd] [{-uc | -uci | -uco}] [-part PartitionDN [-qlimit] [-qused]] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-c] [-q] [-l] 
+        查看用户的组成员关系的语法格式如下：
+            dsget user UserDN [-memberof [-expand]]  [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-c] [-q] [-l] [{-uc | -uco | -uci}]
+    · DSMOD USER。对活动目录中一个或多个用户账号的属性进行修改，其语法格式如下：
+        dsmod user UserDN ... [-upn UPN] [-fn FirstName] [-mi Initial] [-ln LastName] [-display DisplayName] [-empid EmployeeID] [-pwd {Password | *}] [-desc Description] [-office Office] [-tel PhoneNumber] [-email EmailAddress] [-hometel HomePhoneNumber] [-pager PagerNumber] [-mobile CellPhoneNumber] [-fax FaxNumber] [-iptel IPPjoneNumber] [-webpg WebPage] [-title Title] [-dept Department] [-company Company] [-mgr Manager] [-hmdir HomeDirectory] [-hmdrv DriveLetter:] [-profile ProfilePath] [-loscr ScriptPath] [-mustchpwd {yes | no}] [-canchpwd {yes | no}] [-reversiblepwd {yes | no}] [-pwdneverexpires {yes | no}] [-acctexpires NumberOfDays] [-disabled {yes | no}] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-c] [-q] [{-uc | -uco | -uci}] [-fnp FirstNamePhonetic] [-lnp LastNamePhonetic] [-displayp DisplayNamePhonetic]
+    （提示  这些命令可以接受来自DSQUERY USER的输入信息，用来为待操作的用户设置区分名（DN）。你也可以为每个用户键入DN，但要确保每个DN之间使用空格分割。）
+    一瞥之下，这些命令似乎超级复杂，但实际上并非如此复杂--尽管功能非常丰富。通过这些命令，可以添加、查看或修改用户账号，并包含一个可操作的账号属性扩展集。不管是添加、查看还是修改用户账号，用于操作账号某属性的参数是相同的。比如，创建账号时，可以使用-Tel参数设置该用户的办公室电话号码；如果需要确定某个用户的电话号码，可以在DSGET USER命令中使用-Tel参数；如果需要修改某用户的电话号码，可以在DSMOD USER命令中使用-Tel参数。
+    要对本地机器帐号进行管理，可以使用NET USER命令。该命令是一个网络服务命令，具有几种语法格式，具体语法格式依赖于要完成的任务，如下所示。
+        显示或修改本地用户账号：
+        net user [UserName [Password | *]] [/active:{no | yes}] [/comment:"DescriptionText"] [/countrycode:NNN] [/expires:{{MM/DD/YYYY | DD/MM/YYYY | mmm,dd,YYYY} | never}] [/fullname:"Name"] [/homedir:Path] [/passwordchg:{yes | no}] [/passwrodreq:{yes | no}] [/profilepath:[Path]] [/scriptpath:Path] [/times:{Day[-Day] [,Day[-Day]] ,Time[-Time] [,Time[-Time]] [;...] | all}] [/usercomment:"Text"] [/workstations:{ComputerName[,...]| *}]
+        创建本地用户账号：
+        net user [UserName {Password　｜ *} /add [/active:{no | yes}] [/comment:"DescriptionText"] [/countrycode:NNN] [/expires: {{MM/DD/YYYY | DD/MM/YYYY | mmm,dd,YYYY} | never}] [/fullname:"Name"] [/homedir:Path] [/passwordchg:{yes | no}] [/passwordreq:{yes | no}] [/profilepath:[Path]] [/scriptpath:Path] [/times:{Day[-Day] [,Day[-Day]] ,Time[-Time] [,Time[-Time]] [;...] | all}] [/usercomment:"Text"] [/workstations:{ComputerName[,...] | *}] ]
+        删除本地用户账号：
+        net user UserName /delete 
+    可以看出，NET USER命令只可以操作有限的用户属性集，这些账号属性适合于操作本地用户账号。
+    （注解  你也可以使用NET USER命令操作登录域内的域控制器，但对登录域的上层域，则不具备访问权限，而目录服务命令则可以在活动目录森林中任意域内创建与管理域用户帐号。）
+15.2添加用户账号
+    视图访问网络上资源的每个用户都必须具备一个用户账号，且需要的账号类型依赖于网络配置。对活动目录域，使用的是域用户账号；对于工作组，使用的是本地用户账号，且只可以从属于特定的计算机。
+    15.2.1创建域用户账号
+        创建域用户帐号时，要将用户的DN传递给DSADD USER命令。DN的常用名部分用于设置用户名，其余部分用于指定用户账号在活动目录中的具体位置，包括用户账号创建在那个容器与相关域。比如，要为cpandl.com域内Sales组织单元中的Lisa Andrews创建用户账号，可以使用如下命令：dsadd user "CN=Lisa Andrews,OU=Sales,DC=cpanld,DC=com"。创建之后，该账号将以Lisa Andrews作为用户登录名，但由于没有指定其他属性，因此，处于安全原因，该账号将被自动禁用。
+        用户名不区分大小写，最长可以包括64个字符。典型情况下，除了用户账号DN之外，还需要指定如下一些要素。
+        · 首名，以-Fn参数指定。
+        · 中间名，以-Mi参数指定。
+        · 尾名，以-Ln参数指定。
+        · 显示名，以-Display参数指定。
+        （注解  大多数情况下，应该将显示名设置为与通常名一样的值，用来对账号进行管理，只要知道了用户的显示名，就可以获知用户DN中的通常名部分。）
+        · SAM账号名（也被引用为登录名），以-Samid参数指定。
+        · 口令，以-Pwd参数指定。口令设置必须满足组策略中设定的复杂性需求。
+        （注解  默认情况下，通常名中的前20个字符用于设置用户账号的SAM账号名，在Windows 2000以前也称为登录名。在域内，SAM账号名必须是唯一的，如果出现重叠，你可能需要将用户账号名设置为不用于显示名。在这种情况下，可能需要使用-Samid参数设置SAM账号名。）
+        与使用Actice Diretory Users And Computers管理工具创建账号不同的是，这里不使用用户的首名、中间名与尾名等值来设置用户的显示名，而使用-Display参数来设置它。显示名是Windows在对话框中显示的。用户账号名的通常名部分与区分名的域名部分用于设置用户的完全限定登录名，用于用户的登录域认证。比如，如果用户的登录域为cpandl，登录名为lisaandrews，则完全限定登录名为cpandl\lisaandrews。
+        如果需要为使用这些参数的Lisa A.Andrews创建账号，可以使用如下命令： 
+            dsadd user "CN=Lisa Andrews,OU=Sales,DC=cpandl,DC=com" -fn Lisa -mi A -ln Andrews -samid "lisaandrews" -display "Lisa Andrews" -pwd dg56$2# 
+        （注解  注意上面命令中双引号的使用，在参数值中包含空格时，必须使用双引号封装该参数值，对用户DN，samid以及显示名等值，建议总是使用双引号对其进行封装。养成这样的习惯后，在需要双引号时就不会漏掉，从而保证命令的成功执行。否则就可能在需要的时候忘记使用，从而导致帐号创建的失败。）
+        如果创建帐号时出现问题，则会看到警告信息，此时应该对语法进行检查，确保所有参数值正确设置，DN也是有效的。如果一切正常，DSADD USER会报告DSADD SUCCEEDED。
+        （真实场景  在命令行中创建帐号时，无论使用户帐号还是组帐号，最容易混淆的是很多不同的名称值。帐号的通常名，也称为相对区分名，是指DN中使用第一个CN=指定的名组件，比如CN=Lisa Andrews。用户账号还包含一个显示名，在Windows对话框中使用。典型情况下，显示名是用户的完整名，你可以看到的是对完整名的引用而非显示名的引用。用户账号与组帐号还包含一个pre-Windows 2000名。对用户，该名用于域登录域认证，因此也称为pre-Windows 2000登录名。）
+    15.2.2自定义域用户账号属性与组成员关系
+        所有新添加的域用户都是Domain Users组的成员，其主要属组也指定为Domain Users。你可以使用-Memberof参数添加组成员，其后跟随参数名与组的DN。如果组的DN中包含空格，则应该用双引号对其进行封装，比如：
+            dsadd user "CN=Lisa Andrews,OU=Sales,DC=cpandl,DC=com" -memberof "CN=Backup Operators,CN=Builtin,DC=cpandl,DC=com" "CN=DHCP" Administrators,CN=Builtin,DC=cpandl,DC=com 
+        （注解  特别要注意的是，组DN之间要用空格进行分隔。如果不使用空格分隔，则组成员关系将无法正确配置，并会返回错误信息。）
+        上面的命令创建了用户账号，并将其添加为Backup Operators与DHCP Administrators组的成员。这是一个两步骤的过程。首先是添加账号，之后配置组成员关系。如果添加组成员时发生错误，则DSADD USER会说明，对象创建成功，但创建后出错。在指定组DN时，要检查其语法是否正确，之后使用DSMOD USER正确地配置组成员关系。
+        出于安全原因，创建帐号时，可能需要设置如下一些参数。
+        · -muntchpwd{yes|no}。默认情况下，用户第一次登录时并不必须更改口令，即此时设置为-mustchpwd no。如果设置的是-mustchpwd yes，则用户第一次登录时必须更改口令。
+        · -canchpwd{yes|no}。默认情况下，用户可以更改自己的口令，即此时设置为-canchpwd yes。如果设置的是-canchpwd no，则用户无法更改自己的口令。
+        · -pwdneverexoires{yes|no}.默认情况下，设置为-pwdneverexpires no，即根据组策略，用户口令会在一定时间间隔后过期。如果设置的是-pwdneverexpires yes，则用户口令永不过期。
+        （注解  使用-pwdneverexpires yes参数会重写域帐号策略。通常，将账号口令设置为永不过期并不是一个好做法，这会使得口令的存在失去意义。）
+        · -disable{yes|no}。默认情况下，创建用户账号与口令后，该账号就是可用的，即此时设置为-disable no。如果设置的是-disable yes，则该账号会被禁用。这种方法会临时性第防止任何人使用该账号。
+        要了解DSADD USER更多信息，参考如下实例。
+        为cpandl.com域内User容器中的Scott L.Bishop创建一个账号。为其设置口令，并且该口令在第一次登录时必须更改：
+            dsadd user "CN=Scott L.Bishop,CN=Users,DC=cpandl,DC=com" -fn Scott -mi L -ln Bitshop -samid "scottb" -display "Scott L. Bitshop" -pwd acornTree -mustchpwd yes 
+        为ny.cpandl.com域内Engineering OU中的Bob Kelly创建一个账号。为其设置口令，该口令永不过期，但账号禁用：
+            dsadd user "CN=Bob Kelly,OU=Engineering,DC=ny,DC=cpandl,DC=com" -fn Bob -ln Kelly samid "bkelly" -display "Bob Kelly" -pwd dazedOne -pwdneverexpires yes -disabled 
+        为cpanld.com域内Marketing OU中的Eric F.Lang创建一个账号。为其设置口令，该口令不允许更改：
+            dsadd user "CN=Eric F.Lang,OU=Marketing,DC=cpandl,DC=com" -fn Eric -mi F -ln Lang -samid "eflang" -display "Eric F. Lang" -pwd albErt -canchpwd no 
+        （提示  你可以在域森林中任何具备访问权限的域内创建帐号。有些情况下，你可能需要直接登录到某个域的域控制器。你可以使用-S Server连接到域森林内任意域内的特定域控制器，使用-D Domain连接到指定域内任意可用的域控制器。）
+        大多数情况下，本节中讨论的这些参数在创建帐号时已经足够。可以看出，基于DSADD USER语法，还有很多其他的用户账号参数，本章后面部分将讨论如何使用这些参数设置用户账号的属性。
+    15.2.3创建本地用户账号
+        本地机器帐号是单独的计算机上创建的。如果需要为某个特定的计算机创建本地机器帐号，必须本地登录该计算机，或者通过远程登录来打开本地的命令提示符。登录本地计算机后，你可以使用NET USER命令创建帐号。有些情况下，本地计算机策略设置只允许使用待创建的账号名与/Add参数来创建帐号，比如：
+            net user wrstanek /add 
+        （注解  不能在域控制器上创建本地用户账号，域控制器上不包含本地机器帐号。）
+        上面的命令中，创建了一个本地帐号，该帐号登录名为wrstanek，口令为空。尽管可以使用空口令，但这可能会使计算机与网络面临安全威胁。因此，对新创建的本地用户账号，建议同时提供用户名与口令，口令跟随在账号名之后，如下面实例所示：
+            net user wrstanek dg56$2# /add 
+        如果成功创建了帐号，则NET USER会声明“命令成功完成”。然而，如果在帐号创建过程中遇到其他问题，NET SUER并不会显示错误消息本身，而是显示命令语法。这种请款修改，就需要检查语法，并确保相关参数值的设置是正确的。
+        对本地用户账号，可能使用的其他值与参数包括下面列举的。
+        · /comment:"DescriptionText"。为用户账号设置描述信息。通常，设置的是用户的工作头衔或部分。
+        · /fullname:"Name"。为用户账号设置完整名，完整名也被引用为显示名。
+        · /passwordchg{yes|no}默认情况下，用户可以更改自己的口令，即此时设置为/passwordchg yes。如果设置的是/passwordchg no，则用户无法更改自己的口令。
+        · /active{yes|no}。默认情况下，用户账号在创建后是激活的，即此时设置为/active yes。如果设置的是/active no，则用户账号创建后将被禁用。这一参数可用于临时组织任何人使用账号。
+        要了解使用NET USER的更多信息，参考如下实例。
+        使用完整名与描述信息，为Desktop Support组创建一个本地机器帐号：
+            net user dsupport squ5 /fullname:"Desktop Support" /comment:"Desktop Support Account" /add 
+        为Phil Spencer创建一个本地机器帐号，包含完整名与描述信息，并要求使用口令：
+            net user pspencer magma2 /fullname:"Phil Spencer" /comment:"Offsite Sales Manager" /passwordreq yes /add 
+        为chris Preston创建一个本地机器帐号，包含完整名与描述信息，设置口令，但不允许用户更改口令：
+            net user chrisp apples /fullname:"CHris Preston" /comment:"PR Manager" /passwordchg no /add 
+15.3管理用户账号
+    与使用活动目录用户和计算机管理工具相比，从命令行管理账号可以使用更多的选项，尤其是在同时操作多个账号时容易得多。
+    15.3.1查看与查找用户账号
+        你可以使用DSQUERY USER命令查找用户。你可以根据通常名、SAM账号名、描述信息等搜索账号，也可以使用这些字段的通配符进行查找。DSQUERY USER的输出包含了与搜索标准匹配的用户的DN，并且输出信息可以通过管道用作其他命令的输入，包括DSGET USER，并用于显示帐号的相关属性。
+        DSQUERY USER与DSGET USER最适合于一起使用。先使用DSQUERY USER获取一个或多个用户的DN，之后使用DSGET USER显示相关帐号的属性，这些属性是通过不同参数指定的，包括下面列举的。
+        · -display。显示输出信息中匹配用户账号的玩证明属性。
+        · -desc。显示输出信息中匹配用户账号的描述信息。
+        · -dn。显示输出信息中匹配用户账号的区分名。
+        · -empid。显示输出信息中匹配用户账号的雇员ID属性。
+        · -fn。显示输出信息中匹配用户账号的首名属性。
+        · -mi。显示输出信息中匹配用户账号的中间名属性。
+        · -ln。显示输出信息中匹配用户账号的尾名属性。
+        · -samid。显示输出信息中匹配用户账号的SAM账号名。
+        · -sid。显示输出信息中匹配用户账号的安全标识符。
+        · -disabled。显示“是|否”，表示用户账号是否禁用。
+        · -effectivepso。显示输出信息中匹配用户账号的有效的口令设置对象（PSO）。
+        （注释  活动目录中定义了3中帐号策略：口令策略帐号锁定策略以及Kerberos策略。PSO用于定于域中帐号策略设置，域运行在Windows Server 2008功能层时，PSO是可用的。）
+        DSGET USER以表格形式显示输出信息。一般来说，你应该总是使用-Dn、-Samid、-Display等参数，以便清晰地区分与标示输出信息中的用户账号。比如，如果需要搜索所有禁用的engineering用户，可以使用如下命令：
+            dsquery user "OU=Eng,DC=cpandl,DC=com" | dsget user -dn -disabled 
+        上面的命令将列出cpandl.com域内Engineering OU中所有处于禁用状态的用户账号，比如：
+            dn                                           disabled 
+            CN=edwardh,OU=Eng,DC=cpandl,DC=com           yes 
+            CN=jacabl,OU=Eng,DC=cpandl,DC=com           yes 
+            CN=maryk,OU=Eng,DC=cpandl,DC=com           yes 
+            CN=ellene,OU=Eng,DC=cpandl,DC=com           yes 
+            CN=williams,OU=Eng,DC=cpandl,DC=com           yes 
+            dsget succeeded 
+        你可以使用如下命令显示SAM账号名：
+            dsquery user -name william* | dsget user -samid -disabled 
+            samid               disabled 
+            williamb            yes 
+            williamd            yes 
+            williams            no 
+            dsget succeeded 
+        这一命令搜索所有通常名以William引导的用户账号，并显示每个匹配用户账号的SAM账号名与禁用状态。
+    15.3.2确定单独用户账号的组成员关系
+        你可以使用DSGET USER的另一种语法格式来获取单独用户账号的组成员关系。比如，如果需要查看WilliamS属于哪些组，可以使用如下命令：
+            dsquery user -name williams | dsget user -memberof 
+            或
+            dsget user "CN=William Stanek,OU=Eng,DC=cpandl,DC=com" -memberof 
+        上面两条命令的工作方式是一样的。第一条命令中，使用DSQUERY USER获取用户账号的DN。第二条命令则直接指定DN。两种方式都将展示类似于如下的组成员关系信息：
+            "CN=Tech,CN=Users,DC=cpandl,DC=com"
+            "CN=Engineering,CN=Eng,DC=cpandl,DC=com"
+            "CN=Domain,CN=Users,DC=cpandl,DC=com"
+        输出信息表明，用户是Tech、Engineering、Domain Users等组的成员。
+        需要指出的是，尽管可以使用上面的技术显示多个用户的组成员关系，但不能显示相关联用户的DN或SAM账号名。因而，输出信息中用于区分组成员关系针对的是哪一个用户的唯一标识是空白行，比如，使用如下查询命令：
+            dsquery user -name bill* | dsget user -memberof 
+        得到的输出信息将类似于如下格式：
+            "CN=Tech,CN=Users,DC=cpandl,DC=com"
