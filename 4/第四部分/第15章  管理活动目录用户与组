@@ -135,3 +135,298 @@
             dsquery user -name bill* | dsget user -memberof 
         得到的输出信息将类似于如下格式：
             "CN=Tech,CN=Users,DC=cpandl,DC=com"
+            "CN=Engineering,OU=Eng,DC=cpandl,DC=com"
+            "CN=Domain Users,CN=Users,DC=cpandl,DC=com"
+
+            "CN=Domain Users,CN=Users,DC=cpandl,DC=com"
+
+            "CN=Tech,CN=Users,DC=cpandl,DC=com"
+            "CN=ENgineering,OU=Eng,DC=cpandl,DC=com"
+            "CN=Domain Users,CN=Users,DC=cpandl,DC=com"
+
+            "CN=Engineering,OU=Eng,DC=cpandl,DC=com"
+            "CN=Domain Users,CN=Users,DC=cpandl,DC=com"
+
+            "CN=Tech,CN=Users,DC=cpandl,DC=com"
+            "CN=Engineering,OU=Eng,DC=cpandl,DC=com"
+            "CN=Domain Users,CN=Users,DC=cpandl,DC=com"
+
+            "CN=Domain Users,CN=Users,DC=cpandl,DC=com"
+
+            "CN=Domain Users,CN=Users,DC=cpandl,DC=com"
+        上面的输出信息分别显示了7个用户账号的组成员关系，之所以这样说是根据其中包含的空白行，但是你无法确定具体针对的是哪7个用户账号。
+    15.3.3设置或更改用户账号属性
+        从命令行中，使用DSMOD USER命令设置或更改用户账号属性是快捷融易的。你可以为单独的用户设置或更改属性，也可以同时为多个用户设置或更改属性。比如，如果需要将SaleS OU中150个用户账号的部门属性设置为SaleS & Marking，公司属性设置为City Power and Light，头衔设置为Customer SaleS，你可以使用如下命令完成这些设置任务：
+            dsquery user "OU=Sales,DC=cpandl,DC=com" | dsmod user -dept "Sales & Marking" -company "City Power and Light" -title "Customer Sales" 
+        执行之后，DSMOD USER将报告每一更改行为的成功或失败：
+            dsmod succeeded:CN=edwardh,OU=Sales,DC=cpandl,DC=com    no
+            dsmod succeeded:CN=erinp,OU=Sales,DC=cpandl,DC=com    no
+            dsmod succeeded:CN=jayo,OU=Sales,DC=cpandl,DC=com    no
+            dsmod succeeded:CN=johng,OU=Sales,DC=cpandl,DC=com    yes 
+            ...
+            dsmod succeeded:CN=williams,OU=Sales,DC=cpandl,DC=com    yes 
+        在GUI工具中，完成这些修改可能会需要几个小时的时间，而在命令行中则只需要几分钟的时间。你只需要键入相应的命名，余下的工作将由DSMOD USER完成。
+        其他可能需要经常使用的参数包括下面4个。
+        · -webpg。为用户设置intranet或Internet地址，地址将会在目录列表中显示，比如\\Intranet\Sales。
+        · -profile。为用户的profile（设置了用户账号的环境信息）设置路径，比如\\Gamma\Profiles\wrstanek。
+        · -hmdrv。为用户宿主目录设置驱动器盘符，比如X：。用户宿主目录将映射到这一盘符。
+        · -hmdir。为用户设置宿主目录，比如\\Gamme\Users\wrstanek。 
+        （警告  通常，在用户登录时，不能修改用户配置文件路径、宿主驱动器或宿主目录，因为这可能会出现问题。如果需要更新这些信息，可以在正常工作时间之外（或者需要用户暂时退出登录几分钟）改变这些信息。）
+        （提示  默认情况下，进行上述更新时如果出错，则DSMOD USER会报告出错并停止执行。通常，这是期望的行为，因为错误的更改是不需要的。但你也可以使用-C参数，是DSMOD USER在报告出错后继续执行。）
+        这些参数可以接受特殊值$username$。通过这一值，可以为单独的用户名指定路径与文件名。比如，如果将宿主目录路径指定为\\Gamma\Users\$username$或C:\Home\$username$，则Windows会使用实际的用户名来替换$username$。比如，如果当前操作的用户为erinb、sandyr、miked与kyler，则Windows将分别为这些用户指定单独的宿主目录\\Gamma\Users\erinb、\\Gamma\Users\sandyr、\\Gamma\Users\miked、\\Gamma\Users\kyler，或者C:\Home\erinb、C:\Home\sandyr、C:\Home\miked、C:\Home\kyler。其中，\\Gamma\Users是网络共享路径，C:\Home\则代表用户计算机中的目录路径。
+        根据上面的讲述，你可以为Sales OU中的所有用户设置Web page、profile、宿主驱动器以及宿主目录等内容，使用如下命令：
+            dsquery user "OU=Sales,DC=cpandl,DC=com" | dsmod user -webpg \\Intranbet\Sales\$username$ -profile "\\corpdc02\sales\$username$" -hmdrv "x:" -dmdir "\\corpserver01\users\$username$" 
+        （真实场景  在活动目录用户和计算机管理工具中，输入值%username%，可以获取路径与文件名（以单独用户为基础）。不要将这里讨论的特殊参数与该值一起是调用，%username%是一个环境变量，该GUI工具会以每个用户为基础对该环境变量进行相应替换。然而，在命令行中，会根据当前登录用户来对这一值与其他环境变来那个解释。因此，在这一实例中，%username%的取值将是运行该命令的用户账号。）
+    15.3.4禁用与激活用户账号
+        在命令行中，使用DSMOD USER命令与-Disabled参数，可以激活或禁用用户账号。使用-disabled yes参数，可以禁用用户账号：使用-disabled no参数，可以激活用户账号。
+        下面的实例中，禁用OffsiteUsers OU中的所有用户：
+            dsquery user "OU=OffsiteUsers,DC=cpandl,DC=com" | dsmod user -disabled yes 
+        运行之后，DSMOD USER会报告每一更改的成功或失败。
+    15.3.5重置过期的用户账号
+        你可以为域用户账号设置一个特定的到期日期，并使用DSGET USER与-Acctexpires参数来检查账号的到期日期。比如，如果需要检查Sales OU中所有账号的到期日期，可以使用如下命令：
+            dsquery user "OU=Sales,DC=cpandl,DC=com" | dsget user -dn -acctexpires 
+        输出信息包含了Sales OU中每一用户账号的到期日期，并根据账号的区分名列出，比如：
+            dn                                                  acctexpires   
+            CN=Lisa Andrews,OU=Sales,DC=cpandl,DC=com           never
+            CN=Joseph Brad,OU=Sales,DC=cpandl,DC=com           11/15/2010
+            CN=Ann Beebe,OU=Sales,DC=cpandl,DC=com           never
+            CN=Jeanne Bosworth,OU=Sales,DC=cpandl,DC=com           12/31/2010
+            dsget succeeded
+        这里，没有到期日期的账号的这一数值设置为“永不过期”，其他账号有一个具体的到期日期，比如11/15/2010。
+        如果需要扩展或改变账号的到期日期，以便用户登录某个域，可以使用DSMOD USER命令，并将-Acctexpires参数设置为需要该账号有效的天数。比如，如果某账号在下一个60天内应该有效，则抗议而键入-acctexpires 60，比如：
+            dsquery user -name johnw | dsmod user -acctexpires 60 
+            或 
+            dsmod user "CN=John Woods,OU=Sales,DC=cpandl,DC=com" -acctexpires 60 
+        上面的命令中，改变了John Woods的到期日期。
+        如果需要移除账号的到期日期，可以使用0，表示该账号永不过期，比如：
+            dsquery user -name johnw | dsmod user -acctexpires 0 
+        （注解  要设置一个账号使其已经过期，可以使用负数，比如-acctexpires -1。）
+    15.3.6控制与重置用户口令
+        使用DSGET USER命令，可以检查用户账号的口令设置。典型情况下，你可能需要知道某用户是否可以改变口令、口令是否到期、口令加密机制是否可逆等，你可以分别使用-Canchpwd、-Pwdneverexpires、-Reversiblepwd等参数来检查这些设置。你也可能需要知道帐号是否设置为用户下次登录时必须改变口令，为此，可以使用-Mustchpwd参数。比如，如果需要检查Users容器中所有用户的这些设置，可以使用如下命令：
+            dsquery user "CN=User,DC=cpandl,DC=com" | dsget user -samid -canchpwd -pwdneverexpires -reversiblepwd -mustchpwd 
+        执行之后，输出信息将根据SAM账号名展示Users容器所有用户的相关口令设置，比如：
+            samid    mustchpwd    canchpwd    reversibledpwd    pwdneverexpires    
+            andya    no           yes         no                no 
+            billg    no           yes         no                no    
+            bobh     yes          yes         no                no    
+            brianw   no           yes         no                no   
+            conniej  no           yes         yes               yes  
+            dsget succeeded
+        DSMOD  USER还提供了几个参数，用户控制这些以及其他的口令设置。你可以使用-Pwd参数为特定用户账号设置口令，之后按下面列举的使用方式配置口令。
+            · 使用-mustchpwd yes参数，该参数的作用是强制用户在下次登录时修改口令。
+            · 使用-canchpwd no参数，该参数的作用是使得用户无法修改口令。
+            · 使用-pwdneverexpires yes参数，该参数的作用是使得账号口令永不过期，这将覆盖组策略中的设置。
+        命令行的精彩之处在于，可以同时控制与修改多个用户账号的口令。假定需要将TempEmployee OU中每个用户的口令设置为Time2ChangeMe，并强制这些用户下次登录时修改口令，可以使用如下命令：
+            dsquery user "OU=TempEmployee,DC=cpandl,DC=com" | dsmod User -pwd Time2ChangeMe -mustchpwd yes 
+    15.3.7移动用户账号
+        通常，用户账号放置在Users容器或OU中。使用DSMOVE命令，可以将用户账号移动到同一个域内的其他容器或OU中。指定用户账号的当前DN，之后使用-Newparent参数指定该用户账号需要移动到新位置或父DN。比如，如果需要将用户账号William Stanek从Tech OU移动到Engineering OU，则应该指定用户账号DN，比如"CN=William Stanek,OU=Tech,DC=cpandl,DC=com"。之后指定新位置的父DN，比如"OU=Engineering,DC=cpandl,DC=com",相应命令类似于如下：
+            dsmove "CN=William Stanek,OU=Tech,DC=cpandl,DC=com" -newparent "OU=Engineering,DC=cpandl,DC=com" 
+        在执行DSMOVE命令之前，你可能需要使用DSQUERY USER获取用户账号DN，之后将DSQUERY USER的输出通过管道传递给DSMOVE，参考如下实例：
+            dsquery user -name "William Stanek" | dsmove -newparent "OU=Engineering,DC=cpandl,DC=com"
+        这里，用户账号DN，"CN=William Stanek,OU=Tech,DC=cpandl,DC=com"是通过DSQUERY USER获取的，并用作DSMOVE的输入。
+    15.3.8用户账号重命名
+        尽管移动用户是直截了当的，但对用户账号进行重命名则需要做一些工作。对用户账号进行重命名时，为账号赋予了新的通常名。在用户结婚、离婚或过继时，可能都需要为其进行重命名。比如，如果Nancy Anderson（nancya）结婚了，她可能就需要将用户名改变为Nancy Freehafer（nancyf）。对其账号进行重命名时，所有相关联的特权与访问权限都将反应账号名的改变。因而，如果查看nancya具有访问权限的文件许可权限，会发现nancyf具有访问权限（而nancya将不再列出）。
+        你可以使用DMSOVE命令对账号进行重命名。指定用户DN，之后使用-Newname参数指定新的通常名。比如，如果需要将用户对象Nancy Anderson重命名为Nancy Freehafer，则可以使用如下命令：
+            dsmove "CN=Nancy Anderson,OU=Marketing,DC=cpandl,DC=com" -newname "Nancy Freehafer" 
+        你也可以使用DSQUERY USER获取用户DN，参考如下实例：
+            dsquery user -name N*Anderson | dsmove -newname "Nancy Freehafer" 
+        上面命令中，DSQUERY USER查找以字母N引导，以Anderson结束的账号，之后使用DSMOVE对满足这一标准的账号进行重命名。
+        对用户账号进行重命名并不会改变其他的账号属性。由于有些属性会反应旧的用户名，因此需要使用DSMOD USER更新这些属性，以便反应更改之后的账号名。需要修改的参数包括下面6个。
+            · -Ln。用于改变用户账号的尾名。
+            · -Display。用于改变用户账号的显示名。
+            · -Samid。用于改变用户账号的SAM账号名。
+            · -Profile。用于改变用户账号的配置文件路径。之后，需要对磁盘上相应目录进行重命名。
+            · -Loscr。如果为每个用户使用单独的登录脚本，则可以使用-Loscr改变登录脚本名属性。之后，需要对磁盘上相应的登录脚本进行重命名。
+            · -Hmdir。用于改变宿主目录路径。之后，需要对磁盘上相应的目录进行重命名。
+            （注解  大多数情况下，在用户登录时，不能修改这一信息，因为这可能会出现问题。如果需要更新这些信息，可以在正常工作时间之外（或者需要用户退出登录几分钟）改变这些信息。）
+            参考如下实例：
+                dsquery user -name N*Freehafer | dsmod -samid nancyf -ln Freehafer -dsiplay "Nancy Freehafer" 
+        上面的命令中，对SAM账号名、尾名以及显示名进行了修改，以便配合前面对用户Nancy Freehafer所作的重命名。
+        （真实场景  用户名用于更方便地对用户账号进行管理与使用。在更深的系统层面，实际上，Windows Server 2008使用账号的安全标识符（SID）来识别、追踪与处理用户账号，而不是使用用户名，SID是唯一的标识符，在创建帐号时由系统生成。由于在系统内部，SID与账号名存在一个映射关系，因此不需要改变重命名帐号的特权或许可权限，Windows Server 2008会在必要的时候将SID映射到新账号名。）
+    15.3.9删除用户账号
+        如果不再需要一个用户账号，可以使用DSRM命令将其从目录中永久性删除。大多数情况下，你可能㤇删除某个特定的计算机帐号，比如Lisa Andrews。如果是这种情况，你可以将该计算机账号的DN传递给DSRM命令，比如：
+            dsrm "CN=Lisa Andrews,OU=Sales,DC=cpandl,DC=com" 
+        默认情况下，DSRM会弹出提示信息询问是否确认删除。如果不希望看到提示信息，可以使用-Noprompt参数，比如：
+            dsrm "CN=Lisa Andrews,OU=Sales,DC=cpandl,DC=com" -noprompt 
+        （注解  即便删除了用户账号，Windows Server 2008并不会删除该用户的配置文件、个人文件或宿主目录。如果需要删除这些文件与目录，就必须手工删除。如果这时一个需要常规性执行的任务，可以创建一个脚本来完成。要记住的是，在进行这些操作之前，应该对文件或数据进行备份。）
+15.4从命令行管理组帐号概览
+    组帐号用于管理多个用户的特权，Windows Server 2008包含3中类型的组帐号。
+    · 安全组。带有安全描述符的组，用于管理访问许可权限。你可以使用目录服务命令创建与管理安全组。
+    · 分发组。用作电子邮件分发列表的组，不带有安全描述符。你可以使用目录服务命令创建与管理分发组。
+    · 本地组。只在本地计算机上使用的组，你可以使用网络服务命令创建与管理本地组。
+    安全组与分发组在域内使用，在整个目录内都是可用的；本地组则只在其创建机器上可用。通常的域组帐号命令行工具包括下面3个。
+    · DSADD GROUP。在活动目录中创建组帐号，其语法格式如下：
+        dsadd group GroupDN [-secgrp {yes | no}] [-sope {l | g | u}] [-samid SAMName] [-desc Description] [-memberof Group ...] [-members Member ...] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-q] [{-uc | -uco | -uci}]
+    · DSGET GROUP。显示组帐号的属性，有两种方法。
+        显示多个组帐号的语法格式如下：
+        dsget group GroupDN ... [-dn] [-samid] [-sid] [-desc] [-secgrp] [-scope] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-c] [-q] [-l] [{-uc | -uci | -uco}] [-part PartitionDN [-qlimit] [-qused]]
+        查看单独组的组成员关系信息的语法格式如下：
+        dsget group GroupDN [{-memberof | -members} [-expand]] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-c] [-q] [-l] [{-uc | -uci}]
+    · DSMOD GROUP。在活动目录中修改一个或多个组帐号的属性，其语法格式如下：
+        dsmod group GroupDN ... [-samid SAMName] [-desc Description] [-secgrp {yes | no}] [-scope {l | g | u}] [{-addmbr | -rmmbr | -chmbr} MemberDN ...] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-c] [-q] [{-uc | -uci | -uco}]
+    （提示  这些命令可以接受来自DSQUERY GROUP的输入信息，用来为待操作的安全组设置区分名（DN）。你也可以为每隔组键入DN，但要确保每个DN之间使用空格分隔。）
+    要对本地组帐号进行管理，可以使用NET LOCALGROUP命令。该命令具有几种语法格式，具体语法格式依赖于要完成的任务，如下所示。
+    · 创建本地组帐号：net localgroup [GroupName {/add[/comment:"Text"]}]。 
+    · 修改本地组帐号：net localgroup [GroupName Name[...] {/add|/delete}]。 
+    · 删除本地组帐号：net localgroup [GroupName {/delete[/comment:"Text"]}]。 
+    （注解  NET LOCALGROUP用于将一个本地组添加到当前（登录）域内的其他组。在有些受限的环境下，你可能需要这样做，但一般不要使用这一技术为常规用户赋予更高的访问许可权限。比如，如果创建了一个名为DevTesters的本地组，并将其添加到Developers域组中，则作为DevTesters组成员的本地机器用户也将具备与Developers域组成员一样的域许可权限。这样做的原因在于，正在测试本地系统配置的开发人员需要对域的访问权限。）
+15.5添加组帐号
+    需要使用的组帐号类型依赖于网络配置。在域中，典型情况下使用的是安全组与分发组；在工作组中，典型情况下使用的是本地组，且只可以从属于特定的计算机。
+    15.5.1创建安全组与分发组
+        前面讲述了，安全组用于管理组用户的访问许可权限，分发组用于电子邮件分发列表。不管创建的是安全组还是分发组，该组的使用方法都依赖于范围。这里，范围是指该组有效地作用区域。定义的范围包括下面列举的3个。
+        · 域本地组。用于在单一域内授权的组，该组的成员可以只包含其定义域内的账号（用户账号与计算机账号）与组。
+        · 全局组。用于在域树或域森林内对任意域中对象进行授权的组，该组的成员只包括其定义域的账号与组。
+        · 通用组。用于在整个域树或域森林的更广范围内授权的组，该组成员可以包括账号、全局组以及域树或域森林中任意域内的其他通用组。
+        （注解  只有当活动目录运行在Windows 2000本原功能层或更高时，通用安全组才是可用的，并且在大型网络上比小型网络上具有更强大的功能。这主要是因为管理员增加了另外的组层级，因而，在大型网络（需要对组进行更多的控制）中优势比较明显。）
+        基于范围与操作模式，表15-1总结了组能力。从表中可以看出，二者都会对组的操作产生影响。
+            表15-1组能力及其功能层与范围
+            ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            组能力                     |域本地组                                                         |全局组                                    |通用组
+            ---------------------------|----------------------------------------------------------------|------------------------------------------|--------------------------------------------------------
+            Windows 2000本原功能层或更高|成员可以包括任意域中的用户账号、全局组以及通用组，或同一域内的域本地组|成员只可以包括同一域内的用户账号与全局组      |成员可以包括任意域内的用户账号，以及任意域内（不管范围）的组
+            Windows 2000混合功能层     |成员可以包括任意域内的用户账号与全局组                              |成员只可以包括同一域内的用户与组帐号         |在混合模式域内不能创建通用安全组
+            成员关系                   |可以放置到其他域本地组，只可以在同一域内赋予许可权限                 |可以防止到其他组，并可以在任意域内赋予许可权限|可以放置到其他组，并可以在任意域内赋予许可权限
+            ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        创建组时，要将组DN传递给DSADD GROUP命令。DN的常用名部分用于设置组的显示名，其余部分用于指定组在活动目录中具体位置，包括组创建在哪个容器与相关域。默认情况下，如果没有提供其他参数，则会创建一个全局安全组。比如，要在cpandl.com域内Sales组织单元中创建一个名为Sales的全局安全组，可以使用如下命令：dsadd group "CN=Sales,OU=Sales,DC=cpandl,DC=com"。创建之后，将以Sales作为组的显示名与SAM帐号名，但没有设置其他属性。
+        组名不区分大小写，最长可以包括64个字符。典型情况下，可以直接指定组类型与范围。你可以使用-Secgrp参数指定某个组是否为安全组，如下所示。
+        · -secgrp yes。表示正在创建的是安全组。
+        · -secgrp no。表示正在创建的是分发组。
+        要设置组范围，可以使用-Scope参数，如下所示。
+        · -scope l。表示创建一个本地域组。
+        · -scope g。表示创建一个全局组。
+        · -scope u。表示创建一个通用组。对于安全组，只有当活动目录运行在Windows 2000本原功能层或更高时，通用组才是有效的。
+        （注解  默认情况下，组被创建为安全组，作用范围为全局范围。因此，即使使用不同的范围创建安全组，也不需要指定-secgrp yes参数，因为这是默认的。）
+        组名中的前20个字符用于设置组的SAM帐号名--在Windows 2000以前也称为组名。在域内，SAM帐号名必须是唯一的，如果出现重叠，你可能需要将组的SAM帐号名设置为不同于显示名。在这种情况下，可能需要使用-Samid参数设置SAM账号名。 
+        创建组时，还可以指定组成员关系。如果当前创建的组应该是现存组的成员，则可以使用-Memberof参数指定这些组的DN。如果该组应该包含一些用户或其他组作为自己的组成员，则可以使用-Members参数指定这些成员的DN。然而，使用DSMOD GROUP配置组成员关系会更加容易，因为可以将DSQUERY USER的输出信息中DN列表作为DSMOD GROUP的输入，从而不再需要键入数十个甚至数百个DN。
+        要了解如何创建组，参考如下一些实例。
+        创建一个名为Engineering的域本地安全组，并将该组添加到tech.cpandl.com域内的Engineering OU：
+        dsadd group "CN=Engineering,OU=Engineering,DC=tech,DC=cpandl,DC=com" -scope l 
+        在cpandl.com域内的Users容器中创建一个名为Engineering Global的全局安全组，并将其SAM账号名设置为gEngineering：
+        dsadd group "CN=Engineering Global,CN=Users,DC=cpandl,DC=com" -samid "gEngineering" 
+        在cpandl.com域内的Engineering OU中创建一个名为Engineering All的通用分发组的全局安全组，并将其SAM帐号名设置为allEngineering：
+        dsadd group "CN=Engineering All,OU=Engineering,DC=cpandl,DC=com" -samid "allEngineering" -secgrp no -scope u 
+        如果在创建组时遇到问题，会看到一条警告消息。此时需要检查命令语法，确保所有参数值正确设置，并且DN是有效的。如果一切正常，则DSADD GROUP会报告DSADD SUCCEEDED。组创建之后，你可以为其添加成员，并设置其他参数，本章后面将进行讨论。
+    15.5.2创建本地组并为其分配成员
+        本地组是在单独的计算机上创建的，其作用是对本地登录的（而非登录到域）的用户进行许可权限管理。要创建一个本地组，需要登录到待操作的计算机，或者通过远程登录获取一个本地命令提示符。登录之后，可以使用NET LOCALGROUP创建本地组帐号。
+        键入NET LOCALGROUP命令，其后跟随组名，之后使用/Add参数，参考如下实例：
+            net localgroup localDevs /add 
+        （注解  不能在域控制器上创建本地组帐号，域控制器上不包含本地机器帐号。）
+        上面的命令中，在本地计算机上创建了名为localDevs的组。如果需要，你也可以使用/Comment参数为该组指定描述信息，比如：
+            net localgroup localDevs /comment:"Local Developers and Testers" /add 
+        如果成功创建了帐号，则NET LOCALGROUP会声明“命令成功完成”。然而，如果在帐号创建过程中遇到其他问题，NET LOCALGROUOP并不会显示错误消息本身，而是显示命令语法。这种情况下，就需要检查语法，并确保相关参数值的设置是正确的。
+        创建本地组时，也可以指定本地用户账号列表，并将这些账号作为该组的成员，账号列表跟随在组名之后，如下所示：
+            net localgroup localDevs williams johng edwardh /add 
+        上面的命令中，创建了一个名为localDevs的组，并将WilliamS、JohnG、EdwardH添加为该组的成员。
+        如果需要在以后向本地组中添加成员，而不是在创建组时添加，其语法与创建组时一样。比如，下面的命令创建了一个名为custSupport的组：
+            net localgroup custSupport /add 
+        如果以后需要为该组添加成员，则可以使用如下命令：
+            net localgroup custSupport williams hohng edwardh /add 
+        上面命令中，将WilliamS、JohnG、EdwardH添加为该组的成员。 
+15.6管理组帐号
+    与使用活动目录组和计算机管理工具相比，从命令行管理组帐号可以使用更多的选项，尤其是在同时操作多个组帐号时容易得多。
+    15.6.1查看与寻找组帐号
+        需要获取关于组帐号的信息时，你可以使用DSQUERY GROUP命令。你可以根据通常名、SAM账号名、描述信息等进行搜索，也可以使用这些字段的通配符进行查找。DSQUERY GROUP的输出包含了与搜索标准匹配的组的DN，并且输出信息可以通过管道用作其他命令的输入，包含DSGET GROUP。 
+        典型情况下，可以将DSQUERY GROUP与DSGET GROUP一起使用。先使用DSQUERY GROUP获取一个或多个组的DN，之后使用DSGET GROUP显示相关帐号的属性。有用的DSGET GROUP参数包括下面列举的。
+        · -Desc。显示输出信息中匹配组帐号的描述信息。
+        · -Dn。显示输出信息中匹配组帐号的区分名。
+        · -Samid。显示输出信息中匹配组帐号的SAM账号名。
+        · -Scope。显示输出信息中匹配组帐号的范围，包括域本地、全局或通用。
+        · -Secgrp。如果该组是安全组，则显示yes。如果是分发组，显示no。
+        · -Sid。显示输出信息中匹配用户账号的安全标识符。 
+        与其他DSGET命令类似，DSGET GROUP以表格形式显示输出信息。一般来说，你应该使用-Dn、-Samid等参数，以便清晰地区分输出信息中的组帐号。比如，如果需要搜索所有可用的marketing组，可以使用如下命令：
+            dsquery group -name marketing* | dsget group -dn -scope -secgrp 
+        上面命令的执行结果将显示DN、范围以及安全组信息：
+            dn                                           scope        secgrp    
+            CN=MarketingAll,OU=Sales,DC=cpandl,DC=com    universal    no 
+            CN=Marketing Global,OU=Sales,DC=cpandl,DC=com    global    no 
+            CN=Marketing Local,OU=Sales,DC=cpandl,DC=com    domain local    no 
+            dsget succeeded 
+    15.6.2确定组成员关系
+        如果需要确定组成员关系，你可以使用DSGET GROUP的另一种语法格式，这需要两个特殊的参数：-Members与-Memberof。-Members参数可以用于确定哪些用户与组属于某个特定组，-Memberof参数用于确定指定的组属于哪一个组。要了解这些参数如何工作，假定需要查看名为AllUsers的组的当前成员，可以使用如下命令：
+            dsquery group -name AllUses | dsget group -members 
+        或者你也可以直接键入组DN，比如：
+            dsget group "CN=AllUsers,CN=Users,DC=cpandl,DC=com" =members 
+        上面命令中，组存在于cpandl.com域内的Users容器中。无论哪条命令，输出信息中都会展示该组成员的DN，比如：
+            "CN=Tech,OU=Tech,DC=cpandl,DC=com"
+            "CN=Engineering,OU=Eng,DC=cpandl,DC=com"
+            "CN=Sales,OU=Sales,DC=cpandl,DC=com"
+            "CN=Domain Users,OU=Users,DC=cpandl,DC=com"
+        从输出信息中可以看出，AllUsers组包括Tech、Engineering、Sales、Domain Users组等成员。AllUsers组也可能包含用户账号作为其成员。
+        如果需要确定某个组属于哪一个组，可以使用-Memberof参数。比如，DevUsers组为Domain Administrators组与Developers组的成员，通过如下命令，可以显示这种成员关系信息：
+            dsquery group -name deveuses | dsget group -memberof 
+        或 
+            dsget group "CN=deveusers,OU=Dev,DC=cpandl,DC=cpandl,DC=com" -memberof 
+        上面两条命令的工作方式是一样的。第一条命令中，使用DSQUERY GROUP获取组帐号的DN。第二条命令中，直接指定DN。两天命令的输出信息都会包含组列表，DevUsers组是这些组的成员。
+        （注解  你可以使用上面的两种技术显示多个组的成员关系信息。然而，你无法显示相关组的DN或SAM帐号，因为DSGET GROUP的第二种语法不支持这一点。）
+    15.6.3改变组类型或范围
+        创建组之后，有时可能㤇改变组类型或范围。这并不特别容易，因为又很多控制因素用于防止意外的改变，以免影响整个组织内的访问权限。首先，在Windows 2000混合功能层或Windows Server 2003 Interim功能层，不能改变组类型月范围。在Windows 2000本原、Windows Server 2003或Windows Server 2003功能层，有如下一些约束。
+        · 域本地组。可以转换为通用组，前提是该组不包含同时也是其他具有域本地组成员的成员。
+        · 全局组。可以转换为通用组，前提是该组不是任意其他全局组的成员。
+        · 通用组。可以转换为任意其他组。要记住的是，全局组不能包含一个通用组作为其成员，且本地组只能是其他本地组的成员。
+        根据这些约束，可以使用DSMOD GROUP与-Secgrp参数来改变组类型，如下所示。
+        · 使用-secgrp yes，将分发组改变为安全组。
+        · 使用-secgrp no，将安全组改变为分发组。
+        参考如下一些实例。
+        将Engineering安全组转换为分发组：
+            dsquery group -name Engineering | dsmod group -secgrp no 
+        将AllMarketing分发组转换为安全组：
+            dsmod group "CN=AllMarketing,OU=Marketing,DC=cpandl,DC=com" -secgrp yes 
+        你可以使用DSMOD GROUP的-Scope参数改变组范围，如下所示。
+        · 使用-scope l，将范围设置为域本地。
+        · 使用-scope g，将范围设置为全局。
+        · 使用-scope u，将范围设置为通用。
+        参考如下实例。 
+        将Marketing组的范围设置为域本地：
+            dsquery group -name Marketing | dsmod grou -scope l 
+        将Sales组的范围设置为全局：
+            dsmod grou "CN=Sales,CN=Users,DC=cpandl,DC=com" -scope g 
+    15.6.4添加、移除或替换组成员
+        在命令行中，可以很容易地改变任意组的组成员关系。与GUI中类似，你可以很容易地添加或移除用户、组、计算机等组成员。不过，比GUI更强大的是，命令行工具可以同时添加或移除多个组成员。你也可以完全替换现有的组成员关系列表。
+        1.向组内添加成员
+        比如，币可以使用单一的命令将Sales组织单元内的所有100个用户添加到AllSales组。为此，你可以使用DSQUERY USER命令获取待操作的用户账号列表，之后将其作为输入信息传递给DSMOD GROUP。用于添加组成员的参数为-Addmbr，命令类似与如下格式：
+            dsquery user "OU=Sales,DC=ny,DC=cpandl,DC=com" | dsmod group "CN=AllSales,OU=Sales,DC=ny,DC=com" -addmbr 
+        上面的命令中，首先获取ny.cpandl.com域内Sales OU中所有账号的列表，之后将其作为输出传递给DSMOD GROUP。DSMOD GROUP将浙西用户账号添加为AllSales组的成员，该组在ny.cpandl.com域内的Sales容器中。
+        使用-Addmbr的另一种方法是指定待添加对象的DN。比如，如果需要将SalesLocal组与SalesGlobal组添加到AllSlaes组中，可以使用如下命令：
+            dsquery group -name AllSales | dsmod group -addmbr "CN=SalesLocal,OU=Sales,DC=ny,DC=cpandl,DC=com" "CN=SalesGlobal,OU=Sales,DC=ny,DC=cpandl,DC=com" 
+        （注解  对象DN可以包含用户账号、组帐号以及计算机帐号。）
+        2.从组中移除成员
+        与-Addmbr参数相反的是-Rmmbr参数，该参数用于从组中移除成员。与-Addmbr参数类似，-Rmmbr参数可以从输入信息或空格分隔的列表中接收对象DN。因此，如果需要从AllSales组中移除所有市场与客户支持用户，可以使用如下命令：
+            dsquery user "OU=Marketing,DC=ny,DC=cpandl,DC=com" | dsmod group "CN=AllSales,OU=Sales,DC=ny,DC=cpandl,DC=com" -rmmbr 
+
+            dsquery user "OU=CustSupport,DC=ny,DC=cpandl,DC=com" | dsmod group "CN=AllSales,OU=Sales,DC=ny,DC=cpandl,DC=com" -rmmbr 
+        其中，第一条命令获取Marketing OU中所有用户列表，之后将其作为输入信息传递给DSMOD GROUP，用来从AllSales组中移除这些用户。第二条命令获取CustSupport OU中所有用户列表，之后将其作为输入信息传递给DSMOD GROUP，用来从AllSales组中移除这些用户。 
+        （提示  如果两个用户列表不能与AllSales组中的成员准确匹配，就会带来问题，比如，如果新的市场用户开始工作，并且已经被添加到Marketing OU，但尚未赋予对Sales信息的访问权限，也没有在AllSales组中。这种情况下，DSMOD GROUP发现第一个不匹配时，就会推出并报告错误信息。但如果是一个很微小的错误，你可能并不希望推出该命令。为此，可以使用-C参数，这一参数会在报告错误的同时保证该命令继续执行。）
+        与使用-Addmbr参数类似，你也可以直接指定待删除对象DN。比如，假定需要从AllSales组中移除SalesLocal组与SalesGlobal组，则可以使用如下命令：
+            dsquery group -name AllSales | dsmdo group -rmmbr "CN=SalesLocal,OU=Sales,DC=ny,DC=cpandl,DC=com" "CN=SalesGlobal,OU=Sales,DC=ny,DC=cpandl,DC=com" 
+        （注解  上面的命令中，由于页面排版的原因，可能看不清楚，但在每个组的DN之间是有空格的。空格是必要的，分隔之后，每个组的DN才能分别正确解释。）
+        3.替换组中所有成员
+        与GUI工具相比，命令行中可以一次对组中所有成员进行替换。比如，如果AllUsers组中的组成员不是最新更细你的，并且手工添加或移除组成员比较困难，则可以对其进行一次性替换。
+        你可以使用DSMOD GROUP与-Chmbr参数来替换现存的组成员，该参数可以接受来自DSQUERY USER的输入，或者空格分隔的DN列表。比如，如果需要替换现有的组成员列表，并将组织中所有用户添加到AllUsers组，则可以使用如下命令：
+            dsquery user -name * | dsmod group "CN=AllUsers,CN=Users,DC=seattle,DC=cpandl,DC=com" -chmbr 
+        上面的命令中，DSMOD GROUP首先移除所有成员，之后添加传递过来的对象。如果命令中的人一部分出错，则命令会失败，也不会产生任何实际的改变。
+        （注解  尽管通过-C参数，可以确保即便发生错误，操作仍能继续进行，但这会导致组内存在空成员关系。由此可能导致的问题是，DSMOD GROUP可以没有任何问题地移除当前组成员，但无法添加成员。成员的移除只需要具备适当为管理权限，但成员的添加则依赖于所提供的输入信息。）
+    15.6.5移动组帐号
+        与用户账号类似，组帐号也可以移动到其当前所在域内的不同容器或OU中。为此，你需要使用DSMOVE命令指定组帐号的当前DN，并使用-Newparent参数指定组帐号的新位置或父DN。比如，如果需要将ProdDev组从容器中移动到Developers组织单元，你需要指定组帐号的DN，比如"CN=ProDev,CN=Users,DC=cpandl,DC=com"，并提供新位置的父DN，比如"OU=Developers,DC=cpandl,DC=com"。相关的命令类似于如下的格式：
+            dsmove "CN=ProdDev,Cn=Users,DC=cpandl,DC=com" -newparent "OU=Developers,DC=cpandl,DC=com" 
+        通过使用DSQUERY GROUP命令，可以将获取的组DN传递给DSMOVE作为输入信息，可以减少一些键入工作，如下面实例所示：
+            dsquery group -name "ProdDev" | dsmove -newParent "OU=Devepolers,DC=cpandl,DC=com" 
+        上面的命令中，组帐号DN，"CN=ProdDev,CN=Users,DC=cpandl,DC=com"是从DSQUERY GROUP命令获取的，并用作DSMOVE的输入。
+    15.6.6组帐号重命名
+        与用户账号类似，组帐号也包含安全标识符。因而，在改变组名之后，并不需要改变其对文件与文件夹等资源的访问权限。对组进行重命名时，改变的是其通常名。
+        你可以使用DSMOVE命令对组进行重命名，指定组DN，并使用-Newname参数指定新的通常名。比如，可以将组对象从ProDevs重命名为TechDevs，使用如下命令：
+            dsmove "CN=ProDevs,OU=Developers,DC=cpandl,DC=com" -newname "TechDevs"
+        你也可以使用DSQUERY GROUP命令获取组DN，参考如下实例：
+            dsquery group -name ProdDevs | dsmove -newname "TechDevs" 
+        这一命令中，使用DSQUERY GROUP命令获取ProDevs组DN，之后使用DSMOVE命令对其进行重命名。
+        由于对组进行重命名并不会改变Windows 2000之前的组名或组相关的描述信息，因此，你还需要改变这些属性。为此，可以使用DSMOD GROUP命令，并使用-Samid参数设置Windows 2000之前的组名，使用-Desc参数为其描述信息，参考如下实例：
+            dsquery group -name TechDevs | demod -samid techdevs -desc "Technical Decelopers Group" 
+        上面命令中，将Windows 2000之前的组名改变为techdevs，描述信息改变为Technical Developers Group。 
+    15.6.7删除组帐号
+        要从活动目录中永久性删除组帐号，可以使用DSRM命令。大多数情况下，你需要删除的是某一个指定的组，而不是很多组，比如所有组名以M引导的组。如果是这种情况，你需要将待删除组的DN传递给DSRM命令，比如：
+            dsrm "CN=AllSales,OU=Sales,DC=chicago,DC=cpandl,DC=com" 
+        默认情况下，DSRM会弹出提示信息询问是否确认删除。如果不希望看到提示信息，可以使用-Noprompt参数，比如： 
+            dsmr "CN=AllSales,OU=Sales,DC=chicago,DC=cpandl,DC=com" -noprompt 
+        有些情况下，你可能需要依次移除几个组。比如，由于公司范围的重组，你可能发现市场部职能已经外包了，不再需要市场相关的组。如果这些相关组的组名都是以关键词Marketing引导，你可以通过如下命令删除这些组：
+            dsquery group -name Marketing* | dsrm -c 
+        上面的命令中，将所有组名以Marketing引导的组的DN传递给DSRM命令，-C参数的作用是在发生错误时保证操作继续进行。
+        （警告  即便输入信息是从DSQUERY GROUP命令传递来的，你也不能由DSRM命令自己使用。比如，你不能使用dsquery group -name Marketing* | dsrm 这样的命令，原因是命令行仍然期望对象的DN或其他参数跟随在DSRM命令之后。因此，你还需要使用一些相关参数，使用-C是最安全的，因为这会保证在有错误发生时DSRM仍可以继续执行。而如果使用-Noprompt参数，则DSRM会在不提示用户的情况下进行删除操作，这可能会导致一些本不应该删除的组，但没有办法恢复。）
