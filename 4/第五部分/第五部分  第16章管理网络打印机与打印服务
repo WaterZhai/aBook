@@ -1,0 +1,233 @@
+第五部分  使用命令行管理网络
+
+第16章  管理网络打印机与打印服务
+第17章  TCP/IP网络的配置、管理与故障排除
+
+第16章  管理网络打印机与打印服务
+
+大多数组织所拥有的打印机都是多样化的，包括一些高容量、高成本的打印机，也包括一些低容量、低成本的打印机。典型情况下，高容量打印机用于处理多个用户繁重的、日常的打印任务，低容量打印机用于处理小型组或单独用户的打印任务。不管哪种用途，打印服务器都需要足够的内存与处理能力来提供打印服务。在高容量的打印环境，或者经常性地打印很多非常大、非常复杂文档的环境中，需要对打印服务器进行特殊配置，或者使其专门提供打印服务。其他对打印只有一般性需求的环境中，打印服务器并不会非常昂贵，也不会是专门的计算机。实际上，很多打印服务器都是标准的桌面系统，同时还提供其他网络服务。要记住的是，Windows Server 2008与Windows Vista为文件共享赋予了比打印共享更高的优先级。因此，如果某系统同时处理这两种共享服务，则打印服务将会被抑制，以便先提供文件服务，从而防止出现文件访问性能问题。
+打印服务器必须拥有足够的磁盘空间，用来处理打印任务。所需要的磁盘空间总量取决于打印任务的大小与打印队列的长度。为获得最佳性能，打印机缓冲池文件夹应该存储在专用的磁盘驱动器上（不用于打印缓冲之外的任何其他用途）。打印服务管理关键的一个部分是维护。为正确维护与支持打印服务，应该注意及时追踪打印缓冲池信息与使用情况的统计资料，这些信息有助于确定打印服务的执行情况。尽管你主要关注的可能是打印相关的性能问题，但你会发现，有几个命令行工具对打印服务器维护以及打印机故障排除也是有用的，本章将对这些工具进行讲解与讨论。
+
+16.1获取打印机的支持信息与故障排除信息
+    打印机在采购与部署时通常并未过多考虑如何使用。比如，公司内的某个职员觉得某个办公室需要一个打印机，就会采购并安装一个打印机。有时候这项工作并不是由管理员完成的，所以在管理员管理打印时，就会比较盲目。但不管打印机是如何获取的，管理员或支持小组都应该维护每一台打印机的配置信息，包括有哪些可用的驱动程序、使用的是哪种驱动程序等。作为管理员，应该定期检查打印机的任务繁忙程度，以及是否当前正在处理打印任务。也可能需要追踪打印机状态、打印队列中任务数以及其他有助于确定存在问题的重要信息。很多情况下，这些信息对于容量规划也是有用的。
+    16.1.1在命令行中操作打印机
+        与操作其他组件或硬件相比，在命令行中操作打印机存在一些不同，主要原因在于使用的工具存储在子目录中，并且这些子目录不是默认情况下命令路径的组成部分。为此，你或者需要切换到这些子目录中使用相关工具，或者对命令路径进行更新--2.2.1节对这一问题进行了讨论。在%SystemRoot%\System32\Printing_Admin_Scripts的场所特定的文件夹中，比如C:\Windows\System32\Printing_Admin_Scripts\en-us，你会发现其中存在如下一些Windows脚本。
+        · prncnfg.vbs。用于列出与管理打印机配置设置信息。
+        · prndrvr.vbs。用于列出。安装与管理打印机驱动程序。
+        · prnjobs.vbs。用于列出与管理打印队列中的打印任务。
+        · prnmngr.vbs。用于安装、列出与移除打印机。
+        · prnport.vbs。用于添加、配置与移除打印机使用的TCP/IP端口。
+        · prnqctl.vbs。用于管理打印队列。 
+        · pubprm.vbs。用于在活动目录中发布打印机。
+        如果是第一次在命令行中操作脚本，或者已将WScript设置为主脚本宿主，则需要将CScript设置为默认的脚本宿主。为此，需要在命令行中键入cscript//h:cscript//s。设置之后，就可以操作命令行脚本宿主，而非图形界面的脚本宿主。要记住的是，脚本宿主是以每个用户为单位进行设置的。因而，如果需要以某个用户身份运行一个脚本，但该用户可能尚未将CScript设置为默认的脚本宿主，为避免这一情况，可以在脚本中添加一行：cscript//h:cscript//s。 
+        对上面的每一个脚本，通过-S参数，可以指定要操作的远程计算机；通过使用-U与-W参数，可以指定登录凭据。其中，-U用于指定远程登录的用户账号，-W用于指定该账号的口令。下面的实例中，将远程计算机设置为PrintServer43，并使用WilliamS的登录凭据：
+            -s PrintServer43 -u WilliamS -w Rover 
+        （注解  与大多数命令类似，你也可以同时指定用户域与用户账号，其格式为Domain/User。）
+        另一个有用的工具是打印机备份与迁移工具（Printbrm.exe）。在为远程服务器管理安装PrintServices工具时，或者为Windows服务器添加Print Services角色时，会在%SystemRoot%\System32\Spool\Tools文件夹中发现Printbrm，使用Printbrm可以完成如下一些任务。
+        · 列出打印机的配置信息摘要。
+        · 备份与恢复打印服务器的配置。
+        · 恢复时将LPR端口转换为TCP/IP端口。 
+        · 将打印机与打印队列从某计算机迁移到其他计算机。
+        · 在活动目录中发布所有可用的打印机。
+        由于Printbrm是一个命令行工具，因此不需要通过脚本宿主执行。使用Printbrm时，可以使用-S参数指定待操作的远程主机。然而，由于无法指定可替代的登录凭据，你应该使用增强的命令提示符，并以一个具有操作打印机、打印驱动程序、打印队列权限的用户身份登录。
+    16.1.2追踪打印驱动程序与打印机信息
+        要更好地了解打印服务器上打印机的配置与使用方式，你可以需要追踪其上安装的打印机的详细信息。Prndrvr就是一款可用于获取已安装打印机及其驱动程序信息的工具。使用Prndrvr与-L参数，可以列出本地计算机上安装的所有打印机及其各自的打印驱动程序配置。如命令清单16-1中所示，所列出的打印驱动程序与打印机信息是非常详细的。
+            命令清单16-1 Prndrvr-1的输出信息
+                Server name PrintServer43 
+                Driver name magicolor 2300 DL.3.Windows NT x86 
+                Version 3
+                Environment Windows NT x86 
+                Monitor name MLMON_B.DLL 
+                Driver path C:\Windows\systen32\spool\DRIVERS\W32X86\3\MIMFN5_B.DLL 
+                Data file C:\Windows\system32\spool\DRIVERS\W32X86\MSDMLT_B.DLL 
+                Config file C:\Windows\system32\spool\DRIVERS\W32X86\MNT5UI_B.DLL 
+                Help file C:\Windows\system32\spool\DRIVERS\W32X86\3\MSDMLT_B.DLL 
+                Depedent files
+                    C:\Windows\system32\spool\DRIVERS\W32X86\3\MSPL32_B.DLL 
+                    C:\Windows\system32\spool\DRIVERS\W32X86\3\MSPOOL_B.DLL
+                    C:\Windows\system32\spool\DRIVERS\W32X86\3\MIMFPR_B.DLL 
+                    C:\Windows\system32\spool\DRIVERS\W32X86\3\MIMF32_B.DLL 
+                    C:\Windows\system32\spool\DRIVERS\W32X86\3\MSDIMF_B.DLL 
+                    C:\Windows\system32\spool\DRIVERS\W32X86\3\MQDPRT_B.DLL 
+                    C:\Windows\system32\spool\DRIVERS\W32X86\3\MSD32__B.DLL
+                    C:\Windows\system32\spool\DRIVERS\W32X86\3\MSR32__B.DLL 
+                    C:\Windows\system32\spool\DRIVERS\W32X86\3\MDDM32_B.DLL 
+                    C:\Windows\system32\spool\DRIVERS\W32X86\3\MCMM___B.DLL
+                    C:\Windows\system32\spool\DRIVERS\W32X86\3\MICM___B.DLL 
+                    C:\Windows\system32\spool\DRIVERS\W32X86\3\MGDI32_B.DLL 
+                    C:\Windows\system32\spool\DRIVERS\W32X86\3\MDDMUI_B.DLL 
+                    C:\Windows\system32\spool\DRIVERS\W32X86\3\MTAG32_B.DLL 
+                    C:\Windows\system32\spool\DRIVERS\W32X86\3\MLTSRV_B.DLL
+                    C:\Windows\system32\spool\DRIVERS\W32X86\3\MSUMLT_B.DLL 
+                    C:\Windows\system32\spool\DRIVERS\W32X86\3\MICM6__B.DLL 
+                    C:\Windows\system32\spool\DRIVERS\W32X86\3\MICM12_B.DLL 
+                    C:\Windows\system32\spool\DRIVERS\W32X86\3\MICM24_B.DLL 
+                    C:\Windows\system32\spool\DRIVERS\W32X86\3\MICM6L_B.DLL 
+                    C:\Windows\system32\spool\DRIVERS\W32X86\3\MICM12LB.DLL 
+                    C:\Windows\system32\spool\DRIVERS\W32X86\3\MICM24LB.DLL 
+                    C:\Windows\system32\spool\DRIVERS\W32X86\3\MSEP01_B.DLL 
+                    C:\Windows\system32\spool\DRIVERS\W32X86\3\MUINST_B.DLL 
+                    C:\Windows\system32\spool\DRIVERS\W32X86\3\MUNZ___B.DLL 
+        检查这些信息可以发现，其中包含了如下的一些信息。
+        · 打印机驱动程序名，比如magicolor 2300 dl。Windows使用打印机驱动程序名来追踪打印机驱动程序，打印机使用的驱动程序应该与打印机的实际类型相匹配。在上面的实例中，打印机属于Minolta Magicolor 2300 DL系列打印机。打印文档时，用于打印的应用程序会使用打印机驱动程序将文档转换为物理打印设备可以识别的文件格式。如果打印机出现问题，并怀疑是因为加载了错误的驱动程序，这将是最好的标志。
+        · 打印机驱动程序模式。打印机驱动程序或者运作在类型2（内核）模式，或者运作在类型3（用户）模式。在相应的输出信息中，内核模式标记为Version2，用户模式标记为Version3。在内核模式下。打印机驱动程序的运作方式与其他由操作系统运行的程序类似；在用户模式下，打印机驱动程序的运作方式与其他由用户运行的程序类似。典型情况下，内核模式下的终止错误信息比用户模式下的终止错误信息更为详细。然而，如果打印机驱动程序本身存在问题，则运行在内核模式下更容易造成系统的不稳定。在Windows Server 2008与Windows Vista下，更倾向于选择使用用户模式的打印机驱动程序，以便确保操作系统自身的稳定性。
+        · 可用的打印机环境。共享打印机时，Windows会自动将驱动程序设置为可用，以便用户在第一次连接该打印机时可以下载。典型情况下，只有类型3 X86驱动程序是默认可用的。类型3 X86驱动程序。比如，如果所在组织拥有X64或IA64计算机，就需要为这些计算机安装适当的打印机驱动程序。
+        · 使用的打印监视器。每一个打印设备都有相关联的打印监视器。支持双向打印的打印机有宇哥语言监视器，用于处理打印机与打印缓冲池之间的双工通信，还有一个端口监视器，用于控制与打印机相连的I/O端口，所有这些统称为打印设备的打印监视器。如果打印机有相关联的语言监视器，则该监视器的名字被指定为与文件名相同，只是没有.dll扩展名。如果没有语言监视器，则名字值指定为Null，或者不指定。待打印文档到达打印机栈顶后，打印监视器负责将其发送到相关的打印设备，即实际完成打印工作的物理打印机。大多数打印设备都有自己的打印监视器，是由打印设备的制造商创建的。Windows也有自己默认的打印监视器。要使得打印设备完成实例的打印任务，打印监视器是必须的。如果打印监视器损坏或者找不到，则需要重新安装。
+        · 打印缓冲池DLL与相关的数据文件。打印缓冲池的特定DLL文件是由驱动程序路径指定的。缓冲池有相关联的数据、配置与帮助文件。打印缓冲池用于存储用户需要打印处理器处理的文档。打印处理器的作用是创建原始的、必要的打印数据，用来提供给打印设备。打印设备再将这些数据回传给打印缓冲池吗，以便其在缓冲池中排队等待打印。
+        · 打印机驱动程序栈文件。与特定打印机驱动程序相关联的所有栈文件都是以独立文件的形式列出的。待打印文档的路由（使用打印路由器）是从打印缓冲池到打印机栈的，也称为打印队列。出现在打印队列中之后，待打印文档就称为打印任务，这意味着该文档已经称为打印缓冲池需要处理的任务。
+        如果需要使用Prndrvr返回远程打印服务器与网络打印机的驱动程序信息，可以使用-S参数，其后跟随服务器的域名，比如：
+            prndrvr -s corpserver01 
+        上面的命令中，检查的是CorpServer01的打印机驱动程序信息。
+        Prndrvr命令的输出中，缺少一些详细资料，无法完整反映打印机配置的相关信息。要获取更多打印机相关信息，可以使用Printbrm命令与-Q参数。尽管Printbrm -Q的输出与Prndrvr -I的输出类似，但可以提供一些重要的附加信息。参考如下实例输出信息：
+            Operation mode: query 
+            Target server: local machine 
+            Queue publish mode: none 
+            Overwrite Mode: keep existing settings 
+
+            LISTING  PRINT  QUEUES 
+            hp laserjet 9500 on second floor 
+            magicolor 2300 main floor 
+            Adobe PDF 
+
+            LISTING PRINTER DRIVERS 
+            hp laserjet 9500 series, Windows NT x86, HP_PRNMON.DLL 
+            magicolor 2300 DL, Windows NT x86, MLMON_B.DLL 
+            Adobe PDF Converter, Windows NT x86, None 
+
+            LISTING PRINT  PROCESSORS 
+            hpzpplhn Windows NT x86 hpzpplhn.dll 
+            MIMFPR_B Windows NT x86 MIMFPR_B.DLL 
+
+            LISTING PRINTER PORTS 
+            192.169.0.90, TCP 
+            192.168.1.90, TCP 
+
+            Displaying print hierarchy.
+            hp laserjet 9500 on second floor 
+                hp laserjet 9500 (Windows NT x86) #1
+                192.168.1.80  #1
+            magicolor 2300 main floor 
+                magicolor 2300 DL (Windows NT x86) #1
+                192.168.1.90  #1
+            Adobe PDF 
+                Adobe PDF Converter (Windows NT x86)  #1
+            Unassociated:
+                192.168.0.70 #0
+        上面的输出信息中，可以发现如下一些信息。
+        · 所有打印队列的列表，分别列出了打印队列名。
+        · 已安装打印机的打印驱动程序列表，列出了打印驱动程序名、激活的驱动程序环境以及相关联的打印监视器。
+        · 已配置的网络打印机端口列表，列出了相关的IP地址与类型。
+        · 计算机上打印体系列表，用于将打印队列与相关的打印驱动程序（也可能还有打印机端口）进行关联。
+        （注解  打印机可以使用LPT、COM或USB端口直接连接到打印服务器，网络上的打印机通常还设置了IP地址与TCP端口。）
+    16.1.3获取用于容量规划与故障排除的打印详细统计资料
+        通过追踪打印队列信息与使用情况的统计资料，有助于回答如下一些重要问题。
+        · 打印服务器的平均繁忙程度？
+        · 打印任务的平均大小？
+        · 打印队列中排队等待的打印任务数？
+        · 当前缓冲池运行了多久？
+        · 打印缓冲池运行了多久？
+        · 打印机运行了多久？
+        · 打印服务器运行了多久？
+        这些问题之所以重要，是因为通过对这些问题的解答，可以更积极地管理与维护组织内的打印服务，也可以对未来的打印需求进行规划。作为管理员，不应该仅仅满足于对这些问题进行解答，而是应该更进一步，以便为组织内的打印用户提供更好的打印服务。
+        用于追踪打印缓冲池信息与使用情况统计信息的关键工具是Print Queue这一计数器对象，该对象可以通过TYPEPERF命令进行访问。这一性能计数器对象包含了很多性能计数器，可用于追踪打印队列与使用情况统计资料。如第6章到第9章中所讨论的，在命令行中，可以使用很多技术来操作和自动监控性能对象。
+        操作Print Queue对象时，你可能需要追踪_Total计数器实例，用来确定打印服务器的整体繁忙程度，也可能需要追踪单独的计数器实例，用来确定某个特定打印队列的繁忙程度。可用于确定使用情况统计资料的重要计数器包括下面列举的。
+        · Bytes Printed/sec。列出每秒钟打印的字节数，用来确定打印机处理的数据量以及每台打印机的繁忙程度。通过将Bytes Printed/sec与打印服务器的开机时间相比较，可以了解打印机每小时或每天处理的数据量。
+        （注解  有些打印机的配置中，打印任务是在排队后保存的，使得用户可以从打印队列（而不是从应用程序）将文档重提交给打印机。如果需要将打印机配置为保存打印任务，就应该监视Bytes Printed/sec与打印任务的总数。这些信息有助于确定需要多大的磁盘空间，以便维护打印服务，并了解需要从打印队列中清楚旧打印任务的频率。）
+        （提示  大多数打印机拥有自己的内部内存。理想情况下，你可能希望该内存足够大，以便整个打印任务可由打印设备自身完成。如果打印机需要经常性地处理大的或复杂的打印任务，可以考虑为打印设备添加内存。你需要通过打印机的配置页面（可以在打印机自身进行打印）来确定其已安装的内存大小。）
+        · Jobs。展示排队等待的打印任务数。典型情况下，繁忙的打印机都会有几个排队等待的打印任务，尤其在峰值打印时间段。然而，如果频繁地发现有很多打印任务需要排队等待，则可能说明该打印机处于任务过载状态。为解决这一问题，可以让用户知道还有哪些可用的打印机，或者为某些用户设置不同的默认打印机。
+        · Jobs Spooling。列出当前缓冲池中的打印任务数（这些任务稍后将进入打印队列），实际上也是入栈的任务数。
+        · Max Jobs Spooling。列出当前缓冲池中的峰值打印任务数。
+        · References。列出打印队列当前开放的句柄数，开放句柄可以来自当前没有处于活跃打印状态的用户，每个开放的句柄都会占用资源。
+        · Max References。列出打印队列的峰值开放句柄数。
+        · Total Jobs Printed。展示自打印服务器上次重启依赖处理的打印任务数，该值可以相对表示出某打印机的繁忙程度。通过将打印任务数总量与打印服务器的开机时间相比较，可以准确确定打印机的繁忙程度。
+        · Total Pages Printed。展示自上次重启以来打印队列中打印的页面数，该值可以相对表示出某打印机的繁忙程度。
+        示例16-1展示了一个使用TYPEPERF命令获取企业内多台打印服务器相对打印负载快照的实例。该实例中，使用名为Perf.txt的计数器文件指定带追踪的计数器。出打印队列计数器之外，还对System对象的System Up Time计数器进行了追踪，以便确定自计算机上次重启以后运行的时间（以秒为计数单位）。从每一台打印服务器上收集一个示例，将输出信息保存到一个名为SaveData.txt的文件中。如果将这些数据导入到电子表格中，或者将其转换到Word文档的表格中，就可以更清晰地观察这些输出信息，并准确理解每台打印服务器的繁忙程度。
+        示例16-1  获取打印服务器的使用情况统计资料
+            Comand line 
+            typeperf -cf c:\printers\perf.txt -o c:\printers\savedata.txt -so 1 -y
+            Source for perf.txt 
+            \\printserver14\system\System Up Time 
+            \\printserver14\print queue(_Total)\Bytes Printed/Sec 
+            \\printserver14\print queue(_Total)\Jobs Spooling 
+            \\printserver14\print queue(_Total)\Max Jobs Spooling 
+            \\printserver14\print queue(_Total)\Jobs 
+            \\printserver14\print queue(_Total)\References 
+            \\printserver14\print queue(_Total)\Max References 
+            \\printserver14\print queue(_Total)\Total Jobs Printed 
+            \\printserver14\print queue(_Total)\Total Pages Printed 
+            \\printserver21\system\System Up Time 
+            \\printserver21\print queue(_Total)\Bytes Printed/Sec 
+            \\printserver21\print queue(_Total)\Jobs Spooling 
+            \\printserver21\print queue(_Total)\Max Jobs Spooling 
+            \\printserver21\print queue(_Total)\Jobs 
+            \\printserver21\print queue(_Total)\References 
+            \\printserver21\print queue(_Total)\Max References 
+            \\printserver21\print queue(_Total)\Total Jobs Printed 
+            \\printserver21\print queue(_Total)\Total Pages Printed 
+            \\printserver32\system\System Up Time 
+            \\printserver32\print queue(_Total)\Bytes Printed/Sec 
+            \\printserver32\print queue(_Total)\Jobs Spooling 
+            \\printserver32\print queue(_Total)\Max Jobs Spooling 
+            \\printserver32\print queue(_Total)\Jobs 
+            \\printserver32\print queue(_Total)\References 
+            \\printserver32\print queue(_Total)\Max References 
+            \\printserver32\print queue(_Total)\Total Jobs Printed 
+            \\printserver32\print queue(_Total)\Total Pages Printed 
+            Sample output
+            "(PDH_CSV 4.0)","\\printserver14\system\System Up Time","\\printserver14\print queue(_Total)\Bytes Printed/Sec","\\printserver14\print queue(_Total)\Jobs Spooling","\\printserver14\print queue(_Total)\Max Jobs Spooling","\\printserver14\print queue(_Total)\Jobs","\\printserver14\print queue(_Total)\References","\\printserver14\print queue(_Total)\Max References","\\printserver14\print queue(_Total)\Total Jobs Printed","\\printserver14\print queue(_Total)\Total Pages Printed"
+            "10/12/2009 08:20.509","15535.955367","96.827000","3.000000","19.000000","8.000000","93.000000","151.000000","267.000000","2413.000000"
+
+            "(PDH_CSV 4.0)","\\printserver21\system\System Up Time","\\printserver21\print queue(_Total)\Bytes Printed/Sec","\\printserver21\print queue(_Total)\Jobs Spooling","\\printserver21\print queue(_Total)\Max Jobs Spooling","\\printserver21\print queue(_Total)\Jobs","\\printserver21\print queue(_Total)\References","\\printserver21\print queue(_Total)\Max References","\\printserver21\print queue(_Total)\Total Jobs Printed","\\printserver21\print queue(_Total)\Total Pages Printed"
+            "10/12/2009 08:21.002","2487384.875323","124.393923","17.000000","39.000000","12.000000","165.000000","223.000000","17897.000000","35672.000000"
+
+            "(PDH_CSV 4.0)","\\printserver34\system\System Up Time","\\printserver34\print queue(_Total)\Bytes Printed/Sec","\\printserver34\print queue(_Total)\Jobs Spooling","\\printserver34\print queue(_Total)\Max Jobs Spooling","\\printserver34\print queue(_Total)\Jobs","\\printserver34\print queue(_Total)\References","\\printserver34\print queue(_Total)\Max References","\\printserver34\print queue(_Total)\Total Jobs Printed","\\printserver34\print queue(_Total)\Total Pages Printed"
+            "10/12/2009 08:21.535","86375.673823","24.975632","2.000000","7.000000","3.000000","43.000000","67.000000","514.000000","5785.000000"
+        上面的实例中，对3台打印服务器的打印队列进行了检查，并假定每台打印服务器有一个朱打印队列、单台打印服务器上所有活跃打印队列针对的是同一台物理打印机。检查示例中PrintServer14的输出信息，可以确定如下一些事实。
+        · 该服务器平均每个小时处理62个打印任务。因为打印池中共计267个打印任务，服务器开机时间为4.3个小时，用Total Jobs Printed值除以System Up Time值（以小时为计数单位，而非分钟），就可以获得这个结果。
+        · 打印任务的平均长度为2页，这是通过将打印的页面总数除以打印任务总数得到的。
+        · 当前，该打印服务器缓冲池中有3个活跃的打印任务，打印队列中有8个打印任务，缓冲池中打印任务峰值为19。
+        检查示例中PrintServer21的输出信息，可以确定如下一些事实。
+        · 该服务器平均每小时处理26个打印任务。因为打印池中共计17897个打印任务，服务器开机时间为691个小时，用Total Jobs Printed值除以System Up Time值（以小时为计数单位，而非分钟），就可以获得这个结果。
+        · 打印任务的平均长度为2页，这是通过将打印的页面总数除以打印任务总数得到的。 
+        · 当前，该打印服务器缓冲池中有17个活跃的打印任务，打印队列中有12个打印任务，缓冲池中打印任务峰值为39。
+        检查示例中PrintServer34的输出信息，可以确定如下一些事实。
+        · 该服务器平均每小时处理19个打印任务。因为打印池中共计514个打印任务，服务器开机时间为27个小时，用Total Jobs Printed值除以System Up Time值（以小时为计数单位，而非分钟），就可以获得这个结果。 
+        · 打印任务的平均长度为11.25页，这是通过将打印的页面总数除以打印任务总是得到的。
+        · 当前，该打印服务器缓冲池中有2个活跃的打印任务，打印队列中有3个打印任务，缓冲池中打印任务峰值为7。
+        从上面信息可以看出，可以发现当前的打印环境处于繁忙状态，有较重的打印负载。如果在几个时间间隔内检查这些统计信息，并在几次重启printers/spooler之后都看到类似的统计信息，则需要对其进行检查或重新配置。因为这些信息表明打印机处于非常繁忙的状态，考虑到大多数打印机实际上只有在上班时间（12小时，甚至8小时）才会有人使用，这一情况就更需要关注。
+        对于这一水平的使用情况，你可能需要密切关注服务器的使用与性能信息，如第7章中所讨论的。你可能还需要深入挖掘使用情况的统计资料，查看每台打印机配置的详细情况。在对系统性能与使用情况进行了足够时间间隔的检测后，你会发现如下一些事实。
+        · 打印服务器需要添加更多的内存，因为在任意给定时间点上都有大量的打印任务需要处理。
+        · 需要更强的处理能力，因为平均处理的打印任务数较大。
+        · 需要更大的磁盘空间或者用于缓冲池文件夹的专用磁盘驱动器。
+        Print Queue对象还包括几个附加的性能计数器，有助于常规监控，包括下面列举的。
+        · Job Errors。列出自上次重启以来打印队列中的任务错误数。在将打印任务传递给打印机时，如果中间出现问题，就会导致任务错误。如果任务错误数相对较多，则可能表明存在网络故障，或是网卡问题。
+        · Not Ready Errors。列出自上次重启以来打印队列中的打印机尚未就绪错误。如果打印机等待用户输入，或者没有做好打印的准备，就会出现这一错误。
+        · Out Of Pager Errors。列出自上次重启以来打印队列中的出纸错误。如果打印机频繁出现这一错误，则说明打印纸没有正确配套，或者需要一个附加的进纸盒。
+        上面的示例中，给出的打印系统是相对简单的，通过常规性地监控与适当调整，就可以确保打印服务的正确运行。如果需要自动监控，可以创建一个脚本，将使用统计资料写入到一个日志文件中，并将该脚本设置为计划任务，使其在适当的时间间隔运行，第9章中对这些技术进行了讨论。
+        要记住的是，通常需要的是以几天为周期对打印机使用情况进行监控，以便确定是否需要进行必要的升级或修改。进行升级或修改时，你需要终止打印缓冲池，完成之后再重启。
+16.2管理打印机
+    在命令行中，可以使用Prnmngr工具安装与管理打印机。通过Prnmngr，可以操作物理连接到计算机上的打印设备，但只有登录到该计算机的用户才可以进行操作，对这些用户而言，打印设备称之为本地打印设备，对于那些通过网络进行操作的打印设备，则称之为网络打印设备。本地打印机与网络打印机的关键区别在于，本地打印机不能共享。在网络上共享打印机时，需要使用某台计算机作为该打印机的宿主机，该计算机称之为打印服务器。
+    打印服务器的主要任务是将打印设备共享在网络上，并处理打印缓冲池。通过使用打印服务器，可以很便利地对打印队列服务器。实际上，用户也可以直接连接到网络上的打印机，之后就像对连接到用户计算机上的本地打印机一样进行操作。这种方式下，每个用户有自己的打印队列，必须分别进行管理。
+    在计算机上安装打印机时，实际上是配置一个打印队列，以便对打印任务进行路由排队，并在合适的时间将其发送到物理打印设备。因此，讨论安装打印机与配置打印机，实际上是讨论安装与配置打印队列，以便打印任务发送到物理打印设备。
+    如果需要安装或配置打印机，需要具备适当的管理员特权。在域内，这意味着必须是管理员组、Print Operators组或Server Operators组的成员。如果只是需要连接并使用打印机，则不需要具备管理员特权，只需要具备适当的访问许可权限就可以。
+    16.2.1安装物理连接的打印设备
+        物理连接的打印设备直接连接在计算机上，可以配置为本地打印设备或网络打印设备。本地打印设备只对登录到该计算机的用户是可用的，网络打印设备则作为共享资源，网络上具备适当权限的用户都可以访问并使用。配置时，使用适当的串口、并口或USB接口将打印设备物理连接到服务器上。如果配置的是网络打印机，则此计算机充当打印服务器。对即插即用式打印机，登录计算机后，只需要将打印机插到计算机上，就可以自动地识别、安装与配置打印机。
+        你可以使用Prnmngr命令与如下一些参数，手动安装本地打印机。
+        · -A AddPrinter。指定要添加或安装本地打印机。
+        · -P PrinterName。为打印机指定一个打印机名。在控制面板的打印机页面或命令行中对打印机进行操作时，看到的就是这个打印机名。
+        · -M PrinterModel。指定打印机型号。型号必须是由制造商指定的准确的型号，型号决定了打印机应该使用的驱动程序。
+        · -R PrinterPort。指定打印机应该连接到的端口号。端口可以是并口，比如LPT1：、LPT2：、LPT3：。也可以是串口，比如COM1：、COM2：、COM3：。还可以是USB端口，比如USB001。
+        （注解  设置打印机名与型号时，字母的大小写与命令提示符与对话框中显示的是一样的。然而，尽管设定和显示时这些名称能用大小写，但实际上并不区分大小写。也就是说，在Windows看来，centralcolorlaser与CentralColorLaser是一样的。）
+        要配置物理连接的打印机，并不一定需要本地登录计算机，也可以远程进行安装与配置。为此，可以使用-S参数指定远程计算机名（需要为其添加本地打印机）。如果有必要，还可以分别使用-U参数与-W参数指定连接到远程计算机时使用的用户名与口令。
+        （注解  在本地命令提示符进行操作时，不管是远程登录还是物理连接，都不能指定用户名与口令。如果尝试这样做，会返回错误消息“用户凭据不能用于本地连接。”）
+        要了解如何使用Prnmngr命令，参考如下一些实例。
+        使用USB001配置一台HP 5500 Series InkJet打印机：
+            prnmngr -a -p "OfficeJetPrinter" -m "hp officejet 5500 series" -r USB001 
+        使用LPT1配置一台HP 1100 DN Series InkJet打印机： 
+            prnmngr -a -p "BusinessJetPrinter" -m "hp businessjet 1100 series DN" -r LPT1:
+        在chesign09上使用USB001配置一台Epson Stylus Photo打印机：
+            prnmngr -a -p "hotoPrinter" -m "epson stylus photo 1270 esc/p 2" -r USB001 -s cdesign09 
+        在mteam06上使用LPT1配置一台Epson Stylus Color打印机：
+            prnmngr -a -p "ColorPrinter" -m "epson stylus color esc/p 2" -r LPT1: -s mteam06 -u wrstanek -w goldfish 
+        如果打印机成功安装，Prnmngr会报告“已添加打印机”，否则会报告“不能添加打印机”，并描述发生的错误。最常见的错误是型号输入错误或设备型号未知，这会导致Prnmngr报告打印机驱动程序未知。因此，要确保输入了正确的打印机型号名。
+        （注解  如果是计算机上安装的第一台打印机，则会设置为默认的打印机，但不会）
