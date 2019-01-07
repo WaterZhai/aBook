@@ -230,4 +230,333 @@
         在mteam06上使用LPT1配置一台Epson Stylus Color打印机：
             prnmngr -a -p "ColorPrinter" -m "epson stylus color esc/p 2" -r LPT1: -s mteam06 -u wrstanek -w goldfish 
         如果打印机成功安装，Prnmngr会报告“已添加打印机”，否则会报告“不能添加打印机”，并描述发生的错误。最常见的错误是型号输入错误或设备型号未知，这会导致Prnmngr报告打印机驱动程序未知。因此，要确保输入了正确的打印机型号名。
-        （注解  如果是计算机上安装的第一台打印机，则会设置为默认的打印机，但不会）
+        （注解  如果是计算机上安装的第一台打印机，则会设置为默认的打印机，但不会自动设置为共享的打印机。如果需要将其进行共享，以便其他用户也可以使用，可以参考16.4.2节所作的讲述。）
+        （提示  你可以为相同的打印设备创建附加的打印机，唯一的要求是打印机名与共享名是唯一的。通过这种做法，可以设置不同的属性，用来满足不同的需求。比如，一种配置为低优先级打印任务，另一种配置为高优先级打印任务。）
+    16.2.2安装网络连接的打印设备
+        网络连接的打印设备直接通过网卡连接到网络上，并配置为网络打印设备，以便网络用户可以将其作为共享打印设备对其进行访问。为此，需要将打印机连接到网络上，并为其配置适当的IP地址（或者从DHCP服务器获取IP地址），具体操作可以参考制造商的打印机手册。
+        在打印机上配置TCP/IP后，还需要在充当打印服务器的计算机上创建一个TCP/IP端口。以便网络用户通过该端口连接到打印机。之后，就可以像安装物理连接的打印机一样对其进行安装，唯一的区别是使用-R参数指定创建的TCP/IP端口，而不是指定LPT、COM、USB等端口。比如，如果创建了一个名为IP_192.168.10.15的TCP/IP端口，则可以使用个如下命令添加一个使用该端口的打印机：
+            prnmngr -a -p "CentralColorLaser" -m "magicolor 2300 dl" -r IP_192.168.10.15 -s corpsvr03 
+        上面的命令安装了一台Minolta QMS Magicolor彩色激光打印机，该打印机使用TCP/IP端口。由于打印机是在CorpSvr03上配置的，因此该计算机将充当此打印机的打印服务器，但该打印机尚未设置为任意用户的默认打印机，也没有设置为共享资源。如果需要将该打印机设置为共享资源，以便其他用户可以使用，可以参考16.4.2节的讲述。
+    16.2.3列出计算机上配置的打印机
+        通过prnmngr -l命令，可以列出本地计算机上配置的所有打印机。如果需要查看远程计算机上的这些信息，可以使用-S参数，其后跟随计算机名，比如prnmngr -l -s corpsvr03。如果必要，也可以分别使用-U参数与-W参数指定登录帐号使用的用户名与口令。
+        上面命令的输出信息展示了打印服务器名（如果在本地计算机上使用，则为空）以及其他一些关于每台打印机配置的重要信息，参考下面的实例：
+            Server name corpsvr03 
+            Printer name magicolor 2300 main for 5th floor 
+            Share name magicolor 
+            Driver name magicolor 2300 DL 
+            Port name 192.168.1.92 
+            Comment Main printer for the fifth floor. 
+            Location 5/ne 
+            Print processor MIMFPR_B 
+            Data type IMF 
+            Parameters 
+            Attributes 2629 
+            Priority 1 
+            Default priority 0
+            Status Idle 
+            Average pages per minute 8 
+            Printer status Idle 
+            Extended printer status Unknown 
+            Detended printer state Unknown 
+            Extected detected error status Unknown 
+            Number of printers enumberared 1 
+        上面的实例中，打印机名、驱动程序名与端口名是在安装打印机时设置的，该打印机已设置为共享，以便域内其他用户可以用其完成打印任务。如果需要将该打印机移动到新的打印服务器上，真正需要注意的唯一信息是驱动程序名，大多数情况下该名与打印机型号是一致的。
+    16.2.4查看与设置默认打印机
+        在命令提示符中键入prnmngr -g命令，可以显示当前登录用户的默认打印机。如果希望该用户使用其他默认打印机，可以键入prnmngr -t -p命令，其后跟随待设置的默认打印机名，比如：
+            prnmngr -t -p "magicolor 2300 DL" 
+        如果成功执行，则Prnmngr会报告称打印机已经被设置为默认打印机。否则，Prnmngr会报告错误信息。典型情况下，“Not Found”错误说明输入了无效的打印机名。
+    16.2.5打印机重命名
+        对打印机重命名是无法通过Prnmngr完成的，而是需要使用命令行工具Prncnfg。对打印机重命名的语法格式为：
+            prncnfg -x -p CurrentPrinterName -z NewPrinterName 
+        其中，Prncnfg通过-X参数表明待执行的任务是对打印机重命名，之后使用-P参数指定当前打印机名，-Z参数设定新打印机名，比如：
+            prncnfg -x -p "CentralColorLaser" -z "EngineeringPrinter" 
+        如果该打印机存在，则Prncnfg会报告已对其进行了重命名，并设置了新打印机名。
+        你也可以对远程计算机上的打印机重命名。为此，可以使用-S参数指定远程计算机名，比如：
+            prncnfg -x -s corpsvr03 -p "CentralColorLaser" -z "EngineeringPrinter" 
+        上面的命令中，对CorpSvr03上的打印机重命名。然而，这一命令不允许设置登录帐号。
+    16.2.6删除打印机
+        Prnmngr提供了用于删除特定计算机上打印机的两种方法，你可以如下命令删除单独的打印机：
+            prnmngr -d -p PrinterName 
+            比如：
+            prnmngr -d -p "magicolor 2300 DL" 
+        如果输入了无效的打印机名，Prnmngr会报告由于没有发现打印机而无法删除。如果没有许可权限删除打印机，Prnmngr会报告用户登录凭据无法枚举打印机，你需要使用具备管理员特权的账号登录。注意的是，操作远程计算机时情况不是这样。操作远程计算机时，可以使用-U参数与-W参数指定登录帐号及其口令，比如：
+            prnmngr -d =p "magicolor 2300 DL" -s corpsvr03 -u wrstanek -p goldfish 
+        通过如下命令，可以删除计算机上所有打印机：
+            prnmngr -x 
+        Prnmngr不会弹出提示信息询问是否确认操作，但会报告每个已删除的打印机，比如：
+            Deleted printer OfficeJet 
+            Deleted printer CentralPrinter 
+
+            Number of local printers and connections enumerated 2 
+            Number of local printers and connections deleted 2 
+16.3管理网络连接打印机的TCP/IP端口 
+    要连接到网络连接的打印机，需要使用TCP/IP端口，这是使用Prnport创建于管理的。与Prnmngr类似，Prnport也是一个必须使用命令行脚本宿主运行的Windows脚本。
+    16.3.1为打印机创建与改变TCP/IP端口 
+        通过-A参数，可以通知Prnport要执行的任务是添加TCP/IP端口，之后使用-R参数指定端口名，使用-H参数指定打印机的IP地址。通常的做法是，端口名以连接的打印机IP地址为基础设置。比如，如果需要为IP地址为192.168.10.15的打印机配置端口，则可以将其端口设置为IP_192.168.10.15。
+        除端口外，还必须指定端口使用的输出协议。输出协议是使用-O参数设置的，或者是raw，或者是lpr。大多数打印机使用Raw协议。使用这种输出协议时，数据不经修改地使用指定的端口号发送到打印机。大多数请款修改，这一端口号为9100，这也是之所以使用这一数值作为默认值的原因。当然，你也可以使用-N参数将端口号指定为不同的数值。使用LPR协议时，端口是与LPR（行式打印机守护进程）联合使用的，可以使用-Q参数设置打印队列名。
+        与大多数打印机配置命令类似，并不一定需要本地登录计算机来配置端口。如果需要对远程计算机上的打印机端口进行配置，可以使用-S参数指定待操作的远程计算机名。如果需要，可以使用-U参数与-W参数指定到远程计算机的用户名与口令。如果登录域与当前域不同，用户名可以指定为Domain\Username的形式。参考如下一些实例。
+        添加一个端口，使用TCP Raw协议，通过9100端口连接到192.168.10.15：
+            prnport -a -r IP_192.168.10.15 -h 192.168.10.15 -o raw 
+        添加一个端口，使用Raw参数，通过9500端口连接到10.10.1.50：
+            prnport -a -r IP_192.168.10.15 -h 10.10.1.50 -o raw -n 9500 
+        添加一个端口，使用LPR输出，连接到172.20.18.2，将队列名设置为LPRQUEUE：
+            prnport -a -r IP_192.168.10.15 -h 172.20.18.2 -o lpr -q lprqueue 
+        在CORPSVR03上添加一个端口，使用TCP Raw协议，通过9100端口连接到192.168.10.15：
+            prnport -a -r IP_192.168.10.15 -h 192.168.10.15 -o raw -s corpsvr03 
+        如果成功创建，Prnport会报告“创建/更新端口”，否则会报告“无法创建/更新端口”，并描述发生的错误。
+        大多数网络连接的打印机也支持简单网络管理协议（SNMP）。为使打印机支持这一协议，必须使用-Me参数激活SNMP，并使用-Y参数设置SNMP community名，使用-l参数设置SNMP设备索引。典型情况下，community名设置为Public，这表明网络上的任意用户都可以使用与管理该打印设备。设备索引用于指定SNMP community中一个特定的设备。第一个设备索引为1，第二个设备索引为2，以此类推。
+        参考如下实例：
+            Prnport -a -r IP_192.168.10.15 -h 192.168.10.15 -o raw -me -y public -i 1 
+        （注解  你可以使用-Md参数禁用SNMP。）
+        上面的实例中，配置了一个TCP/IP端口，所用协议为TCP Raw，并通过9100端口连接到192.168.10.15.此外，还激活了SNMP，并将SNMP community名配置为public，设备索引则为1。
+        如果以后需要改变TCP/IP端口的配置，可以使用Prnport命令与-T参数。下面的实例中，使用-R参数指定待操作的端口，其他参数用于设置相关的属性值：
+            prnport -a -r MainPrinter -h 10.10.12.50 -o raw -md 
+        这一命令中，试图修改MainPrinter这一TCP/IP端口，IP地址设置为10.10.12.50，输出协议设置为Raw，并禁用SNMP。
+    16.3.2列出打印机使用的TCP/IP端口相关的信息
+        使用prnport -l命令，可以列出本地计算机上已配置的所有打印机TCP/IP端口。如果需要查看远程计算机的这一信息，可以使用-S参数，其后跟随计算机名，比如prnport -l -s corpsvr03。如果必要，也可以使用-U参数与-W参数指定登录帐号的用户名与口令。 
+        输出信息中会展示打印服务器名（如果是本地计算机则为空），以及每个已配置端口的其他一些重要信息。下面给出的是一个Raw端口相关的实例：
+            Server name 
+            Port name IP_192.168.1.101 
+            Host address 192.168.1.101 
+            Protocol RAW 
+            Port number 9100 
+            SNMP Enabled 
+            Community public 
+            Device index 1
+        下面给出的是一个LPR端口相关信息的实例：
+            Server name 
+            Port name IP_192.168.1.101 
+            Host address 192.168.1.101 
+            Protocol LPR 
+            Queue crownnet 
+            Byte Count Enabled 
+            SNMP  Enabled 
+            Comnunity public 
+            Device index 1 
+        （注解  LPR端口信息会错误地展示字节计数是激活的。在激活的情况下，计算机会在将文档发送到打印机之前统计其中包含的字节数。大多数打印机不需要进行字节计数，字节计数或降低性能，因为打印时对文档中每一字节进行计数是一个非常耗时的过程。）
+    16.3.3删除打印机使用的TCP/IP端口 
+        通过如下语法格式，可以删除打印机使用的各个端口：
+            prnport -d -r PortName 
+            比如：
+            prnport -d -r IP_192.168.1.101 
+        如果输入了无效的打印机名，Prnport会报告由于没有发现打印机而无法删除。如果没有许可权限删除打印机，Prnport会报告用户登录凭据无法枚举打印机，你需要使用具备管理员特权的帐号登录。注意的是，操作远程计算机时情况不是这样。操作远程计算机时，可以使用-U参数与-W参数指定登录帐号及其口令，比如： 
+            prnport -d -r IP_192.168.1.101 -s corpsvr03 -u wrstanek -p goldfish 
+16.4配置打印机属性
+    使用Prncnfg脚本与-T参数，可以查看并配置打印机属性。不管当前操作的是什么属性，Prncnfg都期望使用-P参数指定打印机。与大多数打印机配置命令类似，并不一定需要本地登录计算机来配置打印机属性。如果需要修改远程计算机上的打印机属性（而非打印机名），可以使用-S参数指定待操作的远程计算机名。如果必要，可以使用-U参数与-W参数指定连接到远程计算机的用户名与口令。如果登录域与当前域不同，用户名可以指定为Domain\Username的形式。 
+    16.4.1添加注释与位置信息
+        通过为打印机添加注释与位置信息，可以使用户更便利地确定自己应该使用哪一台打印机。注释信息对打印机进行了常规意义上的描述，比如打印设备的类型与责任人。位置信息则描述了打印设备的物理位置。添加之后，这些信息会在打印机属性对话框中的“常规”选项卡中显示，也会在“打印”对话框（大多数应用程序中，选择了打印命令后会显示这一对话框）中显示。
+        为打印机添加注释与位置信息的语法格式如下：
+            prncnfg -t -p PrinterName -m "Comment" -l "Location" 
+        上面的命令中，Prncnfg与-T参数的作用是声明要修改打印机属性，之后使用-M参数指定注释文本，使用-L参数指定打印机的位置信息，比如：
+            prncnfg -t -s corpsvr03 -p "CentralColorLaser" -m "Main EngineeringPrinter" -l "5th Floor SE" 
+        如果成功执行，Prncnfg会报告已经对打印机进行了配置。如果不能执行，则可能是因为没有使用双引号对信息进行封装，也可能是因为忘记输入了其中的一个或几个参数。当然，并不要求一定同时输入注释与位置信息，你也可以分别设置这些信息。
+    16.4.2共享打印机
+        在命令行中添加打印机之后，打印机并不会自动地设置为其他用户共享。如果需要共享打印机，比如专门使用Prncnfg命令对其进行配置。首先使用-T参数表明需要设置或改变打印机属性，使用-P参数指定待操作的打印机，之后使用-H参数设置共享名，并使用+Shared参数激活共享。为与Windows 2000之前的操作系统兼容，共享名在长度上应该为8个字符，并且不能包含空格。
+        由于位置信息可能并不总是可见的，因此，共享名中也可以包含用于指明打印机所在位置的相关信息，以便为用户节省一些时间。比如，如果某个打印机放置在第五层的东南角，则可以将其命名为FifthSE。参考如下实例：
+            prncnfg -t -s corsrv03 -p "CentralColorLaser" -shared 
+    16.4.3在活动目录中发布打印机
+        通过将打印机相关信息发布到活动目录中，可以使得用户更容易找到可用的打印机。打印机在活动目录中发布之后，用户可以根据打印机的位置与功能进行搜索。比如，打印机是否在楼内第五层？是否可以彩打？
+        要对打印机发布进行配置，可以使用Prncnfg命令。如果需要将打印机发布到活动目录中，可以使用-T参数便是要对打印机属性进行设置或修改，-P参数指定待操作的打印机，之后使用-Published参数表示将要发布打印机，或者使用-Published参数表示将要从活动目录中移除打印机。
+        参考如下实例。
+        将CorpSrv03上的打印机CentralColorLaser发布到活动目录：
+            Prncnfg -t -s corpsrv03 -p "CentralColorLaser" +published 
+        从活动目录中删除名为OfficeJet的本地打印机：
+            Prncnfg -t -p "OfficeJet" -published 
+        无论是发布打印机还是移除打印机，Prncnfg都应该报告对打印机进行了配置。但如果打印机已经发布或移除，也不会报告错误。
+    16.4.4设置分隔页并改变打印设备模式
+        分隔页可以用在打印任务的起始处，以便在繁忙的打印设备上找到某个文档。可以用于改变打印设备模式，比如打印设备是使用PostScript或打印机控制语言（PCL）。
+        分隔页存储在文件夹%%SystemRoot\System32中，Windows系统中定义了下面4中默认的分隔页。
+        · pcl.sep。将打印设备切换到PostScript模式，并为每个文档打印一个分隔页。
+        · pscript.sep。将打印设备切换到PostScript模式，但并不打印分隔页。
+        · sysprint.sep。将打印设备切换到PostScript模式，并为每个文档打印一个分隔页。
+        · sysprintj.sep。将打印设备切换到PostScript模式，并为每个文档打印一个分隔页。实际上是Sysprint.sep的替代版，只是使用了不同版本的旗标文本。
+        通过Prcnfg，可以指定打印机应该使用上面的某个分隔页，或者文件夹%SystemRoot%\System32中的其他分隔页。使用-T参数表明正在设置或改变打印机属性，-P参数指定待操作的打印机，之后使用-F参数指定要使用的分隔页。
+        参考如下实例：
+            Prncnfg -t -s corpsrv03 -p "CentralColorLaser" -f sysprint.sep 
+        上面的命令中，将CorpSrv03上的打印机CentralColorLaser配置为使用sysprint.sep。
+        如果需要终止使用分隔页，可以使用-F参数与“ ”，比如：
+            Prncnfg -t -s corpsrv03 -p "CentralColorLaser" -f " "
+    16.4.5打印任务的调度与优先级设置
+        在命令行汇总，可以使用Prncnfg命令管理打印任务的优先级并对其进行调度。打印任务总是按照优先级顺序进行打印，1代表最低优先级，99代表最高优先级。高优先级的打印任务比低优先级的打印任务具有更高的优先打印权。如果某物理打印设备包含几个打印机（打印队列），则每一个高优先级的打印任务都可以优先得到打印。使用-T参数表明正在设置或改变打印机属性，-P参数指定待操作的打印机，之后使用-O参数设置打印任务的优先级：
+            prncnfg -t -p "EngineeringPrinter" -o 50 
+        上面的命令中，将通过EngineeringPrinter传递给相关打印机的打印任务的优先级设定为50.比如，如果某个Marketing打印机也配置为使用同一个物理打印设备，但优先级低于50，则Engineering打印任务总是会优先得以打印。
+        打印机或者总是可用的，或者只有在指定的时间段内可用。要设置打印机的可用性，可以使用-St参数与-Ut参数分别指定打印机可用于不可用的时间点，其中时间是以24小时时钟设置的，比如：
+            prncnfg -t -p "EngineeringPrinter" -st 0530 -ut 1930 
+        上面的命令中，指定打印机在每天的上午5点30到下午的7点30是可用的。
+    16.4.6配置缓冲池与其他高级打印机选项
+        对网络连接的打印机，通常需要打印机对文件进行缓存，而不是直接打印。通过打印缓冲池，可以使用打印机（打印队列）对打印任务进行管理。通过Prncnfg与如下一些选项，可以对打印缓冲池进行配置。
+        · +Direct。通过该参数，可以将打印机配置为直接打印，而不需要通过打印缓冲池。并且，指定了该参数后，就不能再使用任意缓冲池选项。
+        · -Direct。通过该参数，对打印文档进行缓存，以便程序可以快速完成打印任务。这是默认的打印选项。
+        · +Queued。通过该参数，在打印文档最后一页缓存之后开始打印。如果希望在打印开始之前缓存整个文档，则可以选定这一选项，确保在打印开始之前整个文档进入打印队列。如果由于某些原因导致打印取消或未完成，则该打印任务不会被打印。
+        · -Queued。通过该参数，只要开始缓存文档，就开始打印。如果希望在打印设备没有被占用的情况下立即开始打印，则可以选定这一选项。如果需要打印任务更快完成，或者需要确保应用程序尽可能快地将控制权转交给用户，则应该选择这一选项，这也是默认选项。
+        · +Enabledevq。通过该参数，缓冲池会对打印机设置进行检查，并在将文档发送到打印设备之前与文档设置进行匹配。如果不匹配，缓冲池会抑制该打印任务，但允许匹配的文档进行打印。如果需要频繁地改变打印机型号或纸盒分配，则选择这一选项是有益的。
+        · -Enabledevq。通过该参数，缓冲池在将文档发送到打印设备之前不会对打印机设置进行检查。如果不匹配，则打印机通常会终止打印，并等待用户取消该打印任务、改变打印机型号、或插入一个带有合适纸张类型的进纸盒。这是默认的选项。
+        其他一些可以进行配置的Prncnfg高级选项包括下面列举的。
+        · +Keepprintedjobs。通过该选项，任务在打印后不会从打印队列中删除。如果正在打印的文档不易创建，可以使用这一选项，用于以后需要打印该文档时不必再次创建该文档。
+        · -Keepprintedjobs。通过该选项，任务在打印后会从打印队列中删除，从而释放打印任务占用的磁盘空间，但无法从打印队列中再次打印该文档。这是默认选项。
+        · +Docompletefirst。通过该选项，则完成缓存的任务会比正在缓存的任务优先打印，而不管正在缓存的任务是否具有更高的优先级。这是默认选项。
+        · -Docompletefirst。通过该选项，高优先级的任务将抢占低优先级的任务。设置该选项后，如果有高优先级的任务进入打印队列，则低优先级的任务会终止打印，高优先级的任务将开始打印。
+        · Enablebidi。通过该参数，可以激活元文件缓存，并打开那些高级打印选项（如果支持），比如打印顺序、书册打印、多页合并打印。使用该选项时，如果注意到兼容性问题，则应该禁止相关功能。这是默认选项。
+        · -Enablebidi。通过该参数，可以禁用元文件缓存，并关闭那些高级打印选项。如果打印机遇到兼容性问题，则应该使用这一选项。
+        要了解如何使用这些选项，参考如下一些实例。
+        将sales06上的SalePrinter配置为直接打印，并保持已打印的任务：
+            prncnfg -t -s sales06 -p "SalesPrinter" +direct +keepprintedjobs 
+        将本地计算机上的MainPrinter配置为在最后一页缓存后开始打印：
+            prncnfg -t -p "MainPrinter" -queued 
+        将corpsvr09上的HPLaserJet配置为抑制不匹配的文档，并禁用元文件缓存：
+            prncnfg -t -s corpsvr09 -p "HPLaserJet" +enabledevq -enablebidi 
+16.5解决缓存问题
+    Windows使用Print Spooler服务控制打印任务的缓存。如果该任务尚未启动，则打印任务无法缓存。
+    16.5.1检查PrintSpooler服务
+        在本地计算机上，使用如下命令可以检查PrintSpooler服务的状态：
+            sc query spooler 
+        对远程计算机，则需要指定UNC服务名，比如：
+        sc \\Engsvr04 query spooler 
+        无论哪种，输出信息都包含spooler部分，类似于如下格式：
+            SERVICE_NAME: spooler 
+            TYPE        : 110 WIN32_OWN_PROCESS  (interactive)
+            STATE       : 4 RUNNING (STOPPABLE, NOT_PAUSABLE, ACCEPTS_SHUTDOWN)
+            WIN32_EXIT_CODE: 0 (0x0)
+            SERVICE_EXIT_CODE: 0 (0x0)
+            CHECHPOINT  : 0x0 
+            WAIT_HINT   : 0x0 
+        从上面信息可以看出，Print Spooler服务正在运行。如果该服务终止，则可能需要检查服务配置为此，可以键入如下命令：
+            sc qc spooler 
+            或
+            sc \\Engsvr04 qc spooler 
+        输出信息会报告PrintSpooler的启动设置，如下所示：
+            [SC] QueryServiceConfig  SUCCESS 
+            SERVICE_NAME: spooler 
+            TYPE        : 110 WIN32_OWN_PROCESS  (interactive) 
+            START_TYPE  : 2 AUTO_START 
+            ERROR_TYPE  : 1 NORMAL 
+            BINARY_PATH_NAME: C:\Windows\System32\spoolsv.exe 
+            LOAD_ORDER_GROUP: SpoolerGroup 
+            TAG         : 0
+            DISPLAY_NAME: Print Spooler 
+            DEPENDENCIES: RPCSS 
+                        : http
+            SERVICE_START_NAME: LocalSystem 
+        从上面信息可以看出，启动类型为AUTO_START表明PrintSpooler服务被设置为自动启动。
+    16.5.2修复损坏的缓冲池
+        缓冲池也存在损坏的可能性。如果损坏，则打印机会停止工作，或者不能将打印任务发送到打印设备，有时候还可能导致打印设备无法理解的数据。大多情况下，终止后在重新启动PrintSpooler服务就可以解决问题。要终止PrintSpooler服务，可以键入如下命令：
+            sc stop spooler 
+        缓冲池终止后，如果需要重启该服务，可以键入如下命令：
+            sc start spooler 
+        如果操作的是远程计算机，也可以输入远程计算机名，比如：
+            sc \\Engsvr04 stop spooler 
+            sc \\Engsvr04 start spooler 
+        （注解  有些缓存问题可能与许可权限有关。为解决这些问题，可以在%SystemRoot%\System32\Spool文件夹中检查打印机的访问许可权限与许可权限。）
+16.6管理打印队列与单个打印任务
+    有几个Windows脚本可用于操作打印队列及其包含的打印任务，比如，Prnqctl可用于启动、终止或暂停打印队列中所有文档的打印，Prnjobs可用于操作打印任务。
+    16.5.1查看队列中的任务
+        你可以使用Prnjobs查看打印队列中的任务。如果需要查看本地计算机上所有打印机的所有任务可以使用命令prnjobs -l。要查看特定打印机上的任务，可以使用-P参数指定打印机名。对远程计算机可以使用-S参数指定待操作的远程计算机。如果必要，还可以使用-U参数与-W参数指定远程登录的用户名与口令。
+        参考如下实例。
+        查看Corpsrv03上的所有打印任务：
+            prnjobs -l -s corpsrv03 
+        查看本地计算机上MainPrinter的所有打印任务：
+            prnjobs -l -p MainPrinter 
+        单个打印任务的输出包含了如下一些信息。
+        · Job ID。打印任务标识符，在操作单个打印任务时是必需的。
+        · Printer。打印机名。 
+        · Document。文档文件名，可以包含打印该文档文件的应用程序名。
+        · Data Type。打印机数据类型。
+        · Driver Name。打印机驱动程序名，也代表了打印机型号。
+        · Description。打印机描述信息。
+        · Elapsed Time。文档打印的时间长度。
+        · Job Status。打印任务状态，包括正在打印、缓存、暂停、正在删除、正在重启。
+        · Notify。打印任务完成时应该通知的人（如果已经进行了通知配置）。
+        · Owner。文档属主。
+        · Pages Printed。到目前为止已打印的页面数。
+        · Size。文档大小（以字节计数）。
+        · Time Submitted。打印任务提交的时间与日期。
+        · Total Pages。文档的页面总数。
+    16.6.2打印机的暂停与恢复
+        有时候需要暂停打印机，以便操作物理打印设备，对出现的问题进行故障排除。暂停打印机时，打印机完成当前的打印任务，并挂起所有其他打印任务。要暂停打印机，可以使用Prnqctl命令。先键入prnqctl -z，之后，对本地打印机，使用-P参数设置需要暂停的打印机名。对远程计算机。使用-S参数指定待操作的远程计算机。如果必须，还可以使用-U参数与-W参数指定用户名与口令，以便访问远程计算机。
+        要恢复暂停的打印机，可以使用-M参数（而不是-z参数），用来重启对打印队列中所有文档的打印。
+        参考如下实例。
+        暂停CorpSrv03上EngineeringPrinter的打印：
+            prnqctl -z -s corpsrv03 -p EngineeringPrinter 
+        暂停本地计算机上5thfloorPrinter上的打印任务：
+            prnqctl -z -p 5thfloorPrinter 
+        恢复CorpSrv03上EngineeringPrinter的打印：
+            prnqctl -m -s corpsrv03 -p EngineeringPrinter 
+    16.6.3清空打印队列
+        你可以使用Prnqctl命令清空打印队列，并删除其中所有内容。先键入prnqctl -x，之后，对本地打印机，使用-P参数设置需要清空的打印队列名，对远程计算机，使用-S参数指定待操作的远程计算机如果必要，还可以使用-U参数与-W参数指定用户名与口令，用来访问远程计算机。
+        参考如下实例。
+        清空salespc06上SalesPrinter的打印队列：
+            prnqctl -x -s salespc06 -p SalesPrinter 
+        清空本地计算机上TempPrinter上的打印任务：
+            prnqctl -x -p TempPrinter 
+        如果命令执行成功，Prnqctl会报告成功地打印队列中移除了文档，即便打印队列中本来可能没有文档。
+    16.6.4暂停、恢复与重启单个文档的打印
+        你可以使用Prnjobs暂停或恢复单个文档的打印。暂停某打印任务后，就挂起了对该任务的打印，但允许其他文档进行打印。恢复某打印任务后，就从该任务的挂七点恢复打印。
+        要暂停某个打印任务，可以使用如下的语法格式：
+            prnjobs -z -p PrinterName -j JonID 
+        其中，PrintName是待操作的打印机名，JobID是待暂停任务的ID号。
+        要恢复某个打印任务，可以使用如下的语法格式：
+            prnjobs -m -p PrinterName -j JobID 
+        其中，PrintName是待操作的打印机名，JobID是待恢复任务的ID号。
+        上面的两种情况都指的是，默认情况下，对本地计算机上的打印机进行操作。对远程计算机上的打印队列，使用-S参数指定待操作的远程计算机。如果必要，还可以使用-U参数与-W参数指定用户名与口令，用来访问远程计算机。 
+        参考如下实例。
+        餐厅CorpSrv03上EngineeringPrinter中编号为6的任务的打印：
+            Prnjobs -z -s corpsrv03 -p EngineeringPrinter -j 6 
+        暂停本地计算机上5thfloorPrinter上编号为17的任务的打印：
+            prnjobs -z -p 5thfloorPrinter -j 17 
+        恢复CorpSrv03上EngineeringPrinter中编号为6的任务的打印：
+            prnjobs -m -s corpsrv03 -p EngineeringPrinter -j 6 
+        成功执行后，Prnjobs会报告成功暂停或恢复某ID打印任务的打印。如果指定的是无效的任务ID，Prnjobs会报告“不能设置打印任务”。
+    16.6.5移除文档并取消打印任务
+        你可以使用Prnjobs取消单独的打印任务并将其从打印队列中删除。先键入prnqctl -x，之后，对本地打印机，使用-P参数设置打印机名，使用-j参数指定待删除文档的ID。对远程计算机，使用-S参数指定待操作的远程计算机。如果必要，还可以使用-U参数与-W参数指定用户名与口令，用于访问远程计算机。
+        参考如下实例。
+        取消本地计算机上MainPrinter中ID为12的打印任务：
+            prnjobs -x -p MainPrinter -j 12 
+        取消CorpSrv03上EngineeringPrinter中ID为9的打印任务：
+            prnjobs -x -s corsrv03 -p EnginerringPrinter -j 9 
+        成功执行后，Prnjobs会报告成功取消打印任务。如果指定的是无效的任务ID，Prnjobs会报告“不能设置打印任务”。
+        （注解  如果待取消的打印文档正在打印过程中，则打印设备会继续打印部分或全部文档。因为，大多数打印设备会将文档缓存在内部缓冲区中，因而会继续打印缓冲器中的内容。）
+16.7备份与恢复打印服务器配置
+    作为应对故障的常规规划的一部分，应该考虑如何处理打印机与打印服务器的失效。要对潜在的打印机问题有所准备，理想情况下，可以购置空闲的打印机或相应组件，用于修复或替换失效的打印机。如果不能，则应该指定好失效后的策略，以便用户可以使用替代的打印机，或者已经为用户在其计算机上配置好从打印机，以便在主打印机失效后使用。
+    16.7.1备份打印服务器的配置
+        要对潜在的打印服务器问题进行处理，应该准备一台可用的从打印服务器，或者将某台计算机设置为从打印服务器。作为周期性备份的一部分，你可以使用PrintBrm工具对打印服务器的打印机配置进行备份，使用如下命令：
+            printbrm -b -f SaveFile 
+        其中，SaveFile为打印机配置文件（带.printerexport扩展名）的全文件路径。你也可以使用-S参数指定远程计算机。下面的实例中，将打印机配置备份到PrintServer12_Config.printerexport文件中。
+            printbrm -b -f PrintServer12_Config.printerexport 
+        在对打印机配置进行备份的过程中，Printbrm工具还会列出打印机当前配置的摘要信息，并按步骤列出任务，如下面实例所示：
+            Operation mode: backup 
+            Target server: local machine 
+            Target file path: c:\Windows\printserver12_config.printexport. 
+            Queue publish mode: none 
+            Overwrite Mode: keep existing settings 
+
+            LISTING  PRINT  QUEUES 
+            OfficeJetPrinter 
+            HP  Color LaserJet 9500 main 
+
+            magicolor 2300 DL 
+            Adobe PDF 
+            LISTING  PRINTER DRIVERS 
+            hp officejet 5500 series, windiws NT x86, LIDIL hpzllhn 
+            HP Color LaserJet 9500 PS, Windows NT x86, None 
+            magicolor 2300 DL,Windows NT x86, MLMON__B.DLL 
+            Adobe PDF Converter, Windows NT x86, None 
+            LISTING PRINT  PROCESSORS 
+            hpzpplhn Windows NT x86 hpzpplhn.dll 
+            MIMFPR_B  Windows NT x86 MIMFPR_B.DLL 
+            LISTING  PRINTER  PORTS 
+            192.168.0.90, TCP 
+            192.168.1.90, TCP 
+            192.168.10.150, TCP 
+            Saving Print Queues... 
+            Saved print queue OfficeJetPrinter 
+            Saved print queue HP Color LaserJet 9500 main 
+            Saved print queue magicolor 2300 DL 
+            Saved print queue Adobe PDF 
+            Saving Print Processors...
+            Saved print processor hpzpplhn, Windows NT x86, hpzpplhn.dll 
+            Saved print processor MIMFPR_B, Windows NT x86, MIMFPR_B.DLL 
+            Saving Printer Drivers...
+            Saved printer driver hp officejet 5500 series, Windows NT x86, 3
+            Saved printer driver HP Color LaserJet 9500 PS,Windows NT x86, 3
+            Saved printer driver magicolor 2300 DL,Windows NT x86, 3
+            Saved printer driver Adobe PDF Converter, windows NT x86, 3
