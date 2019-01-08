@@ -560,3 +560,42 @@
             Saved printer driver HP Color LaserJet 9500 PS,Windows NT x86, 3
             Saved printer driver magicolor 2300 DL,Windows NT x86, 3
             Saved printer driver Adobe PDF Converter, windows NT x86, 3
+            Saving Printer Ports...
+            Saved printer port 192.168.0.90, TCP 
+            Saved printer port 192.168.1.90, TCP 
+            Saved printer port 192.168.10.150, TCP 
+            ************ 100% Complete ************
+
+            Successfully finished operation. 
+        如果在输出中发现了错误信息，要对导致错误的问题进行解决，之后再次使用Printbrm工具进行备份。要确保打印机配置备份在全服务器故障时是可用的，还应该将配置文件复制到安全的网络文件夹或其他计算机上。
+    16.7.2恢复打印服务器的配置
+        对打印机配置进行备份后，可以有多种方式使用备份文件。发生打印服务器失效后，可以将打印服务器断开网络连接，之后使用Printbrm在新打印服务器上恢复打印机配置，再之后需要改变从打印服务器的IP地址与计算机名，以便于原始打印服务器匹配。设置完毕后，用户就可以访问打印机并恢复打印。
+        用于恢复已保存打印配置的语法格式如下：
+            printbrm -r -f ConfigFileToRestore 
+        其中，ConfigFileToRestore为已保存打印机配置文件（带.printerexport扩展名）的全文件路径。下面实例中，使用PrintServer12_Config.printerexport文件恢复打印机配置：
+            printbrm -r -f PrintServer12_Config.printerexport 
+        恢复打印机配置时，Printbrm会列出设置与操作的摘要信息，如下面实例所示：
+            Operation mode: restore 
+            Target server: local machine 
+            Target file path: c:\windows\printserver12_config.printerexport. 
+            Queue publish mode: none 
+            Overwrite Mode: keep existing settings 
+            Restoring Printer Drivers...
+            Restoring Printer Ports...
+            Restoring Print Processors...
+            Restoring Print Queues...
+            ************ 0% ***********
+
+            Successfully  finished operation.
+        如果输出中包含了错误信息，要先解决导致错误的问题，之后再次运行Printbrm来恢复打印机配置。默认情况下，Printbrm不会重写现存打印队列的设置。在已经包含自己打印队列的计算机上恢复打印队列时，这是有益的。在无意间从打印服务器删除打印队列后，一般希望Printbrm只恢复已删除的打印队列，因而这种不重写设置也是有益的。
+        要强制Printbrm执行恢复操作并重写现存打印队列的设置，可以使用-O FORCE参数，比如：
+            printbrm -r -f PrintServer12_Config.printerexport -o force 
+        如果对已保存打印机配置文件中的内容有疑问，可以使用如下的语法格式查询该文件并列出其中包含的内容：
+            printbrm -q -f ConfigFileToQuery 
+        其中，ConfigFileToQuery为已保存打印机配置文件的全文件路径。
+    16.7.3迁移打印机与打印队列
+        你可以使用Printbrm将打印机及其打印队列从打印服务器移动到其他打印服务器。如果需要加固多台打印服务器或替换旧的打印服务器，这是一种有效的方法。
+        移动打印机时，打印机当前所在服务器为源服务器，打印机将迁移到的服务器为目的服务器。通过如下步骤，可以将打印机移动到新的打印服务器上。
+        （1）为源服务器创建打印机配置文件，使用如下命令：Printbrm -b -s ServerName -f SaveFile。其中，ServerName为源服务器名或IP地址，SaveFile为.printerexport文件的文件名。
+        （2）在目的服务器上恢复打印机配置文件备份，使用如下命令：Printbrm -r -s ServerName -f RestoreFile。其中，ServerName为目的服务器名或IP地址，RestoreFile为用于恢复的.printerexport文件的文件名。 
+        如果目的服务器上包含的打印队列与来自源服务器的打印队列同名，可以通过-O FORCE参数使用恢复文件中的打印队列设置重写现存打印队列设置。

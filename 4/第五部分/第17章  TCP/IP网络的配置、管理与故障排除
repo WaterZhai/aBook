@@ -1,0 +1,356 @@
+第17章  TCP/IP网络的配置、管理与挂账排除
+
+传输控制协议/Internet协议（TCP/IP）的配置、维护与故障排除，是每个管理员工作职责的重要组成部分。本章首先对执行这些任务的命令行工具进行了初步讨论，之后细化为每个单独的领域，使读者具备在Windows Vista与Windows Server 2008上成功管理TCP/IP网络的知识与技术。
+
+17.1使用网络服务Shell
+    网络服务shell（Netsh）是一款命令行脚本工具，可用于管理本地与远程计算机上多种网络服务。Netsh提供了一个单独的命令提示符，可以在交互模式或非交互模式下使用。
+    17.1.1操作Netsh上下文
+        在交互模式下，键入netsh，之后指定待操作网络服务的上下文名称。可用的上下文与子上下文依赖于计算机上已安装的角色服务、角色与功能。关键的上下文名称及其含义如下所示。
+        · advfirewall。高级防火墙，该上下文用于管理与监控Windows高级安全防火墙。Windows高级安全防火墙是标准Windows防火墙的增强版，可用于定义安全策略，并包含了用于定义高级包过滤规则（包括入站与出站的网络流量）的扩展。
+        · bridge。网桥，该上下文用于激活或禁用网桥的传输层（OSI模型第2层）兼容模式，也可用于查看网桥的配置设置。
+        · dhcp。动态主机配置协议（DHCP），该上下文用于查看与管理DHCP服务器。你可以使用DHCP上下文为网络客户端动态指定TCP/IP配置信息。只有当DHCP Server角色服务已安装后，DHCP上下文在Windows Server 2008上才是可用的。如果尚未安装该角色服务，则上下文dhcp的快捷方式将指向dhcpclient上下文。
+        · dhcpclient。DHCP客户端，该上下文用于激活或禁用对DHCP的追踪。
+        · firewall。Windows防火墙，该上下文用于管理Windows防火墙允许的程序、防火墙端口、日志、通告或其他方面。
+        · http。超文本传输协议（HTTP），该上下文用于管理HTTP监听器。
+        · interface ip4。Interface IP版本4（IPv4），该上下文用于查看与管理计算机的IPv4网络配置。要注意的是，很多IPv4 Show命令只有在本地才是可用的。
+        · interface ip6。Interface IP版本6（IPv6），该上下文用于查看与管理计算机的IPv6网络配置。要注意的是，很多IPv6 Show命令只有在本地才是可用的。 
+        · interface portproxy。Interface端口代理，该上下文用于管理IPv4网络、IPv6网络以及两种协议混合网络的代理。
+        · ipsec。Internet协议安全（IPsec），该上下文用于查看与配置IPsec的动态或静态设置。
+        · lan。有线本地局域网（LAN），该上下文用于管理有线网络profiles与操作有线网络接口。大多数lan命令需要利用Wired Autoconfig服务，也就是说，在使用这些命令时，必须先启动该服务。
+        · nap client。网络访问保护（NAP）客户端，该上下文用于管理NAP客户端配置。
+        · nap hra。NAP健康注册授权（HRA），该上下文用于管理NAP HRA配置。在Windows Server 2008中，只有在安装了健康注册授权角色服务（作为Network Policy And Access Services角色的一部分）之后，这一上下文才是可用的。
+        · netio。网络输入/输出（netio），该上下文用于添加、删除与列出网络绑定的过滤器。
+        · ras。远程访问服务器（RAS），该上下文用于查看与管理远程访问服务器的配置。
+        · ras aaaa。认证、授权、记账与审计（AAAA），该上下文用于查看与操作AAAA数据库。Internet认证服务（IAS）以及路由与远程访问服务都使用该数据库。
+        · ras diagnostics。RAS诊断，该山西该文用于配置RAS故障排除过程中的日志与追踪。
+        · routing。路由，该上下文用于管理路由服务，且与路由与远程访问服务器一起使用。在Windows Server 2008中，只用在安装了Routing And Remote Access Services角色（作为Network Policy And Access Services角色的一部分）之后，这一上下文才是可用的。 
+        · rpc。远程过程调用（RPC）帮助者，该上下文用于查看与管理计算机上配置的IP地址接口设置与IP子网地址。只有工作在本地时，该上下文中的命令才是可用的。
+        · rpc filter。RPC防火墙，该上下文用于创建并管理RPC防火墙过滤器及其规则。只有工作在本地时，该上下文中的命令才是可用的。
+        · winhttp。Windows HTTP（WinHttp），该上下文用于管理WinHTTP代理与追踪设置。
+        · wins。Windows Internet域名服务（WINS），该上下文用于查看与管理WINS服务器设置。对Windows以前的系统，可以使用WINS将NetBIOS计算机名解析为IPv4地址。在Windows Server 2008中，只有在安装了WINS Server功能之后，这一上下文才是可用的。
+        · winsock。Winsock，该上下文用于管理Winsock通信设置。
+        · wlan。无线LAN，该上下文用于管理无线网络设置。在Windows Server 2008中，只有在安装了Wireless LAN服务之后，这一上下文才是可用的。
+        （注解  从上面的说明中可以看到，有些上下文与命令只有在本地计算机上的Netsh提示符中才是可用的。比如RPC，只有在本地计算机上操作才是可用的。此外，除要求在本地计算机上之外，有些Netsh上下文与命令还要求预先配置了路由与远程访问服务。如果是这种情况，必须设置Connections To Other Access Servers远程访问策略（以便授予远程访问的许可权限），并确保远程访问服务已经运行。）
+        在附录B中，可以看到关于Netsh上下文及其子上下文的全面资料。上下文名称用于通知Netsh应该加载哪些起帮助作用的DLL，其帮助作用的DLL提供了可以使用的上下文特定的命令。比如，键入netsh以便交互式地操作Netsh，之后键入rpc，就可以进入RPC上下文，之后键入show interfaces，就可以查看计算机上配置的IPv4地址接口。概括地说，上面的实例主要包括如下几个步骤。
+        （1）键入netsh，之后命令提示符改变为netsh>。
+        （2）键入rpc，之后命令提示符改变为netsh rpc>。
+        （3）键入show interfaces，之后会显示计算机上已配置的IPv4地址接口，如下所示：
+            Subnet         Interface         Status         Description
+            127.0.0.0      127.0.0.1         Enabled        Software Loopback Interface 1
+            192.168.1.0    192.168.1.101     Enabled        Intel(R) PRO/1000 PM
+            Network Connection 
+        每个上下文都有不同的命令集，其中的一些命令可能会切换到子上下文，而这些子上下文也可能有自己的命令集。要记住的是，与上下文相关的服务必须已经在计算机或域内进行了配置，这样才能在特定的上下文中进行有意义的操作。不管当前操作的是哪个上下文，都可以键入help或？来查看可用的命令列表。类似地，不管当前操作的是哪个上下文，都可以键入exit或quit来退出网络服务shell，并返回到Windows命令提示符。
+        不管在网络服务shell中的哪个层级，都可以通过键入上下文的完整名来切换到某上下文。比如，如果当前操作的是Interface IPv6上下文，需要切换到Ras Diagnostics上下文，则只需要键入ras disgnostics。此外，不管当前操作的是哪个上下文，总是可以使用..命令返回到上一层上下文。也就是说，如果当前操作的是Netsh Rpc上下文，但需要切换回顶层的netsh上下文，则可以键入..命令，用来返回到上一层上下文。
+        上面讲解了在交互式模式下使用Netsh。可以看出，交互模式下是比较慢、比较繁重的，但对初学者或者试图发现有哪些可用命令的用户而言，交互式模式是有益的。随着对Netsh的熟悉，你可能需要非交互模式使用Netsh。在非交互模式下，可以在命令提示符中或脚本中键入完整的命令序列。比如，前面讲的实例中使用了3个步骤，实际上可以在同一条命令中执行：
+            netsh rpc show interfaces 
+        不管是在命令行中执行上面的命令，还是在脚本中执行，其输出都是一样的，即当前的计算机上的网络接口列表。可以看出，直接键入完整的命令序列要快得多。
+    17.1.2操作远程计算机
+        你可以使用Netsh来操作远程计算机。如果需要交互式地操作远程计算机，可以使用-R参数，其后跟随远程计算机的IP地址或域名，比如：
+            netsh -r 192.168.10.15
+            或
+            netsh -r corpsvr02 
+        操作远程计算机时，Netsh会在命令提示符中包含该计算机的IP地址或计算机名，比如：
+            [corpsvr02] netsh>
+        上面的提示符表明，当前正在使用Netsh操作远程计算机CorpSvr02.通过如下的参数，可以指定必要的用户登录凭据。
+        · -u：。指定不同的用户（以Domain\User或User的形式）登录到远程计算机，且只有在操作远程计算机时才是可用的。
+        · -p：。为指定的用户设置口令。如果不设置口令，或使用“*”作为口令，则会看到提示符要求输入口令。操作远程计算机时，只有在指定了不同的登录用户时才会使用这一参数。
+        下面的实例中，使用帐号CPANDL\WilliamS登录远程计算机FileServer25，并操作其上的Netsh：
+            netsh -r fileserver25 -u cpandl\williams -p * 
+        如果需要以非交互模式操作远程计算机，则必须使用如下的语法格式：
+            netsh -c Context -r RemoteComputer Command 
+        其中，Context为待操作上下文的标识符，RemoteComputer为远程计算机的计算机名或IP地址，Command为待执行的命令。参考如下实例：
+            netsh -c "interface ipv4" -r corpsvr02 show interfaces 
+        上面的实例中，使用Interface IPv4这以上下文获取CorpSvr02上已配置的网络接口列表。要注意的是，这里不能使用RPC上下文完成这一任务，因为该上下文只能在本地计算机上使用。
+        （真实场景  要使用Netsh与远程计算机交互，必须先在网络上配置路由与远程访问服务。特别地，必须设置Connections To Other Access Servers远程访问策略（以便授予远程访问的许可权限），并确保远程访问服务已经运行。）
+    17.1.3操作脚本文件
+        前面提到过，你可以在命令行中输入完整的Netsh命令序列，也可以在批处理脚本中输入，但必须熟练掌握要输入的完整命令，而不能依赖于Netsh的帮助。有些命令行可能是非常长而复杂的，比如，如下的命令连接到DHCP服务器、配置DHCP范围并激活该范围。
+            netsh dhcp server \\corpsvr02 add scope 192.168.1.0 255.255.255.0 MainScope PrimaryScope 
+            netsh dhcp server \\corpsvr02 scope 192.168.1.0 add iprange 192.168.1.1 192.168.1.254 
+            netsh dhcp server \\corpsvr02 scope 192.168.1.0 add excluderange 192.168.1.1 192.168.1.25 
+            netsh dhcp server \\corpsvr02 scope 192.168.1.0 set state 1
+        将上面的命令保存到批处理脚本中之后，就可以像运行其他脚本一样运行该脚本。比如，如果将该脚本命名为dhcpconfig.bat，则可以在命令行中键入dhcpconfig来运行该脚本。
+        操作远程计算机时，可以将该脚本存储在远程计算机可以访问的网络共享位置，之后远程登录并运行该脚本。也可以将脚本直接复制到远程计算机，之后远程登录计算机并执行该脚本。另种方式都可以正常工作，但都涉及到一些附加的步骤。幸运的是，还有一种更快捷地在远程计算机上运行脚本的方法。为此，必须对脚本做一些修改，并使用如下的语法格式：
+            netsh -c Context -r RemoteComputer -f Script 
+        其中，Context为待操作上下文的标识符，RemoteComputer为远程计算机的计算机名或IP地址，Script为待执行监本的文件或网络路径。参考如下实例：
+            netsh -c "dhcp server" -r corpsvr02 -f dhcpconfig.bat 
+        上面的实例中，在CorpSvr02上使用DHCP Server上下文运行了一个名为dhcpconfig.bat的脚本。注意的是，Server上下文是DHCP上下文的子上下文，该脚本中包含如下一些命令：
+            add scope 192.168.1.0 255.255.255.0 MainScope PrimaryScope 
+            scope 192.168.1.0 add iprange 192.168.1.1 192.168.1.254 
+            scope 192.168.1.0 add excluderange 192.168.1.1 192.168.1.25 
+            scope 192.168.1.0 set state 1 
+        这些命令创建、配置并激活了指定的DHCP Server（CorpSvr02）上的DHCP范围。由于已经处于CorpSvr02上的DHCP Server上下文中，因此不需要在每条命令前键入netsh dhcp server \\corpsvr02。 
+17.2管理TCP/IP设置 
+    计算机使用IP地址并通过TCP/IP协议进行通信。Windows Vista与Windows Server 2008实现了双IP层体系结构，同时支持IPv4和IPv6，并共享通用的传输层与数据帧层。IPv4与IPv6在设计与实现上存在很大的差别。IPv4使用32位的地址格式，是大多数网络上使用的主要IP版本；IPv6使用128位的地址格式，是下一代IP版本。
+    安装操作系统时，检测到网卡等网络硬件后，IPv4与IPv6都会默认激活，而不需要安装单独的组件来激活对IPv6的支持。IP地址可以在命令行中shou'gong动态配置。手工配置时，会为计算机指定一个静态的IP地址。静态地址是固定的，除非手工改变，否则不会改变。动态配置时，计算机会从网络上的DHCP服务器动态获取宇哥IP地址，该地址只有在计算机启动后才会从DHCP服务器获取，并可能每次获取不同的IP地址。典型情况下，在域中，Windows服务器使用静态IP地址，Windows工作站则使用动态IP地址。
+    17.2.1配置IPv4
+        IPv4使用32位的地址，通常表示为4个单独的十进制数值，比如127.0.0.1或192.168.10.50。这4个十进制数值也称为八位位组，因为每个十进制数值实际上代表了32位IP地址中的8位（由于8位的限制，十进制数值的范围限定为0到255）。对标准的单播IPv4地址，一部分代表的是网络ID，另一部分代表的是主机ID。要注意的是，主机的IPv4地址与主机的网络是配置使用的内部机器地址（MAC地址）并没有必然的关联。
+        1.设置静态IPv4地址
+            设置IPv4地址时，实际上就是位计算机指定要使用的IPv4地址、该地址的掩码以及默认的网关（如果必要）。完成这些配置后，可能也需要为域名系统（DNS）以及WINS进行域名解析配置。
+            要指定IPv4地址，需要使用Interface IPv4上下文。命令为SET ADDRESS，语法格式如下：
+                set address [name=]InterfaceName source=static address=IPAddress mask=SubnetMask [gateway={none | DefaultGateway [gwmetric=]GatewayMetric}] 
+            （注解  如果计算机在指定的网络接口上已经配置了IPv4地址，则使用SET ADDRESS命令会替代原来设置的值。要为该网络接口添加地址而不是替换原来的地址，可以使用ADD ADDRESS命令。）
+            在命令行中键入netsh interface ipv4 show addresses，或者在netsh Interface IPv4上下文中键入show addresses，可以查看可用的网络接口及其当前配置。如下面实例所示，输出信息指定了可用的网络接口名及其当前配置：
+                Configuration for interface "Local Area Connection" 
+                    DHCP enabled:            Yes 
+                    IP  Address:             192.168.1.101 
+                    Subnet Prefix:           192.168.1.0/24(mask 255.255.255.0)
+                    Default Gateway:         192.168.1.1 
+                    Gateway Metric:          0 
+                    InterfaceMetric:         10 
+
+                Configuration for interface "Loopback Pseudo-Interface 1"
+                    DHCP enabled:            No 
+                    IP Address:              127.0.0.1
+                    Subnet Prefix:           127.0.0.0/8(mask 255.0.0.0)
+                    InterfaceMetric:         50 
+            大多数情况下，需要操作的网络接口名为“本地区域连接”。上面的实例中，列出的伪接口用于本地回环通信。要注意的是，为计算机指定的IPv4地址必须尚未在网络上使用。组网掩码字段用于确保计算机在网络上的正确通信。如果网络使用掩码，则公司内每个网络使用的网络掩码都是不同的。如果计算机需要访问其他TCP/IP网络、Internet或其他子网，还必须指定默认的网关，网关可以使用网络的默认路由器的IPv4地址。
+            网关metric指明了使用网关的相对路由成本。如果某个特定的IPv4地址有多个可用的默认路由则路由成本最低的网关最先使用。乳沟该网关无法使用，Windows会尝试使用路由成本次低的网关，并以此类推。与GUI中不同的是，命令行中不会自动为网络指定metric，而必须对其进行手工指定。参考如下实例：
+                set address name="Local Area Connection" source=static address=192.168.1.50 mask=255.255.255.0 gateway=192.168.1.1 gwmetric=1 
+            上面的实例中，操作的网络接口为“本地区域连接”，设置的静态IPv4地址为192.168.1.50，网络掩码为255.255.255.0，默认网关为192.168.1.1，网关metric为1。
+            （提示  在命令行中键入netsh interface ipv4 show address，或者在Netsh Interface IPv4上下文中键入show addresses，可以查看并确认刚才所作的配置。由于很多Interface IPv4 Show命令与Interface IPv6 Show命令只有在本地工作时才是可用的，因此要使用这些命令，必须首先本地登录。）
+        2.设置动态IPv4地址
+            只要网络上的DHCP服务器是可用的，就可以为计算机上的任意网络适配器分配动态的IPv4地址，之后依赖于DHCP服务器来提供必要的IPv4地址信息。由于动态IPv4地址是变化的，因此通常不应该为Windows Server 2008等服务器分配动态IPv4地址。
+            在Netsh Interface IPv4上下文中，使用SET ADDRESS命令，可以设置动态IPv4地址，其语法格式如下：
+                set address name=InterfaceName source=dhcp 
+                参考如下实例：
+                set address name="Local Area Connection" source=dhcp 
+            上面的实例中，工作在Netsh Interface  IPv4上下文中，并为“本地区域连接”这一网络接口设置动态IPv4地址。
+        3.添加IPv4地址与网关
+            Windows Vista与Windows Server 2008中，都可以使用多个IPv4地址，即便计算机可能只有一个网络适配器。如果需要单一计算机充当几台计算机，或者所在网络划分为几个不同子网，而计算机需要访问这些子网来提供路由信息（或提供其他网络服务时），指定对个IPv4地址是有用的。
+            （注解  要记住的是，使用单一的网络适配器时，多个IPv4地址必须属于同一网段或同一逻辑网的不同网段。如果网络包含了不同的物理网络，则必须使用多个网络适配器，并且每个适配器分配一个属于不同物理网段的IPv4地址。）
+            在Netsh Interface IPv4上下文中，使用ADD ADDRESS命令，可以为单一网络适配器指定多个IPv4地址与网关，其语法格式与SET ADDRESS类似：
+                add address [name=]InterfaceName address=IPAddress mask=SubnetMask [[gateway=]DefaultGateway [gwmetric=]GatewayMetric]
+                参考如下实例：
+                add address name="Local Area Connection" address=192.168.2.12 mask=255.255.255.0 gateway=192.168.2.1 gwmetric=1 
+            （注解  如果指定网关，就必须同时指定网关metric，与前面一样，可以通过show addresses命令查看所作的配置。）
+            上面的实例中，操作的网络接口为“本地区域连接”，设置的静态IPv4地址为192.168.2.12，网络掩码为255.255.255.0，默认网关为192.168.2.1，网关metric为1。
+        4.设置IPv4地址使用的DNS服务器
+            计算机使用DNS来完成主机名与IP地址之间的解析。对使用静态IPぁ地址的计算机，必须为其指定使用哪一台DNS服务器，这可以在Netsh Interface IPv4上下文中指定，其语法格式如下：
+                set dnsserver name=InterfaceName source=static address=DNSAddress 
+                参考如下实例：
+                set dnsserver name="Local Area Connection" source=static address=192.168.1.56 
+            上面的实例中，操作的网络接口为“本地区域连接”，并指定DNS服务器的IP地址为192.168.1.56.配置静态的DNS服务器地址时，可以使用可选的register参数来控制DNS的等级，要记住如下几点。
+            · 默认情况下，网络接口的所有IP地址都在计算机完全限定域名下的DNS中登记。这种自动登记使用了DNS动态更新协议。如果需要禁用，可以使用命令register=none。
+            · 默认情况下，计算机的全名只在其主域内登记，因为默认情况下的设置是register=primary。使用动态DNS时，也可以指定连接特定的DNS名应该在DNS中进行登记。为此，要使用命令register=both。在计算机有多个网络适配器并连接到多个域时，这种做法是有益的。
+            如果计算机使用DHCPv4，并希望由DHCPv4提供DNS服务器地址，则可以提供DNS服务器地址，或指定从DHCPv4获取IPv4地址--这是通过如下命令实现的：
+                set dnsserver name=InterfaceName source=dhcp 
+                参考如下实例：
+                set dnsserver name="Local Area Connection" source=dhcp 
+            上面的实例中，指定网络接口“本地区域连接”应该从DHCPv4获取DNS服务器地址设置。
+            （注解  如果计算机已经设置了DNS服务器的IPv4地址，则可以通过SET DNSSERVER命令替换现存值。如果希望添加DNS服务器的IPv4地址，而不是替换现存值，则可以使用命令ADD DNSSERVER。要确认DNS服务器的设置，可以键入命令show dnsservers。）
+        5.指定附加的DNS服务器
+            大多数网络都有多台DNS服务器来提供域名解析服务，这样才可以保证某台DNS服务器失效的时候由其他DNS服务器继续提供服务。使用DHCPv4指定DNS服务器时，会自动地通知计算机还有哪些可用的DNS服务器，但手工指定DNS服务器时则并非如此。
+            要通知计算机还有哪些可用的DNS服务器（除主DNS服务器之外），可以在Netsh Interface IPv4上下文中使用ADD DNSSERVER命令，其语法格式如下：
+                add dnsserver name=InterfaceName address=DNSAddress 
+                参考如下实例：
+                add dnsserver name="Local Area Connection" address=192.168.1.75 
+            上面的实例中，操作的网络接口为“本地区域连接”，并指定一个备用的DNS服务器，其IP地址为192.168.1.75。 
+            默认情况下，新添加的DNS服务器会添加到TCP/IP配置中DNS服务器列表的最后。如果需要其出现在DNS服务器列表中的特定位置，可以使用参数Index=。比如，如果需要附加的服务器出现在列表首部（即作为主DNS服务器），则应该将其索引设置为1，比如：
+                add dnsserver name="Local Area Connection" address=192.168.1.75 index=1 
+        6.设置WINS服务器
+            WINS用于将NetBIOS名解析为IP地址，计算机可以通过WINS确定网络上Windows 2000以前计算机的地址。尽管所有版本的Windows都支持WINS，但Windows Server 2008支持WINS主要是为了保证向后兼容。
+            对使用静态IP地址的计算机，必须指定要使用的WINS服务器。在Netsh Interface IPv4上下文中，用于指定特定WINS服务器的语法格式如下：
+                set winsserver name=InterfaceName source=static address=WINSAddress 
+                参考如下实例：
+                set winsserver name="Local Area Connection" source=static address=192.168.1.64 
+            上面的实例中，操作的网络接口为“本地区域连接”，并将WINS服务器的IP地址指定为192.168.1.64。 
+            如果计算机使用DHCP，并希望由DHCP提供DNS服务器地址，则可以提供WINS服务器地址，或指定从DHCP获取WINS地址--这是通过如下命令实现的：
+                set winsserver name=InterfaceName source=dhcp 
+                参考如下实例：
+                set winsserver name="Local Area Connection" source=dhcp 
+            上面的实例中，指定网络接口“本地区域连接”应该从DHCP获取WINS服务器地址设置。
+            （注解  如果计算机已经设置了WINS服务器的IP地址，则SET WINSSERVER命令会替换现存值，如果希望添加WINS服务器的IP地址，而不是替换现存值，则可以使用命令ADD WINSSERVER。要确认WINS服务器的设置，可以键入命令show winsservers。）
+        7.指定附加的WINS服务器
+            大多数网络都有一台主WINS服务器与一台备份WINS服务器，这样才可以保证在某台WINS服务器失效的时候由另外的WINS服务器继续提供服务。使用DHCP指定WINS服务器时，会自动地通知计算机还有哪些可用的WINS服务器，但手工指定WINS服务器时则并非如此。
+            要通知计算机还有哪些可用的WINS服务器（除主WINS服务器之外），可以在Netsh Interface IPv4上下文中使用ADD WINSSERVER命令，其语法格式如下：
+                add winsserver  name=InterfaceName address=WINSAddress 
+                参考如下实例：
+                add winsserver name="Local Area Connection" address=192.168.1.155 
+            上面的实例中，操作的网络接口为“本地区域连接”，并指定一个备用的WINS服务器，其IP地址为192.168.1.155。 
+            默认情况下，新添加的WINS服务器会添加到TCP/IP配置中WINS服务器列表的最后。如果需要其出现在WINS服务器列表中的特定位置，可以使用参数Index=。比如，如果需要附加的服务器出现在列表首部（即作为主WINS服务器），则应该将其索引设置为1，比如：
+                add winsserver name="Local Area Connection" address=192.168.1.155 index=1 
+        8.删除IPv4地址解析协议缓存
+            计算机查找IPv4地址的域名信息时，相关的信息会存储在地址解析协议（ARP）缓存中，以便在下次需要该信息时不需要再次查询。地址解析信息会根据接受该信息时的生存时间（TTL）设置来确定自身的过期期限，过期后，必须再次进行查询以便获取当前信息与新的TTL。通常，域名信息的这种自动化获取、清楚、更新机制可以正常运作。然而，有时候系统中的陈旧域名解析信息会在其清除之前造成问题。比如，如果计算机改变了自身的域名信息，但前次查询获取的域名信息与TTL尚未过期，则可能会导致暂时无法查找该计算机的情况。
+            DNS管理员有几个技巧可用于降低域名信息改变造成的不利影响，比如将TTL设置为逐渐变短，使其恰好赶在域名改变之前过期，以便确保陈旧信息尽快删除，防止出现问题。然而，更方便的方法实际上就是清除陈旧信息，并强制计算机进行新的DNS查询。为此，可以在命令行中键入netsh interface ipv4 delete arpcache，或者在Netsh Interface IPv4上下文中键入delete arpcache，这一命令将删除当前操作计算机上所有已配置的网络接口的名信息。如果计算机上有多个网络接口，而只需要清除某个接口上的名信息，则可以通过参数name=InterfaceName指定具体的网络接口，比如：
+                delete arpcache name="Local Area Connection" 
+        9.删除TCP/IPv4设置 
+            使用Netsh Interface IPv4上下文，也可以删除TCP/IPv4配置信息，表17-1根据待执行的具体任务分别总结了可用的命令。
+            表17-1 用于删除TCP/IPv4配置的Netsh Interface IPv4命令 
+            --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+            任务                                    |语法                                                          |实例
+            ----------------------------------------|-------------------------------------------------------------|-------------------------------------------------------------------
+            从指定的网络接口中删除指定的IP地址         |delete address name=(InterfaceName) address=(IPAddress)      |delete address name="Local Area Network" address=192.168.1.5 6
+            从指定的网络接口中删除一个静态的网关IPv4地址|delete address name=(InterfaceName) gateway=(GatewayAddress) |delete address name="Local Area Network" gateway=192.168.1.1 
+            从指定的网络接口中删除所有静态的网关IPv4地址|delete address name=(InterfaceName) gateway=(all)            |delete address name="Local Area Network" gateway=all 
+            从指定的网络接口中删除一台DNS服务器        |delete dnsserver name=(InterfaceName) address=(IPAddress)    |delete dnsserver name="Local Area Network" address=192.168.1.5 6
+            从指定的网络接口中删除所有DNS服务器        |delete dnsserver name=(InterfaceName) address=(all)          |delete dnsserver name="Local Area Network" address=all 
+            从指定的网络接口中删除一台WINS服务器       |delete winsserver name=(InterfaceName) address=(IPAddress)   |delete winsserver name="Local Area Network" address=192.168.1.5 6
+            从指定的网络接口中删除所有WINS服务器       |delete winsserver name=(InterfaceName) address=(all)         |delete winsserver name="Local Area Network" address=all 
+            --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    17.2.2配置IPv6
+        IPv6使用的是128位地址空间，128位地址被划分为8个16位地址块，之间由冒号分隔，每个地址块都由16进制表示。标准的单播IPv6地址的128位中，前64位代表的是网络ID，后面64位代表的是网络接口。比如，FEC0:0:0:0:02BC:FF:BECB:FE4F:961D。由于IPv6地址的很多地址块都设置为0，临近的0地址块可以表示为“：：”，在实际的地址中，并不适用这个双引号，上面给出的地址实例中，连续的两个0地址块就可以这样表示，压缩都的地址格式为FEC0::02BC:FF:BECB:FE4F:961D。3个或更多连续的0地址块也可以类似处理，比如，FFE8:0:0:0:0:0:0:1可以压缩为FFE8::1。 
+        1.设置IPv6地址
+            默认情况下，计算机已经自动设置了IPv6地址。使用IPv6的计算机连接到网络时，会发送一个链路本地多播请求，用来取回配置设置。使用IPv6的计算机也可以使用DHCPv6从DHCPv6服务器获取IPv6配置信息。在网络上配置DHCPv6服务器时，要指定DHCPv6如何为客户提供服务，但并不需要修改动态的客户端配置。典型情况下，自动分配的IPv6地址是链路本地地址，只能在本地网络上访问。
+            对需要可路由IPv6地址的计算机，需要为其指定静态的IPv6地址。设置静态IPv6地址时，还需要指定该地址是单播还是anycast。默认情况下为单播地址，主要有唯一本地单播与全局单播两种单播地址。唯一本地单播IPv6地址可以在内部网络上进行路由，但Internet上不可以访问。全局单播IPv6地址则可以在Internet上进行路由，比如为外部服务器分配这种地址。Anycast地址可以分配给多个网络接口，比如为计算机上所有网络接口分配同一个IPv6地址。
+            要指定静态IPv6地址，需要使用Netsh Interface IPv6上下文，命令为SET ADDRESS，语法格式如下： 
+                set address [interface=]InterfaceName address=IPAddress type=AddressType 
+            （注解  如果计算机在指定的网络接口上已经配置了IPv6地址，则使用SET ADDRESS命令会替代原来设置的值。要为该网络接口添加地面地址而不是替换原来的地址，可以使用ADD ADDRESS命令。）
+            在命令行中键入netsh interface ipv6 show addresses，或者在Netsh Interface IPv6上下文中键入show address，可以查看可用的网络接口及其当前配置。如下面实例所示，输出信息指定了可用的网络接口名及其当前配置： 
+                Interface 1: Loopback Pseudo-Interface 1
+                Addr Type    DAD State    Valid Life    Pref.Life    Address 
+                ---------    ---------    ----------    ---------    ----------------------
+                Other        Preferred    infinite      infinite     ::1
+                
+                Interface 7: Local Area Connection 
+                Addr Type    DAD State    Valid Life    Pref.Life    Address 
+                ---------    ---------    ----------    ---------    ----------------------
+                Other        Preferred    infinite      infinite     fe80::6712:1345:cc87:3829%7
+                
+                Interface 11: Local Area Connection * 8
+                Addr Type    DAD State    Valid Life    Pref.Life    Address 
+                ---------    ---------    ----------    ---------    ----------------------
+                Other        Preferred    infinite      infinite     fe80::5efe:192.168.1.101%11
+            （注解  支持IPv6的计算机将fe80::/64 link-local网络地址用于连接到网络（但没有IPv6路由器或DHCPv6服务器）的网络适配器。如果计算机上配置了多个网络接口，则会在IP地址后跟随一个百分号与数值。比如，%7会添加到Interface 7的输出中，%11会添加到Interface 11的输出中。）
+            参考如下实例：
+                set address interface="Local Area Connection" address=2001:1cb7::2b58:02bb:00ff:fe45:bc7d type=unicast 
+            上面的实例中，操作的网络接口为“本地区域连接”，设置的静态单播IPv6地址为2001:1cb7:2b58:02bb:00ff:fe45:bc7d。
+            （提示  在命令行中键入netsh interface ipv6 show addresses，或者在Netsh Interface IPv6上下文中键入show addresses，可以查看并确认刚才所作的配置。由于很多Interface IPv6与Interface IPv6 Show命令只有在本地工作时才是可用的，因此要使用这些命令，必须首先本地登录。）
+            在Netsh Interface IPv6 上下文中，使用ADD ADDRESS命令，可以为单一网络适配器指定多个IPv6地址，其语法格式类似于SET ADDRESS，如下所示：
+                add address [interface=]InterfaceName address=IPAddress type=AddressType 
+        2.设置IPv6地址使用的DNS服务器 
+        对使用静态IPv6地址的计算机，必须为其指定使用哪一个DNS服务器。这可以在Netsh Interface IPv6上下文中指定，其语法格式如下：
+            set dnsserver name=InterfaceName source=static address=DNSAddress register= 
+            参考如下实例：
+            set dnsserver name="Local Area Connection" source=static address=fec0:0:0:0:ffff::1
+        上面的实例中，操作的网络接口为“本地区域连接”，并指定DNS服务器的IP地址为fec0:0:0:ffff::1。 
+        配置静态的DNS服务器地址时，可以使用可选的register参数来控制DNS的登记。使用命令register=none可以禁用DNS的动态更新，使用register=primary可以将计算机的完整名在主域内登记（默认设置），使用命令register=both可以指定connection-specific DNS名应该以DNS以及主DNS的后缀登记。
+        如果计算机使用DHCPv6，并希望由DHCPv6提供DNS服务器地址，则可以提供DNS服务器地址，或指定从DHCPv6获取IPv6地址。要使得计算机从DHCPv6获取DNS服务器地址，可以使用如下命令：
+            set dnsserver name=InterfaceName source=dhcp 
+            参考如下实例：
+            set dnsserver name="Local Area Connection" source=dhcp 
+        上面的实例中，指定网络接口“本地区域连接”应该从DHCP获取DNS服务器地址设置。 
+        （注解  如果计算机已经设置了DNS服务器的IPv6地址，则SET DNSSERVER命令会替换现存值。如果希望添加DNS服务器的IP地址，而不是替换现存值，则可以使用命令ADD DNSSERVER，要确认DNS服务器的设置，可以键入命令show dnsservers。）
+        要通知计算机还有哪些可用的DNS服务器（除主DNS服务器之外），可以在Netsh Interface IPv6上下文中使用ADD DNSSERVER命令，其语法格式如下： 
+            add dnsserver  name=InterfaceName address=DNSAddress 
+            参考如下实例：
+            add dnsserver name="Local Area Connection" address=fec0:0:0:ffff::2
+        上面的实例中，操作的网络接口为“本地区域连接”，并指定一台备用的DNS服务器，其IP地址为fec0:0:0:ffff::2。 
+        默认情况下，新添加的DNS服务器会添加到TCP/IP配置中DNS服务器列表的最后。如果需要出现在DNS服务器列表中的特定位置，可以使用参数Index=。比如，如果㤇附加的服务器出现在列表首部（即作为主DNS服务器），则应该将其索引设置为1，比如：
+            add dnsserver name="Local Area Connection" address= fec0:0:0:ffff::2 index=1 
+    3.删除TCP/IPv6设置
+        使用Netsh Interface IPv6上下文，也可以删除TCP/IPv6配置信息，表17-2根据待执行的具体任务分别总结了可用的命令。
+        表17-2用于删除TCP/IPv6配置的NetshInterface IPv6命令
+        ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+        任务                               |语法                                                |实例
+        -----------------------------------|---------------------------------------------------|---------------------------------------------------------------------------------------------
+        从指定的网络接口中删除一个指定的IP地址|delete address name=InterfaceName address=IPAddress|delete address name="Local Area Network" address=2001:1cb7::2b58:02bb:00ff:fe45:bc7d 
+        从指定的网络接口中删除一台DNS服务器   |delete dns name=InterfaceName address=IPAddress    |delete dns name="Local Area Network" address=fec0:0:0:ffff::2
+        从指定的网络接口中删除所有DNS服务器   |delete dns name=InterfaceName address=all          |delete dns name="Local Area Network" address=all 
+        --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    
+17.3支持TCP/IP网络 
+    Netsh shell提供了两种用于操作TCP/IP的上下文：Interface IPv4上下文用于查看TCP/IPv4的统计资料并改变设置，Interface IPv6上下文用于查看TCP/IPv6的统计资料并改变设置。使用这些上下文的前提是计算机中已经安装了必要的TCP/IP网络组件，如果尚未安装，则需要先安装再操作。
+    17.3.1获取并保存TCP/IP设置 
+        如果用过Windows，你可能已经知道，在命令提示符中键入ipconfig，就可以获取IPv4与IPv6基本配置信息，比如：
+            Windows IP Configuration
+            Ethernet adapter Local AreaConnection：
+                Connection-specific DNS Suffix   ：
+                Link-local IPv6 Address          : fe80::6712:1345:cc87:3820%7
+                IPv4 Address                     : 192.168.1.101 
+                Subnet Mask                      : 255.255.255.0 
+                Default Gateway                  : 192.168.1.1 
+            Tunnel adapter Local Area Connecntion * 2:
+                Media State                      : Media disconnected 
+                Connection-specific DNS Suffix   :
+            
+            Tunnel adapter Local Area Connection * 8:
+                Connection-specific DNS Suffix   : 
+                Link-local IPv6 Address          : fe80::5efe:192.168.1.101%11
+                Default Gateway                  :
+        从上面可以看出，输出信息中包含了IPv6链路本地地址以及IPv4地址、子网掩码、以及本地局域连接以太网适配器的默认网关。如果需要获取更详尽的资料，可以使用命令ipconfig /add显示一些附加的信息，包括适配器的物理地址（MAC地址）、DHCP状态、使用的DNS服务器以及主机信息，比如：
+            Windows IP Configuration
+
+                Host Name:  salespc09
+                Primary Dns Suffic:  cpandl.com 
+                Node Type: Hybrid 
+                IP  Routing Enabled: No 
+                WINS Proxy Enbaled: No 
+            Ethernet adapter Local Area Connection:
+                Connection-specific DNS Suiifc    :
+                Description   : Intel(R) PRO 1000 PM Network Connection 
+                Physical Address    : EA-BF-C2-D4-EF-12
+                DHCP  Enabled    :  Yes 
+                Autoconfiguration Enabled    :  Yes 
+                Link-local IPv6 Address    :  fe80::6712:1345:cc87:3820%7(Preferred)
+                IPv4 Address    :  192.168.1.35(Preferred) 
+                Subnet Mask    :  255.255.255.0 
+                Lease Obtained    :Friday, April 04, 2009 9:37:43 AM 
+                Lease Expires     :Saturday, April 05, 2009 12:05:32 PM 
+                Default Gateway    : 192.168.1.1 
+                DHCP Server    :  192.168.1.50 
+                NetBIOS over Tcpip    :  Enabled 
+        从这些信息可以看出，完全限定域名为salespc09.cpandl.com配置为使用DHCP，IP地址为192.168.1.35，子网掩码255.255.255.0。由于IP地址是动态分配的，因此包含特定的Lease Obtained与Lease Expiration日期与时间戳。
+        如果在命令提示符中键入netsh interface ipv4 show config，可以获取类似的、缩略的IPv4配置信息，比如：
+            Configuration for interface  "Local Area Connection" 
+                DHCP enbaled : No 
+                IP Address: 192.168.1.50 
+                Subnet Prefix : 192.168.1.0/24(mask 255.255.255.0) 
+                Default Gateway: 192.168.1.50 
+                GatewayMetric: 256 
+                InterfaceMetric : 20 
+                Statically Configured DNS Servers: 127.0.0.1 
+                Register with which suffix: Primary only 
+                Statically Configured WINS Servers: None 
+        通过键入netsh interface ipv6 show addresses以及netsh interface ipv6 show dnsservers，可以获取基本的IPv6配置信息。上面给出的是获取TCP/IP配置信息的所有方法。
+        Netsh还提供了保存IPv4、IPv6配置信息的方法，这样只通过运行Netsh脚本就可以重建这些设置。如果需要将IPv4配置信息保存到一个文件，可以键入如下命令：
+            netsh interface ipv4 dump > FileName 
+        其中，FileName为待保存IPv4配置信息的文件名，命令清单17-1展示了一个IPv4配置文件实例：
+            命令清单17-1  IPv4配置脚本 
+                # ------------------------------
+                # IPv4 Configuration 
+                # ------------------------------
+                pushd interface ipv4 
+
+                set address name="Local Area Connection" source=static address=192.168.1.50 mask=255.255.255.0 
+                set address name="Local Area Connection" gateway=192.168.1.1 gwmetric=1 
+                set dnsserver name="Local Area Connection" source=static address=192.168.1.56 register=primary 
+                set winsserver name="Local Area Connection" source=static address=none 
+
+                popd 
+                # End of interface IPv4 configuration
+            命令清单17-1是一个Netsh脚本，可以通过如下的语法格式运行：
+                netsh -c "interface ipv4" -f FileName 
+                参考如下实例：
+                netsh -c "Interface ipv4" -f corpsvr02-ipconfig.txt 
+            这一实例中，使用Interface IPv4上下文运行一个名为corpsvr02-ipconfig.txt的Netsh脚本，以便应用其中定义的IPv4配置。创建配置脚本的关键原因是可以保存IP配置的备份。如果配置无意间被错误修改，就可以从脚本中恢复原始配置。
+    17.3.2检查IP地址与网络接口配置
+        Netsh Interface IPv4与Netsh Interface IPv6上下文提供了几条命令，可用于查看IP地址与网络接口的配置信息。这里，网络接口是指计算机用于TCP/IP的某个网络适配器。大多数计算机都有两个网络接口：一个本地回环网络接口，一个本地区域连接接口。
+        对IPv4，本地回环接口是一个伪接口，使用的IPv4地址为127.0.0.1，网络掩码为255.255.255.0。所有通过这一接口发送的IPv4信息都会回环到该计算机本身，而不会发送到网络上。
+        对IPv6，本地回环接口的IPv6地址为::1。所有通过这一接口发送的IPv6信息都会回环到该计算机本身，而不会发送到网络上。
+        安装TCP/IP网络时，本地区域连接网络接口是自动创建的，每个网络适配器都有这样一个接口。默认情况下，第一个接口命名为本地区域连接，第二个定义为本地区域连接2，依次类推。
+        在Windows命令行中，键入netsh interface ipv4 show global，可以查看IPv4的全局配置信息，其输出应该类似于如下格式：
+            General Global Parameters
+            -------------------------------------------------------------------
+            Default Hop Limit                : 128 hops 
+            Neighbor Cache Limit             : 256 entries per interface 
+            Route Cache Limit                : 128 entries per compartment 
+            Reassembly Limit                 : 27229728 bytes 
+            ICMP Redirects                   : ebabled 
+            Source Routing Behavior          : dontforward 
+            Task Offload                     : enabled 
+            Dhcp Media Sense                 : enbaled 
+            Media Sense Logging              : enabled 
+            MLD Level                        : all 
+            MLD Version                      : version3 
+            Multicase Forwarding             : disabled 
+            Group Forwarded Fragments        : disabled 
+            Randomize Identifiers            : enbaled 
+            Address Mask Reply               : disabled 
+            Current Global Statistics    
+            ------------------------------------------------------------------
+            Number of Compartments            : 1
+            Number of NL clients              : 7
+            Number of FL providers            : 4
+        上面的信息列出了计算机上配置的所有网络接口IPv4全局状态。默认的Hop Limit列出了数据包在网络上进行路由时的最大默认跳数，Reassembly Limit指定了IP数据报的最大重组尺寸。这一实例中，使用这一网络接口接收或发送的IP数据报最大重组尺寸为27229728字节，但实际上数据块一般不会以这个大小发送，而是进行分片发送，最后再重组为一个完整的IP数据包。稍后会详细讨论IP数据报分片问题。
+        使用netsh interface ipv4 show interfaces命令，可以查看计算机上网络接口的摘要信息，参考如下实例：
+            
