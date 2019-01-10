@@ -519,4 +519,227 @@
             · 已经接收的包含错误（入错误）的TCP段总是。
         2.操作UDP
             与面向连接的TCP协议不同的是，UDP是一种无连接的协议，也就是说，UDP消息发送之前并不需要预先建立连接。UDP端口与TCP端口是完全不同的，即便端口号是一样的。由于UDP消息没有序列号与应答消息，因此是不可靠的，而与之相反，TCP连接是非常可靠的。操作UDP协议时，只有一个本地地址与本地端口组合，代表的是被监听的端口。通过netsh interface ipv4 show udpconn命令，可以查看相关的监听条目，其输出信息类似于如下格式：
-                
+                MIB-II  UDP  Listener Entry 
+                Local Address        LocalPort 
+                -------------        ---------
+                0.0.0.0              42
+                0.0.0.0              445
+                0.0.0.0              500
+                0.0.0.0              1030
+                0.0.0.0              1032
+                0.0.0.0              1701
+                0.0.0.0              3002
+                0.0.0.0              3103
+                0.0.0.0              3114
+                0.0.0.0              4500
+                127.0.0.1            53
+                127.0.0.1            123
+                127.0.0.1            1036
+                127.0.0.1            3101
+                127.0.0.1            3102
+                192.168.1.50         53
+                192.168.1.50         67
+                192.168.1.50         137
+                192.168.1.50         138
+                192.168.1.50         389
+                192.168.1.50         464
+                192.168.1.50         2535
+            条目0.0.0.0代表的是UDP广播地址，条目127.0.0.1代表的是本地计算机使用的本地回环端口，网络适配器物理IP地址条目为用于监听连接的端口。
+            UDP消息是以IP数据报的形式发送的，其中包含了UDP头与UDP消息数据。通过netsh interface ipv4 show udpstats命令，可以查看附加的UDP统计消息，其输出应该类似于如下格式：
+                MIB-II  UDP  Statistics 
+                ---------------------------------------
+                In Datagrams:    42640 
+                In Ivalid Port : 732 
+                In Erroneous Datagrams: 20 
+                Out Datagrams:   72217 
+
+                UDP统计信息包括如下一些详细资料。
+                · UDP端口接收的数据报总数。
+                · 无效端口接收并丢弃的数据报总数。
+                · 接收并丢弃的含错数据报总数。
+                · 通过UDP端口发送的数据报总数。
+17.4排除TCP/IP网络故障
+    TCP/IP网络的问题可能是难以追寻的，这也是为什么会存在那么多工具来帮助确定问题的所在。在进行故障排除之前，要确保对17.3节中的概念与过程有清晰的理解和掌握，其中所讨论的工具与技术有助于发现与诊断一些最复杂的TCP/IP网络问题。除该节中的讨论之外，你也可以用本节中讨论的工具与技术来对网络联通性与配置问题进行故障排除。
+    17.4.1查看诊断信息
+        很多TCP/IP网络问题都与网络组件的不正确配置相关，要获取计算机网络配置与负载快照，最快、最简单的方法是使用Netsh Ras Diagnostics上下文中的命令。尽管这些命令的设计目标是对远程访问相关问题进行故障排除，但实际上也可以用于对一般性的网络问题进行故障排除。
+        Netsh Ras Diagnostics上下文提供了不同的Show命令（用于操作指定类型的诊断信息）与Set命令（用于配置诊断记录、追踪、报告）。然而，一般不会只关注某一个很狭窄的领域进行诊断，而是希望生成网络整体情况的诊断报告。为此，可以键入命令netsh ras disgnostics show all type=file destination=FileName verbose=enabled，其中，FileName为该命令将要生成的HTML文件名。
+        在IE中查看生成的诊断文件时，会发现几个日志的内容，包括远程访问踪迹日志、调制解调器踪迹日志、连接管理器日志、IPsec踪迹日志以及远程访问时间日志等。还可以看到对远程访问与网络必须组件是否安装的检查、已安装网络组件的详细列表、远程访问所用到的注册表键的当前值等信息。尽管存在这么多信息，但最应该集中关注的是如下一些命令行工具的输出信息。
+        · arp.exe -a，显示了地址解析协议的相关条目。
+        · ipconfig.exe /add，显示了所有网络接口的配置信息。
+        · ipconfig.exe /displaydns，显示了DNS解析器缓存中的内容。
+        · route.exe print，显示了IPv4与IPv6路由表的内容。
+        · net.exe start，列出所有运行中的Windows服务。
+        · netstat.exe -e，列出用于数据包传输的网络接口统计信息。
+        · netstat.exe -o，根据协议列出活跃连接，包括TCP连接与UDP连接。
+        · netstat.exe -s，列出IPv4、IPv6、ICMPv4、ICMPv6、TCP for IPv4、TCP for IPv6、UDP for IPv4、UDP for IPv6的摘要统计信息。
+        · netstat.exe -n，根据地址与端口列出活跃连接，包括TCP连接与UDP连接。
+        · nbtstat.exe -c，列出运行于TCP/IP之上的NetBIOS缓存内容。
+        · nbtstat.exe -n，列出本地NetBIOS名。
+        · nbtstat.exe -r，列出了由广播与WINS解析的名。
+        · nbtstat.exe -S，列出了NetBIOS会话表及其目的IP地址。
+        · netsh.exe dump，对网络配置信息进行完全的转储。转储文件可用于查看网络配置，或以后用于重建网络配置。
+        （注解  这些命令可以在命令提示符中直接运行，但要记住的是，通过Netsh，可以对网络中存在的问题进行远程故障排除，而不是必须物理接触该计算机或者通过远程桌面登录该计算机--只需要启动Netsh并使用-R参数指定远程计算机名，就可以着手诊断存在的问题了。）
+    17.4.2诊断常规的计算机配置问题
+        作为故障诊断排除工作的一部分，你可能需要查看计算机与操作系统的详细配置信息。对此，最佳的一个途径就是访问WMI对象（用于追踪相关的配置设置信息）。比如，win2_ComputerSystem对象用于追踪计算机整体配置信息，Win32_OperatingSystem对象用于追踪操作系统整体配置信息。
+        Windows PowerShell是可用于操作WMI的一种途径。在Windows PowerShell中，可以使用Get-WMIObject来获取待操作的WMI对象。通过将对象重定向到Format-List*，可以列出对象的所有属性与值。操作WMI对象时，可能需要操作根命名空间，这可以通过将-Namespace参数设置为root/cimv2实现。通过-Computer参数，可以指定待操作的计算机。如果待操作的是本地计算机，则可以使用句点（.）而非计算机名来指定。
+        在Windows PowerShell提示符中，输入如下命令，可以检查Win32_ComputerSystem对象及其属性，来获取计算机配置相关的摘要信息：
+            Get-WmiObject -Class Win32_ComputerSystem -Namespace root/cimv2 -ComputerName . | Format-List * 
+        如果想将输出信息保存到某个文件，只需将输出信息重定向到该文件即可。下面的实例中，将输出信息重定向到工作目录下一个名为computer_save.txt的文件中：
+            Get-WmiObject -Class Win32_ComputerSystem -Namespace root/cimv2 -ComputerName . | Format-List * > computer_save.txt 
+        命令清单17-2列出了由上面命令获取的详细的计算机信息。
+            命令清单17-2  计算机配置信息
+                AdminPasswordStatus     : 1
+                BootupState             : Normal boot 
+                ChassisBootupState      : 3 
+                KeyboardPasswordStatus  : 2 
+                PowerOnPasswordStatus   : 1 
+                PowerSupplyState        : 3
+                PowerState              : 0 
+                FrontPanelResetStatus   : 3 
+                ThermalState            : 3 
+                Status                  : OK 
+                Name                    : MAILSERVER25 
+                PowerManagementCapabilities : 
+                PowerManagementSupported  : 
+                __GENUS                 : 2 
+                __CLASS                 : Win32_ComputerSystem 
+                __SUPERCLASS            : CIM_UnitaryComputerSystem 
+                __DYNASTY               : CIM_ManagedSystemElement 
+                __RELPATH               : Win32_ComputerSystem.Name="MAILSERVER25" 
+                __PROPERTY_CONUT        : 58 
+                __DERIVTION             : {CIM_UnitaryComputerSystem,CIM_ComputerSystem,CIM_System,CIM_LogicalElement...}
+                __SERVER                : MAILSERVER25 
+                __NAMESPACE             : root\cimv2
+                __PATH                  : \\MAILSERVER25\root\
+                cimv2:Win32_ComputerSystem.Name="MAILSERVER25"
+                AutomaticManagedPagefile : True 
+                AutomaticResetBootOption : True 
+                AutomaticResetCapability : True 
+                BootOptionOnLimit        : 
+                BootOptionOn WatchDog    : 
+                BootROMSupported         : True 
+                Caption                  : MAILSERVER25 
+                CreateionClassName       : Win32_ComputerSystem 
+                CurrentTimeZone          : -400 
+                DaylightInEffect         : True 
+                Description              : AT/AT COMPATIBLE 
+                DNSHostName              : MAILSERVER25 
+                Domain                   : cpandl.com 
+                DomainRole               : 5 
+                EnableDaylightSavingsTime : True 
+                InfraredSupported         : False 
+                InitialLoadInfo           : 
+                InstallDate               : 
+                LastLoadInfo              : 
+                Manufacturer              : Dell Inc. 
+                Model                     : Dimension XP5 
+                NameFormat                : 
+                NetworkServerModeEnabled  : True 
+                NumberOfLogicalProcessors : 2
+                NumberOfProcessors        : 1 
+                OEMLogoBitmap             : 
+                OEMStringArray            : {www.dell.com} 
+                PartOfDomain              : True 
+                PauseAfterReset           : -1 
+                PCSystemType              : 5 
+                PrimaryOwnerContact       : 
+                PrimaryOwnerName          : Windows User 
+                ResetCapability           : 1 
+                ResetCount                : -1 
+                ResetLimit                : -1 
+                Roles                     : {LM_Workstation, LM_Server, Primary_Domain_Controller, Timesource...} 
+                SupportContextDescrition  : 
+                SystemStartupDelay        : 
+                SystemStartupOptions      : 
+                SystemStartupSetting      : 
+                SystemType                : x64-based PC 
+                TotalPhysicalMemory       : 3755343872 
+                UserName                  : CPANDL\williams 
+                WakeUpType                : 6 
+                Workgroup                 : 
+                Scope                     : System.Management.ManagementScope 
+                Path                      : \\Server52\root\cimv2:
+                Win32_ComputerSystem.Name="Server52" 
+                Options                   : System.Management.ObjectGetOptions 
+                ClassPath                 : \\Server52\root\cimv2:Win32_ComputerSystem 
+                Properties                : {AdminPasswordStatus...} 
+                SystemProperties          : {__GENUS, __CLASS, __SUPERCLASS...} 
+                Qualifiers                : {dynamic, Locale, provider, UUID} 
+                Site                      : 
+                Container                 : 
+        表17-4对输出信息中相应配置条目及其含义进行了总结。
+            表17-4  计算机配置条目及其含义
+                ----------------------------------------------------------
+                属性                     | 描述
+                -------------------------|--------------------------------------------
+                AdminPasswordStatus      | 管理员口令状态。值1代表禁用，值2代表激活，值3代表未实现，值4代表未知
+                AutomaticManagedPagefile | 指明该计算机的页面文件是否由操作系统来管理
+                AutomaticResetBootOption | 指明自动重设引导选项是否激活
+                AutomaticResetCapability | 指明自动重设是否激活
+                BootOptionOnLimit        | 达到ResetLimit值时采取的系统动作。1代表保留，2代表操作系统，3代表系统工具，4代表不重新引导
+                BootOptionOnWatchDog     | 在观测的计时器时间已到时采取的重新引导操作。1代表保留，2代表操作系统，3代表系统工具，4代表不重新引导
+                BootROMSupported         | 指明是否支持引导ROM
+                BootupState              | 指明系统启动方式。值包括正常引导、安全模式引导、带网络连接的安全模式引导
+                Caption                  | 系统名
+                ChassisBootupState       | 系统机箱的启动状态。值为1代表其他，2代表未知，3代表安全，4代表警告，5代表关键，6代表不可恢复
+                ClassPath                | WMI对象类路径
+                Container                | 与对象相关联的容器
+                CreationClassName        | 导出对象的类名
+                CurrentTimeZone          | 计算机从协调世界时偏离的分钟数
+                DaylightInEffect         | 指明是否激活夏时制模式
+                Description              | 计算机的描述信息
+                DNSHostName              | 根据DNS获取的服务器名
+                Domain                   | 计算机所属域的域名
+                DomainRole               | 计算机的域角色。0代表独立工作站，1代表成员工作站，2代表独立服务器，3代表成员服务器，4代表备份域控制器，5代表主域控制器
+                EnableDaylightSavingTime | 指明是否激活了夏令时时间。如果取值为TRUE，则系统会改变为DST启动或终止后的前一个小时或后一个小时。如果取值为FALSE，则不做这种改变
+                FrontPanelResetStatus    | 计算机上重置按钮的硬件安全设置。0代表禁用，1代表激活，2代表未实现，3代表未知
+                InfraredSupported        | 指明计算机上是否存在红外（IR）端口
+                InitialLoadInfo          | 发现初始负载设备或引导服务（用来请求操作系统启动）必须的数据
+                InstallDate              | 计算机的安装时间
+                KeyboardPasswordStatus   | 指明键盘口令状态。0代表禁用，1代表激活，2代表未实现，3代表未知
+                LastLoadInfo             | InitialLoadInfo属性的数组条目，其中保存了引导当前加载的操作系统的相应数据
+                Manufacturer             | 计算机制造商名
+                Model                    | 制造商给定的产品名
+                Name                     | 计算机名
+                NameFormat               | 识别计算机系统名是如何生成的
+                NetworkServerModeEnabled | 指明是否激活了网络服务器模式
+                NumberOfLogicalProcessors| 处理器核的数量。如果计算机有两个处理器，每个处理器有4个核，则逻辑处理器数量为8。如果计算机是超线程体系结构，则逻辑处理器的数量也可能超过实例处理器的数量
+                NumberOfProcessors       | 计算机上激活的处理器数
+                OEMLogoBitmap            | 标识OEM的logo的位图
+                OEMStringArray           | 列出OEM设置的描述性的字符串
+                PartOfDomain             | 指明计算机是否为某个域的一部分。如果值为TRUE，则该计算机属于某个域。如果值为FALSE，则计算机属于某个工作组
+                Options                  | 列出了管理对象选项
+                Path                     | 标识对象类的全WMI路径
+                PauseAfterReset          | 
+                PCSystemType             | 
+                PowerManagementCapabilities|
+                PowerManagementSupported | 
+                PowerOnPasswordStatus    | 
+                PowerState               | 
+                PowerSupplyState         | 
+                PrimaryOwnerContact      | 
+                PrimaryOwnerName         | 
+                Properties               | 
+                Qualifiers               | 
+                ResetCapability          | 
+                ResetCount               | 
+                ResetLimit               | 
+                Roles                    | 
+                Scope                    | 
+                Site                     | 
+                Status                   | 
+                SupportContectDescription| 
+                SystemProperties         | 
+                SystemStartupDelay       | 
+                SystemStartupOptions     | 
+                SystemStartupSetting     | 
+                SystemType               | 
+                ThermalState             | 
+                TotalPhysicalMemory      | 
+                UserName                 | 
+                WakeUpType               | 
+                Workgroup                | 
+                -------------------------------------------------------------------------
+        可以看出，通过这些详细的配置信息，可以获知计算机的配置情况。对操作系统同样如此，在Windows PowerShell提示符中，输入如下命令，可以获取操作系统详细资料：
+            Get-WmiObject -Class Win32_OperatingSystem -Namespace root/cimv2 -ComputerName . | Format-List * 
+        命令清单17-3列出了上面命令的输出信息实例。与此前讨论的一样，你可以将这些输出信息重定向保存到相应文件中。
