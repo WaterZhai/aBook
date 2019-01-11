@@ -1,0 +1,45 @@
+附录A  基本命令行工具参考
+
+本书讨论了很多命令行工具与脚本，本附录提供了关于这些工具语法与用途的简明参考，也包含了很多本书未曾讲解但很有用的其他工具。且这些工具以工具名的字母先后顺序列出。除非特别提及，这些工具在Windows Server 2008与Windows Vista上的用法与工作方式是一致的。此外，如果某个工具没有同时包含在这两个版本的操作系统中吗，则会给出该工具的出处，比如“仅适用于Windows Server 2008”的含义是，默认情况下，该工具只在Windows Server 2008中可用。
+
+ARP
+显示与修改地址解析协议（ARP）使用的IP地址到网卡物理地址之间的转换表。
+    arp -a [inet_addr] [-N if_addr] 
+    arp -d inet_addr [if_addr] 
+    arp -s inet_addr eth_addr [if_addr] 
+
+ASSOC
+显示与修改文件扩展关联
+    assoc [.exe[=[fileType]]] 
+
+ATTRIB
+显示与修改问价你属性
+    atttrib [+r|-r] [+a|-a] [+h|-h] [+i|-i] [[drive:] [path] filename] [/s] [/d] [/l]
+
+BCDEDIT
+显示与管理引导配置数据（BCD）库文件
+    bcdedit /command [options] 
+    bcdedit [/v] 
+    通过Bcdedit，可以使用如下一些命令。
+    · /bootdebug。激活或禁用引导应用程序的引导调试。
+    · /boottems。激活或急用引导应用程序的应急管理服务。
+    · /bootsqquence、为引导管理器设置一次性的引导顺序。
+    · /copy。复制BCD库中的条目。
+    · /create。在BCD库中创建新条目。
+    · /createstore。创建新（空）引导配置数据库文件。
+    · /dbgsettings。设置全局调试器参数。
+    · /debug。激活或引用操作系统条目的内核调试。
+    · /default。设置引导管理器的默认条目。
+    · /delete。从BCD库中删除相应条目。
+    · /deletevalue。从BCD库中删除相应条目选项。
+    · /displayorder。设置引导管理器小时可用操作系统的顺序。
+    · /ems。为操作系统条目激活或禁用应急管理服务。
+    · emssettings。设置全局应急管理服务参数。
+    · /enum。列出库中的条目。
+    · /export。将系统库中的内容导出到文件，该文件可用于恢复操作系统库的状态
+    · /import。使用由/export命令创建的备份文件恢复操作系统库的状态
+    · /set。设置BCD库中的条目选项值。
+    · /timeout。设置引导管理器的超时值
+    · /toolsdisplayorder。设置引导管理器显示工具菜单的顺序。
+
+CACLS
