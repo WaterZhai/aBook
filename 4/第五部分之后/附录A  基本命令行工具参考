@@ -43,3 +43,232 @@ BCDEDIT
     · /toolsdisplayorder。设置引导管理器显示工具菜单的顺序。
 
 CACLS
+该命令已经过时，参见ICACLS
+
+CALL
+以过程的形式调用脚本或脚本标记
+    call [drive:] [path] filename [batch=parameters] 
+    call :label [args]
+
+CD 
+显示目录名或切换当前目录
+    chdir [/d] [drive:] [path]
+    chdir [...] 
+    cd [/d] [drive:] [path]
+    cd [...]
+
+CHDIR 
+参见CD。
+
+CHKDSK
+检查磁盘的错误并显示报告
+    chkdsk [drive:] [[path] filename] [/f] [/v] [/r] [/x] [/i] [/c] [/l [:size]] [/b] 
+
+CHKNTFS
+显示卷状态，在计算机启动时设置或排除一些系统自动检测过程中涉及到的卷。
+    chkntfs [/x | /c] volume: [...] 
+    chkntfs /t[:time] 
+    chkntfs /d 
+
+CHOICE
+创建一个选择列表，通过该列表，用户可以在批处理脚本中选择相应的选项。
+    choice [/c choices] [/n] [/cs] [/t nnnn /d choice] [/m "text"] 
+
+CIPHER
+显示当前的加密状态，或在NTFS卷上修改文件夹与文件加密。
+    cipher [/e | /d | /c] [/s:dir] [/b] [/h] [[path] filename [...]] 
+    cipher [/k | /r:filename | /w:dir] 
+    cipher /u [/n] 
+    cipher /x[:efsfile] [filename] 
+    cipher /y 
+    cipher /adduser [/certhash:hash | /certfile:filename] [/s:dir] [/b] [/h] [pathname [...]] 
+    cipher /removeuser /certhash:hash [/s:dir] [/b] [/h] [pahtname [...]] 
+    cipher /rekey [pathnaem [...]] 
+
+CLIP
+与管道技术类似，键命令行工具的输出重定向到写字板。
+    [command |] clip 
+    clip < filename.txt 
+    （注解  本实例中，符号|为管道符号）
+
+CLS 
+清空控制台窗口
+    cls 
+
+CMD 
+启动一个新的命令shell实例。
+    cmd [/a | /u] [/q] [/d] [/e:on | /e:off] [/t:{bf | f}] [/f:on | /f:off] [/v:on | /v:off] [[/s] [/c | /k] string] 
+
+CMDKEY
+创建与管理存储的用户名与口令。
+    cmdkey [{/add | /generic}:targetname {/smartcard | /user:user@domain {/pass{:pwd}}} | /delete{:targetname} | /ras | /list{:targetname}] 
+
+COLOR
+设置命令shell窗口的颜色。
+    color [[b]f]
+
+COMP
+比较两个文件或文件集的内容。
+    comp [data1] [data2] [/d] [/a] [/l] [/n=number] [/c] [/offline] 
+
+COMPACT
+在NTFS分区上显示或修改问价压缩。
+    compact [/c | /u] [/s[:dir]] [/a] [/i] [/f] [/q] [filename [...]] 
+
+CONVERT 
+将FAT或FAT32卷转换为NTFS格式。
+    convert volume /fs:NTFS [/v] [/x] [/cvtarea:filename] [/nosecurity] 
+
+COPY 
+复制或合并文件
+    copy [/d] [/v] [/n] [/y|/-y] [/z] [/l] [/a|/b] source [/a | /b] [+ source [/a | /b] [+ ...]] [destination [/a | /b]] 
+
+DATE 
+显示或设置系统日期。
+    date [/T | mm-dd-yy] 
+
+DCDIAG 
+在域控制器上执行诊断性测试。
+    dcdiag [/s:Server[:LDAPPort]] [/u [Domain\]UserName] [/p {Password | * | ""}] [/h | /?] [/xsl] [/a | /e] [/I] [/fix] [/c] [/q | /v] [/n:NumberContext] [/skip:TestName] [/test:TestName] [/f:textlogname] [/x:xmllogname] 
+    该命令仅适用于Windows Server 2008。 
+
+DCGPOFIX
+恢复默认的组策略对象。
+    dcgpofix [/ignoreschema] [/target: {domain | dc | both}] 
+    该命令仅适用于Windows Server 2008。
+
+DEFRAG
+对硬盘驱动器进行碎片整理。
+    defrag volume [/a] [/v] 
+    defrag [volume | -c] [{-r | -w}] [-f] [-v] 
+    只能在管理员命令提示符下运行该命令。
+
+DEL 
+删除一个或多个文件。
+    del [/p] [/f] [/s] [/q] [/a[[:]attributes]] [drive:] [path]filename[...] 
+
+DIR 
+显示目录内的文件与子目录列表。
+    dir [drive:][path][filename] [/a[[:]attributes]] [/b] [/c] [/d] [/l] [/n] [/o[[:]sortorder]] [/p] [/q] [/r] [/s] [/t[[:]timefield]] [/w] [/x] [/4] 
+
+DSIKCOMP
+比较两个软盘的内容。
+    diskcomp [drive1: [drive2:]] 
+
+DISKCOPY 
+将一个软盘的内容复制到另外的软盘。
+    diskcopy [drive1: [drive2:]] [/v] 
+
+DISKPART
+调用一个文本模式的命令解释器，来使用单独的命令提示符管理磁盘、分区与卷，以及DISKPART的内部命令。
+    diskpart 
+    （更多信息  第10章、第11章、第12章都有部分内容讲解了如何使用DISKPART。如果在非管理员权限的命令提示符中运行DISKPART，会收到提示信息，声称DISKPART必须在管理员权限的命令提示符中运行。用于Windows Vista SP1与Windows Server 2008 RTM的DISKPART对Windows Vista RTM中国的DISKPART进行了修订，且修订中包含SAN与UNIQUED两个附加的命令。）
+
+DOSKEY
+编辑命令行，重新调用命令行。创建宏。
+    doskey [/reinstall] [/listsize=size] [/macros[:all | :exename]] [/history] [/insert | /overstrike] [/exename=exename] [/macrofile=fname] [macroname=[text]] 
+
+DRIVERQUERY 
+显示所有已安装设备驱动程序及其属性列表。
+    driverqurey [/s computer [/u [domain\]user [/p [pwd]]]] [/fo {table| list | csv}] [/nh] [/v] [/si] 
+
+DSADD COMPUTER 
+在活动目录服务中创建一个计算机帐号。
+    dsadd computer ComputerDN [-samid SAMName] [-desc Description] [-loc Location] [-memberof GroupDN ...] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-q] [{-uc | -uco | -uci}] 
+    如果Windows Server 2008管理工具包已经安装，则该命令在Windows Vista Business及其后续版本中是可用的。
+
+DSADD GROUP 
+在活动目录中创建一个组帐号。
+    dsadd group GroupDN [-secgrp {yes | no}] [-scope {l | g | u}] [-samid SAMName] [-desc Description] [-memberof Group ...] [-members Member ...] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-q] [{-uc | -uco | -uci}] 
+    如果Windows Server 2008管理工具包已经安装，则该命令在Windows Vista Business及其后续版本中是可用的。 
+
+DSADD USER 
+在活动目录中创建一个用户。
+    dsadd user UserDN [-samid SAMName] [-upn UPN] [-fn FirstName] [-mi Initial] [-ln LastName] [-display DisplayName] [-empid EmployeeID] [-pwd {Password | *}] [-desc Description] [-memberof Group ...] [-office Office] [-tel PhoneNumber] [-email EmailAddress] [-hometel HomePhoneNumber] [-pager PagerNumber] [-mobile CellPhoneNumber] [-fax FaxNumber] [-iptel IPPhoneNumber] [-webpg WebPage] [-title Title] [-dept Department] [-company Company] [-mgr Manager] [-hmdir HomeDirectory] [-mustchpwd {yes | no}] [-canchpwd {yes | no}] [-acctexpires NumberOfDays] [-disabled {yes | no}] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-q] [{-uc | -uco | -uci}] [-fnp FirstNamePhonetic] [-lnp LastNamePhonetic] [-displayp DisplayNamePhonetic] 
+    如果Windows Server 2008管理工具包已经安装，则该命令在Windows Vista Business及其后续版本中是可用的。 
+
+DSGET COMPUTER 
+使用两种语法格式显示计算机帐号的属性，查看多台计算机属性的语法格式为：
+    dsget computer ComputerDN ... [-dn] [-samid] [-sid] [-desc] [-loc] [-disabled] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-c] [-q] [-l] [{-uc | -uco | -uci}] [-part PartitionDN [-qlimit] [-quserd]] 
+    查看一个计算机成员信息的语法格式为：
+    dsget computer ComputerDN [-memberof [-expand]] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-c] [-q] [-l] [{-uc | -uco | -uci}]
+    如果Windows Server  2008管理工具包已经安装，则该命令在Windows Vista Business及其后续版本中是可用的。
+
+DSGET GROUP 
+使用两种语法格式显示组帐号的属性，查看多个组属性的语法格式为：
+    dsget group GroupDN ... [-dn] [-samid] [-sid] [-desc] [-secgrp] [-scope] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-c] [-q] [-l] [{-uc | -uco | -uci}] [-part PartitionDN [-qlimit]] [-quserd] 
+    查看一个组成员信息的语法格式为：
+    dsget group GroupDN [{-memberof | -members} [-expand]] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-c] [-q] [-l] [{-uc | -uco |-uci}] 
+    如果Windows Server 2008管理工具包已经安装，则该命令在Windows Vista Business及其后续版本中是可用的。
+
+DSGET SERVER 
+使用3种语法格式显示域控制器的属性，显示指定域控制器常规属性的语法格式：
+    dsget server ServerDN ... [-dn] [-desc] [-dnsname] [-site] [-isgc] [{-s Server | -d Doamin}] [-u UserName] [-p {Password | *}] [-c] [-q] [-l] [{-uc | -uco |-uci}] 
+    显示安全主体（在指定域控制器上拥有最大数量目录对象）列表的语法格式为：
+    dsget server ServerDN [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-c] [-q] [-l] [{-uc | -uco | -uci}] [-topobjowner NumbertoDisplay] 
+    显示指定域控制器上目录分区区分名的语法格式为：
+    dsget server ServerDN [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-c] [-q] [-l] [{-uc | -uco |-uci}] [-part] 
+    如果Windows Server 2008管理工具包已经安装，则该命令在Windows Vista Business及其后续版本中是可用的。 
+
+DSGET USER 
+使用两种语法格式显示用户账号的属性，查看多个用户属性的语法格式为：
+    dsget user UserDN ... [-dn] [-samid] [-sid] [-upn] [-fn] [-mi] [-ln] [-display] [-fnp] [-lnp] [-displayp] [-effectivepso] [-empid] [-desc] [-office] [-tel] [-email] [-hometel] [-pager] [-mobile] [-fax] [-iptel] [-webpg] [-title] [-dept] [-company] [-mgr] [-hmdir] [-hmdrv] [-profile] [-loscr] [-mustchpwd] [-canchpwd] [-pwdneverexpires] [-disabled] [-acctexpires] [-reversiblepwd] [{-uc | -uco | -uci}] [-part PartitionDN [-qlimit] [-qused]] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-c] [-q] [-l] 
+    查看用户组成员关系信息的语法格式为：
+    dsget user UserDN [-memberof [-expand]] [{-uc | -uco | -uci}] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-c] [-q] [-l] 
+    如果Windows Server 2008管理工具包已经安装，则该命令在Windows VistaBusiness及其后续版本中是可用的。
+
+DSMGMT
+调用一个文本模式的命令解释器，以便使用单独的命令提示符管理目录服务以及DSMGMT的内部命令。
+    dsmgmt
+
+DSMOD COMPUTER 
+修改目录中一个或多个计算机帐号的属性。
+    dsmod computer ComputerDN ... [-desc Description] [-loc Location] [-disabled {yes | no}] [-reset] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-c] [-q] [{-uc | -uco | -uci}] 
+    如果Windows Server 2008管理工具包已经安装，则该命令在Windows Vista Business及其后续版本中是可用的。 
+
+DSMOD GROUP 
+修改目录中一个或多个组帐号的属性。
+    dsmod group GroupDN ... [-samid SAMName] [-desc Description] [-secgrp {yes | no}] [-scope {l | g | u}] [{-addmbr | -rmmbr | -chmbr} MemberDN ...] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-c] [-q] [{-uc | -uco | -uci}] 
+    如果Windows Server 2008管理工具包已经安装，则该命令在Windows Vista Business及其后续版本中是可用的。 
+
+DSMOD SERVER 
+修改域控制器的属性。
+    dsmod server ServerDN ... [-desc Description] [-isgc {yes | no}] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-c] [-q] [{-uc | -uco | -uci}] 
+    如果Windows Server 2008管理工具包已经安装，则该命令在Windows Vista Business及其后续版本中是可用的。 
+
+DSMOD USER 
+修改目录中一个或多个用户账号的属性。
+    dsmod user UserDN ... [-upn UPN] [-fn FirstName] [-mi Initial] [-ln LastName] [-display DisplayName] [-empid EmployeeID] [-pwd {Password | *}] [-desc Description] [-office Office] [-tel PhoneNumber] [-email EmailAddress] [-hometel HomePhoneNumber] [-pager PagerNumber] [-mobile CellPhoneNumber] [-fax FaxNumber] [-iptel IPPhoneNumber] [-webpg WebPage] [-title Title] [-dept Department] [-company Company] [-mgr Manager] [-hmdir HomeDiractory] [-hmdrv DriveLetter:] [-profile ProfilePath] [-loscr ScriptPath] [-mustchpwd {yes | no}] [-canchpwd {yes | no}] [-reversiblepwd {yes | no}] [-pwdneverexpires {yes | no}] [-acctexpires NumberOfDays] [-disabled {yes | no}] [{-s Server | -d Domain}] [-u UserName] [-p {Password | *}] [-c] [-q] [{-uc | -uco | -uci}] [-fnp FirstNamePhonetic] [-lnp LastNamePhonetic] [-displayp DisplayNamePhonetic] 
+    如果Windows Server 2008管理工具包已经安装，则该命令在Windows Vista Business及其后续版本中是可用的。 
+
+DSMOVE
+移动活动目录对象或其重命名。
+    dsmove objectdn [-newname newname] [-newparent parentdn] [{-s Server | -d domain}] [-u username] [-p {password | *}] [-q] [{-uc | -uco | -uci}] 
+    如果Windows Server 2008管理工具包已经安装，则该命令在Windows Vista Business及其后续版本中是可用的。 
+
+DSQUERY COMPUTER 
+搜索匹配特定标准的计算机帐号。
+    dsquery computer [{startnode | forestroot | domainroot}] [-o {dn | rdn |samid}] [-scope {subtree | onelevel |base}] [-name name] [-desc description] [-samid samname] [-inactice numberofweeks] [-stalepwd numberofdays] [-disabled] [{-s server | -d domain}] [-u username] [-p {passwrod | *}] [-q] [-r] [-gc] [-limit numberofobjects] [{-uc | -uco | -uci}] 
+    如果Windows Server 2008管理工具包已经安装，则该命令在Windows Vista Business及其后续版本中是可用的。 
+
+DSQUERY CONTECT 
+搜索匹配特定标准的联系人。
+    dsquery contect [{startnode | forestroot | domainroot}] [-o {dn | rdn}] [-scope {subtree | onelevel | base}] [-name name] [-desc description] [{-s server | -d domain}] [-u username] [-p {password | *}] [-q] [-r] [-gc] [-limit numberofobjects] [{-uc | -uco | -uci}] 
+    如果Windows Server 2008管理工具包已经安装，则该命令在Windows Vista Business及其后续版本中是可用的。 
+
+DSUQERU GROUP
+搜索匹配特定标准的组帐号。
+    dsquery group [{startnode | forestroot | domainroot}] [-o {dn | rdn | samid}] [-scope {subtree [onelevel | base]}] [-name name] [-desc description] [-samid SAMName] [{-s Server | -d domain}] [-u username] [-p {password | *}] [-q] [-r] [-gc] [-limit numberofobjects] [{-uc | -uco | -uci}] 
+    如果Windows Server 2008管理工具包已经安装，则该命令在Windows Vista Business及其后续版本中时可用的。 
+
+DSQUERY PARTITION 
+搜索匹配特定标准的活动分区。
+    dsquery partition [-o {dn | rdn}] [-part filter] [-desc description] [{-s Server | -d domain}] [-u username] [-p {password | *}] [-q] [-r] [-limit numberofobjects] [{-uc | -uco | -uci}] 
+    如果Windows Server 2008管理工具包已经安装，则该命令在Windows Vista Business及其后续版本中时可用的。 
+
+DSQUERY　QUOTA 
+搜索匹配特定标准的磁盘配额。
+    dsquery quota {domainroot | objection} [-o {dn | rdn}] [-acct name] [-qlimit filter] [-desc description] [{-s server | -d domain}] [-u username] [-p {password | *}] [-q] [-r] [-limit numberofobjects] [{-uc | -uco | -uci}] 
+    如果Windows Server 2008管理工具包已经安装，则该命令在Windows Vista Business及其后续版本中是可用的。 
+
+DSQUERY SERVER 
