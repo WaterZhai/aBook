@@ -272,3 +272,475 @@ DSQUERY　QUOTA
     如果Windows Server 2008管理工具包已经安装，则该命令在Windows Vista Business及其后续版本中是可用的。 
 
 DSQUERY SERVER 
+搜索匹配特定标准的域控制器。
+    dsquery server [-o {dn | rdn}] [-forest] [-domain domainname] [-site sitename] [-name name ] [-desc description] [-hasfsmo {schema | name | infr | pdc | rid }] [-isgc] [-isreadonly] [{-s server | -d domain}] [-u username] [-p {password | *}] [-q] [-r] [-gc] [-limit numberofobjects] [{-uc | -uco | -uci}] 
+    如果Windows Server 2008管理工具包已经安装，则该命令在Windows Vista Business及其后续版本中是可用的。 
+
+DSQUERY SITE 
+搜索匹配特定标准的活动目录站点。
+    dsquery site [-o {dn | rdn}] [-name name] [-desc description] [{-s server | -d domain}] [-u username] [-p {password | *}] [-q] [-r] [-gc] [-limit numberofobjects] [{-uc | -uco | -uci}] 
+    如果Windows Server 2008管理工具包已经安装，则该命令在Windows Vista Business及其后续版本中是可用的。 
+
+DSQUERY USER 
+搜索匹配特定标准的用户账号。
+    dsquery user [{startnode | forestroot | domainroot}] [-o {dn | rdn | upn |samid}] [-scope {subtree | onelevel | base}] [-name name] [-namep namephonetic] [-desc description] [-upn upn] [-samid samname] [-inactive numberofweeks] [-stalepwd numberofdays] [-disabled] [{-s server | -d domain}] [-u username] [-p {password | *}] [-q] [-r] [-gc] [-limit numberofobjects] [{-uc | -uco | -uci}] 
+    如果Windows Server 2008管理工具包已经安装，则该命令在Windows Vista Business及其后续版本中是可用的。 
+
+DSQUERY * 
+搜索匹配特定标准的任意活动目录对象。
+    dsquery * [{startnode | forestroot | domainroot}] [-scope {subtree | onelevel | base}] [-filter ldapfilter] [-attr {attributelist | *}] [-attrsonly] [-l] [{-s server | -d domain}] [-u username] [-p {password | *}] [-q] [-r] [-gc] [-limit numberofobjects] [{-uc | -uco | -uci}] 
+    如果Windows Server 2008管理工具包已经安装，则该命令在Windows Vista Business及其后续版本中是可用的。 
+
+DSRM 
+删除活动目录对象。
+    dsrm objectdn ... [-subtree [-exclude]] [-noprompt] [{-s server | -d domain}] [-u username] [-p {password | *}] [-c] [-q] [{-uc | -uco | -uci}] 
+    如果Windows Server 2008管理工具包已经安装，则该命令在Windows Vista Business及其后续版本中是可用的。 
+
+ECHO
+显示消息，或者打开/关闭命令回显。
+    echo [on | off] 
+    echo [message] 
+
+ENDLOCAL 
+在批文件中终止环境变量的局部化。
+    endlocal 
+
+ERASE
+参见DEL。
+
+ESENTUTL 
+管理可扩展存储引擎（ESE）数据库，包括活动目录域服务（ADDS）使用的。
+碎片整理语法：
+    esentutl /d databasename /s [streamingfilename] /t [tempdbname] /f [tempstreamingfilename] /i /p /b [backupfilename] /8 /o 
+恢复语法：
+    esentutl /r logfilebasename /l [logdirectory] /s [systemfileesdirectory] /i /t /u [log] /d [dbfiledirectory] /n path1[:path2] /8 /o 
+完整性检查语法：
+    esentutl /g databasename /s [streamingfilename] /t [tempdbname] /f [tempstreamingfilename] /i /8 /o 
+校验和计算语法：
+    esentutl /k filetoheck /s [streamingfilename] /t [tempdbnaem] /p nn /e /i /8 /o 
+修复语法：
+    esentutl /p databasename /s [streamingfilename] /t [tempdbname] /f [reportprefix] /i /g /createstm /8 /o 
+转储文件语法：
+    esentutl /m [h|k|l|m|s|u] filename /p pagenumber /s [streamingfilename] /t tablename /v /8 /o 
+复制文件语法：
+    esentutl /y sourcefile /d descinationfile /o 
+
+EVENTCREATE
+在时间日志中创建自定义事件。
+    eventcreate [/s computer [/u domain\user [/p password]]] [/l {application | system}] | [/so srcname] /t {success | error | warning | information} /id eventid /d description 
+
+EXIT
+退出命令解释器
+    exit [/b] [exitcode] 
+
+EXPAND 
+取消文件的压缩。
+    expand [-r] source destination 
+    expand -r source [destination] 
+    expand -d source.cab [-f:files] 
+    expand source.cab -f:files destination 
+
+FC 
+比较文件并显示差别。
+    fc [/a] [/c] [/l] [/lbn] [/n] [/t] [/u] [/w] [/nnnn] [/offline] [drive1:][path1]filename1 [drive2:][path2]filename2
+    fc /b [drive1:][path1]filename1 [drive2:][path2]filename2 
+
+FIND 
+在文件中搜索文本字符串
+    find [/v] [/c] [/n] [/i] [/offline] "string" [[drive:][path]filename[ ...]] 
+
+FINDSTR 
+使用正则表达式在文件中搜索字符串。
+    findstr [/b] [/e] [/l] [/r] [/s] [/i] [/x] [/v] [/n] [/m] [/o] [/p] [/f:file] [/a:attr] [/c:string] [/d:dir] [/g:file] [/offline] [strings] [[drive:][path]filename[ ...]] 
+
+FOR 
+对文件集中的每一文件运行指定命令。
+命令行FOR循环：
+    for %variable in (set) do command [parameters] 
+    for /d %variable in (set) do command [parameters] 
+    for /r [[drive:]path] %variable in (set) do command [parameters] 
+    for /l %variable in (start,stop,end) do command [parameters] 
+    for /f ["options"] %variable in (set) do command [parameters] 
+脚本FOR循环：
+    for %%variable in (set) do command [parameters] 
+    for /d %%variable in (set) do command [parameters] 
+    for /r [[drive:]path] %%variable in (set) do command [parameters] 
+    for /l %%variable in (start,step,end) do command [parameters] 
+    for /f ["options"] %%variable in (set) do command [parameters] 
+
+FORFILES
+选择一个或多个文件并对每一文件执行命令。
+    forfiles [/p pathname] [/m searchmask] [/s] [/c command] [/d [+ | -] {mm/dd/yyyy | dd}] 
+
+FORMAT
+对软盘或硬盘进行格式化。
+    format drive: [/fsfile-system] [/v:label] [/q] [/a:size] [/c] [/x] [/p:numzerofillpasses] 
+    format drive: [/v:label] [/q] [/f:size | /t:tracks /n:sectors] [/p:numzerofillpasses] 
+
+FTP 
+传输文件。
+    ftp [-v] [-d] [-i] [-n] [-g] [-s:filename] [-a] [-A] [-x:sendbuffer] [-r:recvbuffer] [-b:asyncbuffers] [-w:windowsize] [host] 
+    用于FTP命令的参数是区分大小写，注意要以上面语法格式中的大小写格式进行输入。
+
+FTYPE 
+显示或修改文件扩展关联中使用的文件类型。
+    ftype [fileType[=[command]]] 
+
+GET_EVEZNTLOG
+Windows PowerShell命令，用于显示事件日志的信息或存储在事件日志中的条目。
+    get-eventlog -list 
+    get-eventlog [-logname] logname [-newest nn] 
+
+GET_PROCESS 
+Windows PowerShell命令，用于显示运行中进程信息。
+    get-process -id [id1, id2, ...] 
+    get-process -inputobject processname1, processname2, ... [process ...] 
+    get-process [-name] [processname1, processname2, ...] 
+
+GET-SERVICE 
+Windows PowerShell命令，用于显示已配置服务信息。
+    get-service [-displayname [servicename1, servicename2 , ...]] -include [servicename1, servicename2 ...] -exclude [servicename1, servicename2, ...] 
+    get-service [-name] [servicename1, servicename2, ...] -include [servicename1, servicename2, ...] -exclude [servicename1, servicename2, ...] 
+    get-service [-inputobject service1, servicename2, ...] [-include [servicename1, servicename2, ...]] [-exclude [servicename1, servicename2, ...]] 
+
+GETMAC 
+显示网络适配器信息。
+    getmac [/s computer [/u [domain]\user [/p [pwd]]]] [/fo {table|list|csv}] [/nh] [/v] 
+
+GOTO
+跳转到脚本中标号行。
+    goto :label 
+    goto :EOF 
+
+GPUPDATE 
+强制进行组策略的后台刷新。
+    gpupdate [/tatget:{computer | user}] [/force] [/wait:<value>] [/logoff] [/boot] [/sync] 
+
+HOSTNAME 
+打印计算机名。
+    hostname 
+
+ICACLS 
+显示或修改文件的访问控制表（ACL）。
+将所有匹配名的ACL存储到ACL文件，语法格式如下：
+    icacls name /save aclfile [/t] [/c] [/l] [/q] 
+将存储的ACL恢复到目录中的某个文件，语法格式如下：
+    icacls directory [/substitute sidold sidnew [...]] /restore aclfile [/c] [/l] [/q] 
+改变所有匹配名的属主，语法格式如下：
+    icacls name /setowner user [/t] [/c] [/l] [/q] 
+使用特定SID寻找所有匹配名，语法格式如下：
+    icacls name /filesid sid [/t] [/c] [/l] [/q] 
+授予许可权限，语法格式如下：
+    icacls name [/grant[:r] sid:perm[...]] 
+取消许可权限，语法格式如下：
+    icacls name [/deny sid:perm [...]] 
+移除许可权限，语法格式如下：
+    icacls name [/remove[:g|:d] sid[...]] [/t] [/c] [/l] [/q] 
+将ACL重置为继承值，语法如下：
+    icacls name /reset [/t] [/c] [/l] [/q] 
+设置完整性级别，语法格式如下：
+    icacls name [/setintefritylevel level:policy[...]] 
+验证ACL，语法格式如下：
+    icacls name /verify [/t] [/c] [/l] [/q] 
+
+IF 
+在批处理脚本程序中进行条件处理。
+    if [not] errorlevel number command 
+    if [not] [/i] string==string2 command 
+    if [not] exist filename command 
+    if [/i] string1 computer-op string2 command 
+    if cmdextversion number command 
+    if defined variable command 
+
+IPCONFIG 
+显示TCP/IP配置。
+    ipconfig [/allcompartments] {/all} 
+    ipconfig [/release [adapter] | /renew [adapter] | /release6 [adapter] | /renew6 [adapter]]  
+    inconfig /flushdns | /displaydns | /registerdns 
+    ipconfig /showclassid adapter 
+    ipconfig /setclassid adapter [classidtoset] 
+
+LABEL 
+创建、改变或删除磁盘的卷标。
+    label [drive:][label] 
+    label [/mp] [volume] [label] 
+
+MD 
+创建目录或子目录。
+    mkdir [drive:]path 
+    md [drive:]path 
+
+MKDIR 
+参见MD。
+
+MORE 
+输出一次显示在一个屏幕。
+    more [/e [/c] [/p] [/s] [/tn] [+n]] < [drive:][path]filename 
+    more /e [/c] [/p] [/s] [/tn] [+n] [files] 
+    command-name | more [/e [/c] [/p] [/s] [/tn] [+n]] 
+
+MOUNTVOL 
+管理卷挂载点。
+    mountvol [drive:]path volumeName 
+    mountvol [drive:]path {/d | /l | /p} 
+    mountvol [/r | /n | /e] 
+
+MOVE
+将文件从某个目录移动到同一驱动器上的其他目录。
+    move [/y] [/-y] source target 
+
+NBTSTAT 
+显示NETBIOS状态。
+    nbtstat [-a remotename] [-A ipaddress] [-c] [-n] [-r] [-R] [-RR] [-s] [-S] [interval]
+    （注解  该命令使用区分大小写的参数。） 
+
+NET ACCOUNTS
+管理用户账号与口令策略。
+    net accounts [/forcelogoff:{minute | no}] [/minpwlen:length] [/maxpwage:{days | unlimited}] [/minpwage:days] [/uniquepw:number] [/domain] 
+
+NET COMPUTER 
+从域中移除计算机或向内添加计算机。
+    net computer \\computername {/add | /de} 
+
+NET CONFIG SERVER 
+显示或修改server服务的配置。
+    net config server [/autodisconnect:time] [/srvcommand:"text"] [/hidden:{yes | no}] 
+
+NET CONFIG  WORKSTATION 
+显示或修改workstation服务的配置。
+    net config workstation [/charcount:bytes] [/chartime:msec] [/charwait:sec] 
+
+NET  CONTINUE 
+恢复暂停的服务。
+    net continue service 
+
+NET FILE 
+显示或管理服务器上的打开文件。
+    net file [id [/close]] 
+
+NET GROUP 
+显示或管理全局组。
+    net group [groupname [/comment:"text"]] [/domain] 
+    net group groupname {/add [/comment:"text"] | /delete} [/domain] 
+    net group groupname username [...] {/add | /delete} [/domain] 
+
+NET LOCALGROUP 
+显示本地组账号。
+    net localgroup [GroupName [/comment:"Text"]] [/domain] 
+创建本地组帐号：
+    net localgroup GroupName {/add [/comment:"Text"]} [/domain] 
+修改本地组帐号。
+    net localgroup [GroupName Name [...] /add [/domain]] 
+删除本地组帐号。
+    net localgroup GroupName /delete [/domain] 
+
+NET PAUSE 
+挂起服务。
+    net pause service 
+
+NET PRINT 
+显示或管理打印任务与共享队列。
+    net print \\computername\sharename 
+    net print [\\computername] job# [/hold | /release | /delete] 
+NET SESSION 
+列出或断开会话。
+    net session [\\computername] [/delete] 
+
+NET SHARE 
+显示或管理共享的打印机与目录。
+    net share [sharename] 
+    net share sharename[=drive:path] [/users:number | unlimited] [/remark:"text"] [/cache:flag]
+    net share {sharename | devicename | drive:path} /delete 
+
+NET START 
+列出或启动网络服务。
+    net start [service] 
+
+NET STATISTICS 
+显示工作站与服务器统计信息。
+    net statistics [workstation | server] 
+
+NET STOP 
+终止服务。
+    net stop service 
+
+NET TIME 
+显示或同步网络时间。
+    net time [\\computername | /domain[:domainname] | /rtsdomain[:domainname]] [/set] 
+    net time [\\computername] /querysntp 
+    net time [\\computername] /setsntp[:serverlist] 
+
+NET USE 
+显示或管理远程连接。
+    net use [devicename | *] [\\computername\sharename[\volume] [password | *]] [/user:[domainname\]username] [/user:[username@domainname]] [[/delete] | [/persistent:{yes | no}]] [/smartcard] [/savecred] 
+    net use [devicename | *] [password | *] [/home] 
+    net use [/persistent:{yes | no}] 
+
+NET USER 
+创建本地用户账号。
+    net user UserName [Password | *] /add [/active:{no | yes}] [/comment:"DescriptionText"] [/countrycode:NNN] [/expires:{{MM/DD/YYYY | DD/MM/YYYY | mmmm,dd,YYYY} | never}] [/fullname:"Name"] [/homedir:Path] [/passwordchg:{yes | no}] [/passwordreq:{yes | no}] [/profiulepath:[Path]] [/scriptpath:Path] [/times:{Day[-Day][,Day[-Day]],Time[-Time][,Time[-Time]][;...] | all}] [/usercomment:"Text"] [/workstations:{ComputerName[,...] | *}] [/domain] 
+修改本地用户账号。
+    net user [UserName [Password | *]] [/actice:{no | yes}] [/comment:"DescriptionText"] [/countrycode:NNN] [/expires:{{MM/DD/YYYY | DD/MM/YYYY | mmm,dd,YYYY} | never}] [/fullname:"Name"] [/homedir:Path] [/passwordchg:{yes | no}] [/passwordreq:{yes | no}] [/profilepath:[Path]] [/scriptpath:Path] [/times:{Day[-Day][,Day[-Day]],Time[-Time][,Time[-Time]][;...] | all}] [/usercomment:"Text"] [/workstations:{ComputerName[,...] | *}] [/domain] 
+删除本地用户账号。
+    net user UserName [/delete] [/domain] 
+
+NET VIEW 
+显示网络资源或计算机。
+    net view [\\computername [/cache] | [/all] | /domain[:domainname]] 
+    net view /newwork:nw [\\computername] 
+
+NETDOM ADD 
+向域内添加一个工作站或服务器账号。
+    netdom add computer [/domain:domain] [/userd:user] [/passwordd:[password | *]] [/server:server] [/ou:oupath] [/dc] [/securepasswordprompt] 
+
+NETDOM COMPUTERNAME 
+管理计算机的主要名与备用名，该命令可以安全地对域控制器或服务器进行重命名。
+    netdom computername computer [/usero:user] [/passwordo:[password | *]] [/userd:user] [/passwordd:[password | *]] [/securepasswordprompt] /add:newalternatednsname | /remove:alternamerednsname | /makeprimary:computerdnsname | /enumerate[:{alternatenames | primaryname | allnames}] /verify 
+
+NETDOM JOIN 
+将工作站或成员服务器添加到域内。
+    netdom join computer /domain:domain [/ou:oupath] [/userd:user] [/passwordd:[password | *]] [/usero:user] [/passwordo:[password | *]] [/reboot[:timeinseconds]] [/securepasswordprompt]
+
+NETDOM MOVE 
+将工作站或成员服务器移动到新域内。
+    netdom move computer /domain:domain [/ou:oupath] [/userd:user] [/passwirdd:[password | *]] [/usero:user] [/passwordo:[password | *]] [/userf:user] [/passwordf:[password | *]] 
+    [/reboot[:timeinseconds]] [/securepasswordprompt] 
+
+METDOM MOVENT4DBC 
+将Windows NT 4.0备份域控制器移动到新域内。
+    netdom movent4dbc computer [/domain:domain] [/reboot[:timeinseconds]] 
+
+NETDOM QUERY 
+查询某个域的相关信息。
+    netdom query [/domain:domain] [/server:server] [/userd:user] [/passwordd:[password | *]] [/verify] [/reset] [/direct] [/securepasswordprompt] {workstation | server | dc | ou | pdc | fsmo | trust} 
+
+NETDOM REMOVE 
+从域中移除工作站或服务器。
+    netdom remove computer [/domain:domain] [/userd:user] [/passwordd:[password | *]] [/usero:user] [/passwordo:[password | *]] [/reboot[:timeinseconds]] [/force] [/securepasswordprompt] 
+
+NETDOM RENAMECOMPUTER 
+对计算机进行重命名。如果计算机加入到域中，则域中相应的计算机对象也被重命名。要注意的是，不能使用本命令对域控制器进行重命名。
+    netdom renamecomputer computer /newname:newname [/userd:user [/passwordd:[password | *]]] [/usero:user [/passwordo:[password | *]]] [/force] [/reboot[:timeinseconds]] [/securepasswordprompt] 
+
+NETDOM RESET 
+重置工作站与域控制器之间的安全连接。
+    netdom reset computer [/domain:domain] [/server:server] [/usero:user] [/passwordo:[password | *]] [/securepasswordprompt] 
+
+NETDOM RESETPWD 
+重置本命令所运行域控制器上的机器帐号口令。
+    netdom resetpwd /server:domaincontroller /userd:user /passwordd:[password | *] [/securepasswordprompt] 
+
+NETDOM TRUSET 
+管理或验证域间的信任关系。
+    netdom trust trustingdomainname /domain:trusteddomainname [/userd:user] [/passwordd:[password | *]] [/usero:user] [/passwordo:[password | *]] [/usero:user] [/passwordo[password | *]] [verify] [/reset] [/passwordt:newrealmtrustpassword] [/add] [/remove] [/twoway] [/realm] [/kerberos] [/transitive[:{yes | no}]] [/oneside:{trusted | trusting}] [/force] [/quaranting[:{yes | no}]] [/namesuffixes:trustname [/togglesuffix:#]] [/enablesidhistory[:{yes | no}]] [/foresttransitive[:{yes | no}]] [/crossorganization[:{yes | no}]] [/addtlin:toplevelname] [/removetln:toplevelname] [/removetlnex:toplevelnameexclusion] [/securepasswordprompt] 
+
+NETDOM VERIFY 
+验证工作站与域控制器之间的安全连接。
+    netdom verify computer [/domain:domain] [/usero:user] [/passwordo:[password | *]] [/securepasswordprompt] 
+
+NETSH 
+调用一个单独的命令提示符，用于对本地计算机或远程计算机上的网络服务配置进行管理。
+    netsh 
+    （更多信息  Netsh的操作技术在第17章有详细的讲解。）
+
+NETSTAT 
+显示网络连接的状态。
+    netstat [-a] [-b] [-e] [-f] [-n] [-o] [-p protocol] [-r] [-s] [-t] [interval] 
+
+NSLOOKUP 
+显示DNS状态。
+    nslookup [-option] [computer] 
+    dnlookup [-option] [computer server] 
+
+PATH 
+在当前命令窗口中，显示或设置可执行文件的搜索路径。
+    path [[drive:]path[;...][;%PATH%]] 
+    path ; 
+
+PATHPING 
+对路由进行追踪并提供丢包信息。
+    pathping [-n] [-h maxhops] [-g hostlist] [-i address] [-p period] [-q numqueries] [-w timeout] targetname [-4] [-6] 
+
+PAUSE 
+挂起对脚本的处理，直至有键盘输入。
+    pause 
+
+PING 
+确定是否可以建立网络连接。
+    ping [-t] [-a] [-n count] [-l size] [-f] [-i ttl] [-v tos] [-r count] [-s count] [[-j hostlist] | -k hostlist] [-w timeout] [-R] [-S sourceaddress] [-4] [-6] destinationlist 
+    （注解  该命令使用区分大小写的参数。）
+
+POPD
+切换到由PUSHD保存的目录。
+    popd 
+
+PRINT 
+打印文本文件。
+    print [/d:device] [[drive:][path]filename[...]] 
+
+PROMPT
+改变Windows命令提示符。
+    prompt [text] 
+
+PUSHD 
+保存当前目录，之后切换到新目录。
+    pushd [path | ..] 
+
+RD 
+移除目录。
+    rmdir [/s] [/q] [drive:]path 
+    rd [/s] [/q] [drive:]path 
+
+RECOVER 
+从损坏的或有缺陷的磁盘中恢复可读信息。
+    recover [drive:][path]filename
+
+REG ADD 
+向注册表中添加一个子健或条目。
+    reg add keyname [/v valuename | /ve] [/t datatype] [/d data] [/f] [/s separator] 
+
+REG COMPARE 
+比较注册表子健或条目。
+    reg compare keyname1 keyname2 [/v valuename | /ve] [/s] [/outputoption] 
+
+REG COPY 
+将注册表条目复制到本地或远程系统上的特定键路径。
+    reg copy keyname1 keyname2 [/s] [/f] 
+
+REG DELEFE 
+从注册表中删除一个子健或条目。
+    reg delete keyname [/v valuename | /ve | /va] [/f] 
+
+REG QUERY 
+列出某注册表键下的条目与子健名（如果有。）
+    erg query keyname [/v valuename | /ve] [/s] [/f data [/k] [/d] [/c] [/e]] [/t type] [/z] [/se separtor] 
+
+REG RESTORE 
+将保存的子健与条目写回到注册表。
+    reg restore keyname "filename" 
+
+REG SAVE 
+将指定子健、条目、值的副本保存到某个文件中。
+    reg save keyname "filename" [/y] 
+
+REGSVR32 
+注册或取消对DLL的注册。
+    regsvr32 [/u] [/s] [/n] [/i[:cmdline]] dllname 
+
+REM 
+向脚本中添加注释。
+    rem [comment] 
+
+REN 
+对文件进行重命名。
+    rename [drive:][path]filename1 filename2 
+    ren [drive:][path]filename1 filename2 
+
+RMDIR 
+参见RD。
+
+ROUTE
+管理网络路由表。
+    route [-f] [-p] [-4|-6] command [destination] [mask netmask] [gateway] [metric metric] [if interface] 
+
+RUNAS 
