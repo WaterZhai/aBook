@@ -1,0 +1,139 @@
+附录B  Netsh快速参考
+
+如第17张所讲述的，网络服务shell（Netsh）是一个命令行脚本工具，可用于在本地计算机与远程计算机上对多种网络服务配置进行管理。Netsh提供了单独的命令提示符，可以在交互模式或非交互模式下使用。在Netsh命令环境下，可以操作复杂的上下文与命令。
+本附录提供了Netsh的简明参考，有助于读者在不同的上下文中浏览并快速发现需要使用的命令。上下文是以字母顺序列出的，每个上下文中的子上下文与命令也是以字母顺序列出的。要记住的是，有些上下文只有在安装了相关的角色、角色服务与功能后才可用或才能正确起作用。
+
+Netsh 
+    Netsh上下文是网络服务shell中的顶级上下文，表B-1总结了这一级中的可用命令。不管操作的哪一级上下文，都可以使用命令..返回到上一级上下文。如果当前级内子上下文是可用的，则可以键入该子上下文名，来访问该子上下文及其命令。因而，如果当前操作的是顶级的Netsh上下文，现在需要切换到Advfirewall上下文，可以键入advfirewall。如果后来需要返回到顶级的Netsh上下文，可以键入命令..。
+    表B-1  Netsh上下文中的可用命令
+    ----------------------------------------------------------------------
+    命令           |描述
+    --------------|-------------------------------------------------------
+    ..            | 返回到上一级上下文 
+    abort         | 摒弃脱机模式下所作的改变
+    add helper    | 安装一个帮助者DLL
+    advfirewall   | 切换到netsh advfirewall上下文 
+    alias         | 添加一个别名
+    bridge        | 切换到netsh bridge上下文
+    bye           | 退出程序
+    commit        | 接收脱机模式下所作的改变
+    delete helper | 移除一个帮助者DLL
+    dhcp          | 如果已经安装了DHCP Server角色，则切换到netsh dhcp上下文，否则切换到netsh dhcpclient上下文
+    dhcpclient    | 却换到netsh dhcpclient上下文
+    dump          | 显示上下文内的设置配置脚本
+    exec          | 运行脚本文件
+    exit          | 退出程序
+    firewall      | 切换到neths firewall上下文
+    http          | 切换到netsh http上下文
+    interface     | 切换到netsh interface上下文
+    ipsec         | 切换到netsh ipsec上下文
+    lan           | 切换到netsh lan上下文
+    nap           | 切换到netsh nap上下文
+    netio         | 切换到netsh netio上下文
+    nps           | 切换到netsh nps上下文
+    offline       | 将当前模式设置为脱机
+    online        | 将当前模式设置为联机
+    p2p           | 切换到netsh p2p上下文
+    popd          | 从栈中弹出上下文
+    pushd         | 将当前上下文压入栈
+    quit          | 退出程序
+    ras           | 切换到netsh ras上下文
+    routing       | 切换到netsh routing上下文
+    rpc           | 切换到netsh rpc上下文
+    set file      | 将控制台输出复制到文件
+    set machine   | 设置当前的操作主机
+    set mode      | 将当前模式设置为联机或脱机
+    show alias    | 列出所有已定义的别名
+    show helper   | 列出所有顶级帮助者
+    show mode     | 显示当前模式
+    unalias       | 删除一个别名
+    winhttp       | 切换到netsh winhttp上下文
+    winsock       | 切换到netsh winsock上下文
+    wlan          | 切换到netsh wlan上下文
+    ---------------------------------------------------------------------
+
+Netsh Advfirewall 
+    Netsh Advfirewall上下文可以用于查看与管理高级安全Windows防火墙的设置，表B-2总结了该上下文及其相关子上下文中可用的命令。
+    表B-2  Netsh Advfirewall的命令与子上下文
+    ----------------------------------------------------------------------------
+    上下文/命令         | 描述
+    -------------------|---------------------------------------------------------
+    netsh advfirewall
+    consec             | 切换到netsh Advfirewall consec上下文
+    dump               | 显示上下文中设置配置脚本
+    export             | 将当前策略导出文件
+    firewall           | 切换到netsh advfirewall firewall上下文 
+    import             | 将策略文件导入到当前策略库
+    monitor            | 切换到netsh advfirewall monitor上下文
+    reset              | 将策略重置为默认的out-of-box策略
+    set allprofiles    | 在所有配置文件中设置属性
+    set currentprofile | 在活跃配置文件中设置属性
+    set domainprofile  | 在域配置文件中设置属性
+    set global         | 设置全局属性
+    set privateprofile | 在私有配置文件中设置属性
+    set publicprofile  | 在公开配置文件中设置属性
+    set store          | 为当前交互式会话设置策略库
+    show allprofiles   | 显示所有配置文件的属性
+    show currentprofile| 显示活跃配置文件的属性
+    show domainprofile | 显示域配置文件的属性
+    show global        | 显示全局属性
+    show privateprofile| 显示私有配置文件的属性
+    show publicprofile | 显示公开配置文件的属性
+    show store         | 显示当前交互式会话的策略库
+    ------------------------------------------------------------------------------
+    netsh advfirewall consec 
+    add rule           | 添加一条新的连接安全规则
+    delete rule        | 删除所有匹配的连接安全规则
+    dump               | 显示上下文中设置配置脚本
+    set rule           | 为现存规则设置新的属性值
+    show rule          | 显示指定的连接安全规则
+    -----------------------------------------------------------------------------
+    netsh advfirewall firewall 
+    add rule           | 添加一条新的入站/出站防火墙规则
+    delete rule        | 删除所有匹配的入站/出站规则
+    dump               | 显示上下文中设置新的属性值
+    set rule           | 为现存规则设置新的属性值
+    show rule          | 显示指定的防火墙规则
+    -----------------------------------------------------------------------------
+    netsh advfirewall monitor 
+    delete             | 删除所有匹配的安全关联
+    dump               | 显示上下文设置配置脚本
+    show               | 显示所有匹配的安全关联
+    ------------------------------------------------------------------------------
+
+Netsh Bridge 
+    Netsh Bridge上下文中可以查看与管理网桥的设置，表B-3总结了该上下文中可用的命令。
+    表B-3  Netsh Bridge上下文中的命令
+    -------------------------------------------------------------------------------
+    命令         | 描述
+    -------------|-----------------------------------------------------------------
+    dump         | 显示上下文中设置配置脚本
+    install      | 安装与当前上下文对应的组件
+    set adapter  | 修改指定适配器的网桥配置
+    show adapter | 显示配置为单一网桥的适配器
+    uninstall    | 移除与当前上下文对应的组件
+    ------------------------------------------------------------------------------
+
+Netsh Dhcp 
+    Netsh Dhcp上下文与相关的子上下文可用于管理DHCP服务器的配置。要注意的是，这些上下文只有在DHCP Server角色服务已经在Windows服务器中安装后才是可用的。如果DHCP Server角色服务尚未安装，则使用Dhcp命令会打开Dhcpclient上下文。
+    Netsh Dhcp上下文支持如下的命令。
+    · server[\\ServerName or \\IPAddress]。将上下文切换到指定的服务器。
+    · add server。向目录服务中的授权服务器列表添加到一台DHCP服务器。
+    · delete server。从目录服务中授权服务器列表删除一台DHCP服务器。
+    · show server。显示当前域目录服务中的所有DHCP服务器。
+    表B-4、表B-5、表B-6分别总结了Netsh Dhcp Server上下文、Netsh Dhcp Server V4上下文、Netsh Dhcp Server V6上下文中可用的命令。
+    表B-4  Netsh Dhcp Server上下文中的命令
+    ---------------------------------------------------------------------------
+    命令  | 描述   
+    ---------------------------------------------------------------------------
+    add class | 
+    add mscope | 
+    add optiondef | 
+    add scope     | 
+    backup        | 
+    delete class  | 
+    delete dnscredentials|
+    delete mscope        | 
+    delete optiondef     | 
+    delete optionvalue   | 
+    delete superscope    | 

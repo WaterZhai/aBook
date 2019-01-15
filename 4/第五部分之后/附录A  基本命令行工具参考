@@ -744,3 +744,238 @@ ROUTE
     route [-f] [-p] [-4|-6] command [destination] [mask netmask] [gateway] [metric metric] [if interface] 
 
 RUNAS 
+以特定用户许可权限运行程序。
+以指定用户的凭据运行，语法如下：
+    runas [/noprofile | /profile] [/env] [/netonly] [/savecred] /user:account program 
+以来自智能卡的凭据运行，语法如下：
+    runas [/noprofile | /profile] [/env] [/netonly] [/savecred] /smartcard [/user:account] program 
+显示可用的信任级别，语法如下：
+    runas /showtrustlevels 
+在指定的信任级别上运行，语法如下：
+    runas /trustlevel:trustlevel program 
+
+SC CONFIG 
+配置服务的启动与登录帐号。
+    sc [\\ServerName] config ServiceName [type= {own | share | {interact type = {own | share}} | kernel | filesys | rec | adapt}] [start= {boot | system | auto | demand | disabled | delayed-auto}] [error= {normal | severe | critical | ignore}] [binpath= BinaryPathName] [group= LoadOrderGroup] [tag= {yes | no}] [depend= Dependencies] [obj= {AccountName | ObjectName}] [DisplayName= displayname] [password= password] 
+
+SC CONTINUE 
+恢复已暂停的服务。
+    sc [\\ServerName] continue ServerName 
+
+SC FAILURE 
+查看服务失败时要采取的操作。
+    sc [\\ServerName] failure ServerName [reset= ErrorFreePeriod] [reboot= BroadcastMessage] [command= ComandLine] [actions= FailureActionsAndDelayTime] 
+
+SC PAUSE 
+暂停服务。
+    sc [\\ServerName] pause ServiceName 
+
+SC QC 
+显示指定服务的配置信息。
+    sc [\\ServerName] qc ServiceName [BufferSize] 
+
+SC QFAILURE 
+设置服务失败时采取的操作。
+    sc [\\ServerName] qfailure ServiceName [BufferSize] 
+
+SC QUERY 
+显示计算机上配置的服务列表。
+    sc [\\ServerName] query ServiceName [type= {driver | service | all}] [type= {own | share | interact | kernel | filesys | rec | adapt}] [start= {active | inactive | all}] [bufsize= BufferSize] [ri= ResumeIndex] [group= GroupName] 
+
+SC START 
+启动服务。
+    sc [\\ServerName] start ServiceName [ServiceArgs] 
+
+SC STOP 
+终止服务。
+    sc [\\ServerName] stop ServiceName 
+
+SCHTASKS /CHANGE 
+改变现有任务的属性。
+    schtasks /change /tn taskname [/s system [/u [domain\]user [/p [password]]]] {[/ru [domain\]user] [/rp password] [/tr taskorun]} [/st starttime] [/ri runintrral] [{/et endtime | /du duration} [/k]] [/sd startdate] [/ed enddate] [enable | disable] [/it] [/z] 
+
+SCHTASKS /CREATE 
+创建计划任务。
+    schtasks /create [/s system [/u [domain\]user [/p [password]]]] [/ru [domain\]username [rp password]] /tn taskname /tr taskorun /sc scheduletype [/mo modifier] [/d day] [/i idletime] [/st starttime] [/m month [, month [...]]] [/sd startdate] [/ed enddate] [/ri runintrral] [{/et endtime | /du duration} [/k]] [/it | /np] [/z] [/f] [/xml xmlfile] 
+
+SCHTASKS /DELETE 
+移除不再需要运行的计划任务。
+    schtasks /delete /tn {TaskName | *} [/f] [/s computer [/u [domain\]user [/p [password]]]] 
+
+SCHTASKS /END 
+终止运行中的任务。
+    schtasks /end /tn taskname [/s computer [/u [domain\]user [/p [password]]]] 
+
+SCHTASKS /QUERY 
+显示本地计算机或指定计算机上的计划任务。
+    schtasks /query [/s computer [/u [domain\]user [/p [password]]]] [/fo {table | list | csv} | /xml] [/nh] [/v] [/tn {TaskName}] 
+
+SCHTASKS /RUN 
+启动一个计划任务。
+    schtasks /run /tn taskname [/s computer [/u [domain\]user [/p [password]]]] 
+
+SERVERMANSGERCMD 
+安装或移除角色、角色服务与功能，也可以用于列出已安装的角色、角色服务与功能。
+用于查询的语法格式如下：
+    servermanagercmd -query [queryfile.xml] [-logPath logfile.txt] 
+    servermanagercmd -version 
+用于安装的语法格式如下：
+    servermanagercmd -install component [-resultPath resultfile.xml [-restart] | [-whatif]] [-logPath logfile.txt] [-allSubFeatures] 
+用于移除的语法格式如下：
+    servermanagercmd -remove component [-resultPath resultfile.xml [-restart] | [-whatif]] [-logPath logfile.txt] 
+用于使用answer文件安装或移除的语法格式如下：
+    servermanagercmd -inputPath answerfile.xml [-resultPath resultfile.xml [-restart] | [-whatif]] [-logPath logfile.txt] 
+
+SET 
+显示或修改Windows环境变量，也可以用于在命令行中评估数字表达式。
+    set [variable=[string]] 
+    set /a expression 
+    set /p variable=[promptstring] 
+
+SET-SERVICE 
+WindowsPowerShell命令，用于修改系统服务的配置。
+    set-service [-name] servicename [-displayname displayname] [-description description] [-startiptype {Automatic|Manual|Disabled}] [-whatif] [-config] [parameters] 
+
+SETLOCAL 
+在批处理文件中开始变量的局部化。
+    setlocal 
+    setlocal {enableext | disableext} 
+
+SFC 
+扫描并验证受保护的系统文件。
+    sfc [/scannow] [/verifyonly] [/scanfile=file] [/verifyfile=file] [/offwindir=offlinewindowsdirectory /offbootdir=offlinebootdirectory] 
+
+SHIFT 
+移动脚本中可替换变量的位置。
+    shift [/n] 
+
+SHUTDOWN 
+关闭或重启计算机。
+    shutdown [/i | /l | /s | /r | /g | /a | /p | /h | /e] [/f] [/m \\computerName] [/t nn] [/d [p|u:]n1:n2 [/c "comment"] ]
+
+SORT 
+对输入进行排序。
+    [command |] sort [/r] [/+n] [/m kb] [/l locale] [/rec recordbytes] [drive1:][path1]filename1 [/t [drive2:][path2]] [/o [drive3:][path3]filename3] 
+    （注解  在本实例中，|是管道符号。）
+START
+启动一个新的命令shell窗口，用来运行指定的程序或命令。
+    start ["title"] [/d path] [/i] [/min] [/max] [/separate | /shared] [/wait] [/b] [/low | /belownormal | /normal | /abovenormal | /high | /realtime] [/affinity hh] [command/program] [parameters] 
+
+STOP-PROCESS 
+Windows PowerShell命令，用于终止一个或多个运行中的进行。
+    stop-process -id [id1, id2, ...] [-confirm] [-passthru] [-whatif] [parameters] 
+    stop-process -inputobject processname1, processname2, ... [-passthru] [-whatif] [-config] [parameters] 
+    stop-process -name processname1, processname2, ... [-confirm] [-passthru] [-whatif] [parameters] 
+
+STOP-SERVICE 
+WindowsPowerShell命令，用于终止一个或多个运行中的服务。
+    stop-service [-displayname [servicename1, servicename2, ...]] -include [servicename1, servicename2, ...] -exclude [servicename1, servicename2, ...] 
+    stop-service [-name] [servicename1, servicename2, ...] -include [servicenaem1, servicename2, ...] -exclude [servicename1, servicename2, ...] 
+    （注解  Windows PowerShell还包括用于启动（start-service）、重启（restart-service）、挂起（suspend-service）、恢复（resume-service）服务的命令，其语法格式与stop-service一样。）
+
+SUBST 
+将路径映射到驱动器盘符。
+    subst [drive1: [drive2:]path] 
+    subst drive1: /d 
+
+SYSTEMINFO 
+显示详尽的配置信息。
+    systeminfo [/s computer [/u [domain\]user [/p [pwd]]]] [/fo {table|list|csv}] [/nh] 
+
+TASKOWN 
+允许管理员拥有一个或多个文件的主导权。
+    taskown [/s computer [/u [domain\]user [/p [pwd]]]] /f filename [/a] [/r [/d prompt]] 
+
+TASKKILL 
+根据进程名或进程ID终止运行中的进程。
+    taskkill [/s computer] [/u [domain\]user [/p pwd]] {[/fi filter1 [/fi filter2 [...]]] [/pid ID|/im imgName]} [/f][/t] 
+
+TASKLIST 
+根据进程名或进程ID列出所有运行中的进程。
+    tasklist [/s computer [/u [domain\]user [/p [password]]]] [{/m module | /svc | /v}] [/fo {table | list | csv}] [/nh] [/fi filename [/fi filtername2 [...]]] 
+
+TIME 
+显示或设置系统时间。
+    time [time | /T] 
+
+TIMEOUT 
+在批脚本中设置超时周期或等待按键。
+    timeout /t timeout [/nobreak] 
+
+TITLE 
+为命令shell窗口设置标题。
+    title [string] 
+
+TRACERPT 
+从踪迹日志中生成总计报告。
+    tracerpt {[-l] logfile1 logfile2 ... | [-o outputfile] | -rt sessionname1 sessionname2 ...} [-of <CSV | EVTX | XML>] [-lr] [-summary summaryreportfile] [-report reportfilename] [-f <XML | HTML>] [-df schemafile] [-int dumpeventfile] [-rts] [-tmf tracedefinitionfile] [-tp tracefilepath] [-gmt] [-i imagepath] [-pdb sysbolpath] [-r|n] [-export schemaexportfile] [-config configfile] [-y] 
+
+TRACERT 
+显示计算机之间的联通路径。
+    tracert [-d] [-h maximumhops] [-j hostlist] [-w timeout] [-r] [-s sourceaddress] [-4] [-6] targetname 
+
+TYPE 
+显示文本文件的内容。
+    type [drive:][path]filename 
+
+TYPEPERF 
+显示或记录指定计数器的性能数据。
+    typeperf {{counter1 counter2 ...} | -cf counterfile} [-sc numsamples] [-si [[[hh:]mm:]ss] [-o logfile] [-f {CSV | TSV | BIN | SQL}] [-s server] [-y] 
+    typeperf {-q object | -qx object} [-sc numsamples] [-si [[[hh:]mm:]ss] [-o logfile] [-f {CSV | TSV | BIN |　SQL}] [-s server] [-y] 
+
+VER 
+显示Windows版本。
+    ver 
+
+VERIFY 
+让Windows验证文件是否正确写入到磁盘。
+    verify [on | off] 
+
+VOL 
+显示磁盘卷标与序列号。
+    vol [drive:] 
+
+WAITFOR 
+规定计算机等到特定信号后再继续执行。
+发送信号的语法格式如下：
+    waitfor [/s computer [/u [domain\]user [/p [pwd]]]] /si signal 
+等待信号的语法格式如下：
+    waitfor [/t timeout] signal 
+
+WBADMIN 
+执行或计划备份与恢复操作，该命令仅适用于Windows Server 2008、Windows Vista Business、Enterprice、Ultimate版。
+用于激活备份的语法格式如下：
+    wbadmin enable backup [-addtarget:{BackupTargetDisk}] [-removetarget:{BackupTargetDisk}] [-schedule:TimeToRunBackup] [-include:VolumesToInclude] [-allCritical] [-quiet] 
+用于禁用备份的语法格式如下：
+    wbadmin disable backup [-quiet] 
+用于启动备份的语法格式如下：
+    wbadmin start backup [-backupTarget:{TargetVolume | TargetNetworkShare}] [-include:VolumeToInclude] [-allCritical] [-noVerify] [-user:UserName] [-password:Password] [-noInheritAcl] [-vssFull] [quiet] 
+用于终止当前备份任务的语法格式如下：
+    wbadmin stop job [-quiet] 
+用于列出可用磁盘的语法格式如下：
+    wbadmin get disks 
+用于获取当前备份任务状态的语法格式如下：
+    wbadmin get status 
+用于获取可用备份列表的语法格式如下：
+    wbadmin get versions [-backupTarget:{VolumeName | NetworkSharePath}] [-machine:BackupMachineName] 
+用于启动系统状态备份的语法格式如下：
+    wbadmin start systemstatebackup -backupTarget:{VolumeName} [-quiet] 
+用于启动系统状态恢复的语法格式如下：
+    wbadmin start systemstaterecovery -version:VersionIdentifier -showsummary [-backupTarget:{VolumeName | NetworkSharePath}] [-machine:BackupMachineName] [-recoveryTarget:TargetPathForRecovery] [-authsysvol] [-quiet] 
+用于删除系统状态备份的语法格式如下：
+    wbadmin delete systemstatebackup -keepVersions: NumberCopiesToKeep | -version VersionID | -deleteOldest [-backupTarget:{VolumeName}] [-machine:BackupMachineName] [-quiet] 
+
+WHERE 
+显示匹配搜索模式的文件列表。
+    where [/r dir] [/q] [/f] [/t] pattern 
+    where [/q] [/f] [/t] $env:pattern 
+    where [/q] [/f] [/t] path:pattern 
+
+WHOAMI 
+显示当前用户的登录域安全信息。
+    whoami [/upn | /fqdn | /logonif] 
+    whoami {[/user] [/groups] [/priv]} [/fo {table|list|csv}] [/nh] 
+    whoami /all [/fo {table|list|csv}] [/nh] 
+
+
+
