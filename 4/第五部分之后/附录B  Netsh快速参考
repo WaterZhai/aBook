@@ -124,16 +124,846 @@ Netsh Dhcp
     表B-4、表B-5、表B-6分别总结了Netsh Dhcp Server上下文、Netsh Dhcp Server V4上下文、Netsh Dhcp Server V6上下文中可用的命令。
     表B-4  Netsh Dhcp Server上下文中的命令
     ---------------------------------------------------------------------------
-    命令  | 描述   
+    命令                       | 描述   
+    ---------------------------|------------------------------------------------
+    add class                  | 向服务器中添加一个类
+    add mscope                 | 向服务器中添加多播范围
+    add optiondef              | 向服务器中添加新选项
+    add scope                  | 向服务器中添加范围
+    backup                     | 备份配置
+    delete class               | 从服务器中删除特定类
+    delete dnscredentials      | 删除DNS动态更新要使用的凭据
+    delete mscope              | 从服务器中删除多播范围
+    delete optiondef           | 从服务器中删除选项
+    delete optionvalue         | 从服务器中删除选项值
+    delete superscope          | 从服务器中删除superscope
+    dump                       | 将配置信息转储到文本文件
+    export                     | 将配置信息导出到文件
+    import                     | 从文件中导入配置信息
+    initiate auth              | 发起到服务器的授权尝试
+    initiate reconcile         | 检测与协调服务器下的所有范围的数据库
+    msacope<mscope-name>       | 切换到由Mscope名表示的mscope
+    restore                    | 恢复配置
+    scope<scope-ip-address>    | 切换到由IP地址标识的范围
+    set auditlog               | 设置服务器的审计日志参数
+    set bindings               | 设置服务器的接口绑定
+    set databasebackupinterval | 设置当前服务器的数据库备份时间间隔
+    set databasebackuppath     | 设置当前服务器的数据库备份路径
+    set databasecleanupinterval| 设置数据库清空时间间隔
+    set databaseloggingflag    | 设置/重置数据库登录标记
+    set databasename           | 设置服务器数据库文件名
+    set databasepath           | 设置服务器数据库文件路径
+    set databaserestoreflag    | 设置/重置数据库恢复标记
+    set detectconflictretry    | 设置DHCP服务器的冲突检测尝试次数
+    set dnsconfig              | 设置服务器的DNS动态更新配置
+    set dnscredentials         | 设置DNS动态更新使用的凭据
+    set napdeffail             | 设置服务器的NAP默认失败状态
+    set napstate               | 设置服务器的NAP状态
+    set optionvalue            | 设置服务器的全局选项值
+    set server                 | 设置服务器模式下的当前服务器
+    set userclass              | 设置随后操作的全局用户类名
+    set vendorclass            | 设置随后操作的全局销售商类名
+    show all                   | 显示服务器的所有信息
+    show auditlog              | 显示服务器的审计日志参数
+    show bindings              | 显示服务器的接口绑定
+    show class                 | 显示服务器的所有可用类
+    show dbproperties          | 显示服务器数据库配置信息
+    show detectionconflictretry| 显示冲突检测重试设置
+    show dnsconfig             | 显示服务器的DNS动态更新配置
+    show dnscredentials        | 显示当前设置的DNS凭据
+    show mibinfo               | 显示服务器的MIBInfo
+    show mscope                | 显示服务器的多播范围
+    show napdeffail            | 显示服务器的NAP默认失败状态
+    show napstate              | 显示服务器的NAP状态
+    show optiondef             | 显示服务器的所有选项
+    show optionvalue           | 显示服务器设置的所有选项值
+    show scope                 | 显示服务器下所有可用的范围
+    show server                | 显示当前服务器
+    show serverstatus          | 显示服务器的当前状态
+    show superscope            | 显示服务器下所有可用的超级范围
+    show userclass             | 显示当前设置的用户类名
+    show vendorclass           | 显示当前设置的销售商类名
+    show version               | 显示服务器的当前版本
+    V4                         | 切换到netsh dhcp server v4上下文 
+    V6                         | 切换到netsh dhcp server v6上下文
+    ----------------------------------------------------------------------------------
+
+    表B-5  Netsh Dhcp Server V4上下文的命令
+    --------------------------------------------------------------------------------
+    命令                       | 描述
+    ---------------------------|------------------------------------------------------
+    add class                  | 向服务器中添加一个类
+    add mscope                 | 向服务器中添加多播范围
+    add optiondef              | 向服务器中添加新选项
+    add scope                  | 向服务器中添加范围
+    delete class               | 从服务器中删除特定类
+    delete dnscredentials      | 删除DNS动态更新要使用的凭据
+    delete mscope              | 从服务器中删除多播范围
+    delete optiondef           | 从服务器中删除选项 
+    delete optionvalue         | 从服务器中删除选项值 
+    delete scope               | 从服务器中删除范围 
+    delete superscope          | 从服务器中删除超级范围
+    dump                       | 将配置信息转储到文本文件
+    export                     | 将配置信息导出到文件
+    import                     | 从文件中导入配置信息 
+    set binfings               | 设置服务器的接口绑定 
+    set detectconflictretry    | 设置DHCP服务器的冲突检测尝试次数 
+    set dnsconfig              | 设置服务器的DNS动态更新配置 
+    set dnscredentials         | 设置DNS动态更新使用的凭据
+    set napdeffail             | 设置服务器的NAP默认失败 
+    set napstate               | 设置服务器的NAP默认失败状态 
+    set optionvalue            | 设置服务器的全局选项值
+    set userclass              | 设置随后操作的全局用户类名
+    set vendorclass            | 设置随后操作的全局销售商类名
+    show all                   | 显示服务器的所有信息
+    show bingings              | 显示服务器的接口绑定
+    show class                 | 显示服务器的所有可用类
+    show detectionconflictretry| 显示冲突检测重试设置
+    show dnsconfig             | 显示服务器的DNS动态更新配置
+    show dnscredentials        | 显示当前设置的DNS凭据 
+    show mibinfo               | 显示服务器的MIBInfo 
+    show mscope                | 显示服务器的多播范围
+    show napdeffail            | 显示服务器的NAP默认失败状态
+    show napstate              | 显示服务器的NAP状态
+    show optiondef             | 显示服务器的所有选项
+    show optionvalue           | 显示服务器的所有选项值
+    show scope                 | 显示服务器下所有可用的范围
+    show superscope            | 显示服务器下所有可用的超级范围
+    show userclass             | 显示当前设置的用户类名
+    show vendorclass           | 显示当前设置的销售商类名
+    ------------------------------------------------------------------------------------
+
+    表B-6  Netsh Dhcp Server V6上下文的命令 
+    -------------------------------------------------------------------------------------
+    命令                  | 描述
+    ----------------------|--------------------------------------------------------------
+    add class             | 向服务器中添加一个类
+    add optiondef         | 向服务器中添加DHCPv6选项
+    add scope             | 向服务器中添加范围
+    delete class          | 从服务器中删除特定类 
+    delete optiondef      | 从服务器中删除选项 
+    delete optionvalue    | 从服务器中删除选项值 
+    delete scope          | 从服务器中删除范围 
+    dump                  | 将配置信息转储到文本文件
+    export                | 将配置信息导出到文件
+    import                | 从文件中导出配置信息
+    set bingings          | 设置服务器的接口绑定 
+    set dnsconfig         | 设置服务器的DNS动态更新配置 
+    set preferredlifetime | 设置DHCP服务器上已发布lease的首选生存时间
+    set rapidcommitflag   | 设置服务器的全局快速commit标记
+    set t1                | 设置DHCP服务器上已发布lease的T1值
+    set t2                | 设置DHCP服务器上已发布lease的T2值
+    set unicastflag       | 设置服务器的全局单播标记
+    set userclass         | 设置随后操作的全局用户类名
+    set validlifetime     | 设置DHCP服务器上已发布lease的有效生存时间
+    set vendorclass       | 设置随后操作的全局销售商类名
+    show binghings        | 显示服务器的接口绑定
+    show class            | 显示服务器所有可用类
+    show dnsconfig        | 显示服务器的DNS动态更新配置
+    show mibinfo          | 显示服务器的MIBInfo 
+    show optiondef        | 显示服务器的所有DHCPv6选项
+    show optionvalue      | 显示服务器设置的所有选项值
+    show preferredlifetime| 设置DHCP服务器上已发布lease的首选生存时间 
+    show rapidcommitflag  | 设置服务器的全局快速commit标记 
+    shwo scope            | 显示服务器下所有可用范围
+    show t1               | 显示已发布lease的T1值
+    show t2               | 显示已发布lease的T2值
+    show unicastflag      | 显示单播标记
+    show userclass        | 显示当前设置的用户类名
+    show validlifetime    | 显示有效生存时间
+    show vendorclass      | 显示当前设置的销售商类名
+    ------------------------------------------------------------------------------------
+
+Netsh Dhcpclient 
+    Netsh Dhcpclient上下文中可以激活或禁用对DHCP通信的追踪，该上下文支持如下一些命令。
+    · trace enable。激活对DHCP客户端与DHCP QEC的追踪。
+    · trace disable。禁用对DHCP客户端与DHCP QEC的追踪。 
+
+Netsh Firewall 
+    Netsh Firewall上下文可用于对Windows防火墙进行管理，表B-7总结了这一上下文中所有可用命令。
+    表B-7  Netsh Firewall上下文中可用命令
+    ------------------------------------------------------------------------------------
+    命令                           |    描述
+    -------------------------------|-----------------------------------------------------
+    add allowedprogram             | 添加防火墙允许通过的程序配置
+    add portopening                | 添加防火墙端口配置
+    delete allowedprogram          | 删除防火墙允许通过的程序配置
+    delete portopening             | 删除防火墙端口配置
+    dump                           | 显示上下文中配置监本设置
+    reset                          | 将防火墙配置重置为默认设置
+    set allowedprogram             | 设置防火墙允许通过的程序配置
+    set icmpsetting                | 设置防火墙ICMP配置
+    set logging                    | 设置防火墙记录配置
+    set multicastbroadstresponse   | 设置防火墙多播/广播响应配置
+    set notifications              | 设置防火墙通知配置
+    set opmode                     | 设置防火墙操作配置
+    set portopening                | 设置防火墙端口配置
+    set service                    | 设置防火墙服务器配置
+    show allowedprogram            | 设置防火墙允许通过的程序配置
+    show config                    | 显示防火墙配置
+    show currentprofile            | 显示当前防火墙配置文件
+    show icmpsetting               | 显示防火墙ICMP配置
+    show logging                   | 显示防火墙记录配置
+    show multicastbroadcastresponse| 显示防火墙多播/广播响应配置
+    show notifications             | 显示防火墙通知配置
+    show opmode                    | 显示防火墙操作配置
+    show portopening               | 显示防火墙端口配置
+    show service                   | 显示防火墙服务配置
+    show state                     | 显示当前防火墙状态
+    ------------------------------------------------------------------------------------
+
+Netsh HTTP 
+    Netsh Http上下文可用于管理HTTP监听程序的配置，表B-8总结了该上下文中可用的命令。
+    表B-8  Netsh Http上下文中可用命令
+    --------------------------------------------------------------------------------
+    命令               | 描述
+    ------------------|-------------------------------------------------------------
+    add iplisten      | 向IP监听列表中添加一个IP地址
+    add sslcert       | 为IP地址与端口添加ssl服务器证书绑定
+    add timeout       | 为服务添加全局超时
+    add urlacl        | 添加一个URL保留条目
+    delete cache      | 从HTTP服务内核URI缓存中删除条目
+    delete iplisten   | 从IP监听列表中删除一个IP地址
+    delete sslcert    | 从IP地址与端口删除SSL证书绑定
+    delete timeout    | 删除全局超时
+    delete urlacl     | 删除URL保留
+    dump              | 显示上下文内的配置脚本设置
+    flush logbuffer   | 清空日志文件的内部缓冲区
+    show cachestate   | 列出缓存的URI资源及其相关联的属性
+    show iplisten     | 显示IP监听列表中的所有IP地址
+    show servicestate | 显示HTTP服务的快照
+    show sslcert      | 显示IP地址与端口的SSL整数绑定
+    show timeout      | 显示服务的超时值
+    show urlacl       | 显示URL命令空间保留
+    --------------------------------------------------------------------------------
+
+Netsh Interface 
+    Netsh Interface上下文中可以配置计算机网络接口与IP地址，如表B-9中所显示的，该上下文还包括了很多相关的上下文。
+    表B-9  Netsh Interface上下文的命令 
     ---------------------------------------------------------------------------
-    add class | 
-    add mscope | 
-    add optiondef | 
-    add scope     | 
-    backup        | 
-    delete class  | 
-    delete dnscredentials|
-    delete mscope        | 
-    delete optiondef     | 
-    delete optionvalue   | 
-    delete superscope    | 
+    命令            | 描述
+    ----------------|-----------------------------------------------------------
+    6to4            | 切换到netsh interface 6to4上下文
+    add interface   | 为路由器添加接口
+    delete interface| 从路由器删除接口
+    dump            | 显示上下文内的配置脚本设置
+    ipv4            | 切换到netsh interface ipv4上下文
+    ipv6            | 切换到netsh interface ipv6上下文
+    isatap          | 切换到netsh interface isatap上下文
+    portproxy       | 切换到netsh interface portproxy上下文
+    reset all       | 重置信息
+    set credentials | 设置连接到接口使用的凭据
+    set interface   | 设置接口参数
+    show credentials| 显示连接到接口使用过的凭据
+    show interface  | 显示接口
+    tcp             | 切换到netsh interface tcp上下文
+    teredo          | 切换到netsh interface teredo上下文
+    --------------------------------------------------------------------------
+
+    表B-10、表B-11分别总结了配置Ipv4、Ipv6网络接口时可用的命令，表B-12总结了其他Netsh Interface子上下文可用的命令。
+
+    表B-10  用于Netsh Interface Ipv4上下文的命令
+    -----------------------------------------------------------------------------
+    命令                   |   描述
+    -----------------------|------------------------------------------------------
+    add address            | 为指定的接口添加静态IP地址或默认网关
+    add dnsserver          | 蒹葭静态DNS服务器地址
+    add neighbors          | 添加邻居地址
+    add route              | 为接口添加路由
+    add winsserver         | 添加静态WINS服务器地址
+    delete address         | 为指定的接口删除静态IP地址或默认网关
+    delete arpcache        | 清空某个或所有接口的ARP缓存
+    delete destinationcache| 删除目标缓存
+    delete dnsserver       | 从指定的接口删除DNS服务器
+    delete neighbors       | 删除邻居缓存
+    delete route           | 删除路由
+    delete winsserver      | 从指定的接口删除WINS服务器
+    dump                   | 显示上下文内的脚本配置设置
+    install                | 安装IP协议
+    reset                  | 重置IP配置
+    set address            | 为接口设置IP地址或默认网关
+    set compartment        | 修改区域配置参数
+    set dnsserver          | 设置DNS服务器模式与地址
+    set dynamicportange    | 修改动态端口分配使用的端口范围
+    set global             | 修改全局配置的常规参数
+    set interface          | 修改IP地址的接口配置参数
+    set neighbors          | 设置邻居地址
+    set route              | 修改路由参数
+    set subinterface       | 修改子接口配置参数
+    set winsserver         | 设置WINS服务器模式与地址
+    show compartments      | 显示IP地址配置
+    show config            | 显示区域参数
+    show destinationcache  | 显示IP地址与附加信息
+    show dnsservers        | 显示DNS服务器地址
+    show dynamicportrange  | 显示动态端口范围配置参数
+    show global            | 显示全局配置参数
+    show icmpfaces         | 显示ICMP统计信息
+    show interfaces        | 显示接口参数
+    show ipaddresses       | 显示当前IP地址
+    show ipnettomedia      | 显示IP net-to-media映射
+    show ipstats           | 显示IP统计信息
+    show joins             | 显示添加的多播组
+    show neighbors         | 显示邻居缓存条目
+    show offload           | 显示卸载信息
+    show route             | 显示路由表条目
+    show subinterfaces     | 显示子接口参数
+    show tcpconnections    | 显示TCP连接
+    show tcpstats          | 显示TCP统计信息
+    show udpconnections    | 显示UDP连接
+    show udpstats          | 显示UDP统计信息
+    show winsservers       | 显示WINS服务器地址
+    uninstall              | 卸载IP协议
+    -----------------------------------------------------------------------------
+
+    表B-11  Netsh Interface Ipv6上下文中的命令
+    -----------------------------------------------------------------------------
+    命令                   | 描述
+    -----------------------|------------------------------------------------------
+    6to4                   | 切换到netsh interface ipv6 6to4上下文 
+    add address            | 为指定的接口添加静态IP地址或默认网关 
+    add dnsserver          | 添加静态DNS服务器地址
+    add neighbors          | 添加邻居地址
+    add potentialrouter    | 将路由器添加到接口上潜在的路由器列表
+    add prefixpolicy       | 添加一个前缀策略条目
+    add route              | 为接口添加路由
+    add v6v4tunnel         | 创建Ipv6-in-Ipv4点到点隧道
+    delete address         | 从指定接口删除IP地址或默认网关
+    delete destinationcache| 删除目标缓存
+    delete dnsserver       | 从指定的接口删除DNS服务器 
+    delete neighbors       | 删除邻居缓存
+    delete potentialrouter | 从接口上潜在路由器列表中删除路由器
+    delete prefixpolicy    | 删除前缀策略条目
+    delete route           | 删除路由
+    dump                   | 显示上下文内的脚本配置设置
+    isatap                 | 切换到netsh interface ipv6 isatap上下文 
+    reset                  | 重置IP配置 
+    set address            | 为接口设置IP地址或默认网关 
+    set compartment        | 修改区域配置参数
+    set dnsserver          | 设置DNS服务器模式与地址
+    set dynamicportrange   | 修改动态端口分配使用的端口范围
+    set global             | 修改全局配置的常规参数 
+    set interface          | 修改IP地址的接口配置参数 
+    set neighbors          | 设置邻居地址
+    set prefixpolicy       | 修改前缀策略信息
+    set privacy            | 修改隐私配置参数
+    set route              | 修改路由参数
+    set subinterface       | 修改子接口配置参数
+    set teredo             | 设置Teredo状态
+    show addresses         | 显示当前IP地址
+    show compartments      | 显示区域参数
+    show destinationcache  | 显示目的缓存条目
+    show dnsservers        | 显示DNS服务器地址 
+    show dynamicportrange  | 显示动态端口范围配置参数
+    show global            | 显示全局配置参数
+    show interfaces        | 显示接口参数
+    show ipstats           | 显示IP统计信息 
+    show joins             | 显示添加的多播组
+    show neighbors         | 显示邻居缓存条目
+    show offload           | 显示卸载信息
+    show potentialrouters  | 显示潜在的路由器
+    show prefixpolicues    | 显示前缀策略条目
+    show privacy           | 显示隐私配置参数
+    show route             | 显示路由表条目
+    show siteprefixes      | 显示站点prefix表条目
+    show subinterfaces     | 显示子接口参数
+    show tcpstats          | 显示TCP统计信息
+    show tredo             | 显示Teredo状态
+    show udpstats          | 显示UDP统计信息 
+    ----------------------------------------------------------------------------------
+
+    表B-12  用于Netsh Interface其他子上下文的命令
+    -------------------------------------------------------------------------------
+    上下文    |  描述
+    -------------------------------------------------------------------------------
+    netsh interface 6to4 
+    dump          | 显示上下文内的配置脚本设置
+    set interface | 设置6to4接口配置信息
+    set relay     | 设置6to4转播信息
+    set routing   | 设置6to4路由信息
+    set state     | 设置6to4状态
+    show interface| 显示6to4接口配置信息
+    show relay    | 显示6to4转播信息
+    show routing  | 显示6to4路由状态
+    state         | 显示6to4状态
+    -------------------------------------------------------------------------------
+    netsh interface ipv6 6to4 
+    dump          | 显示上下文内的配置脚本设置
+    set interface | 设置6to4接口配置信息
+    set relay     | 设置6to4转播信息
+    set routing   | 设置6to4路由信息
+    set state     | 设置6to4状态
+    show interface| 显示6to4接口配置信息
+    show relay    | 显示6to4转播信息
+    show routing  | 显示6to4路由状态
+    show state    | 显示6to4状态
+    -------------------------------------------------------------------------------
+    netsh interface ipv6 isatap 
+    dump       | 显示上下文内的配置脚本设置
+    set router | 设置ISATAP路由器信息
+    set state  | 设置ISATAP状态
+    show router| 显示ISATAP路由器信息
+    shwo state | 显示ISATAP状态
+    -------------------------------------------------------------------------------
+    netsh interface isatap 
+    dump       | 显示上下文内的配置脚本设置
+    set router | 设置ISATAP路由器信息 
+    set state  | 设置ISATAP状态 
+    show router| 显示ISATAP路由器信息 
+    show state | 显示ISATAP状态
+    -------------------------------------------------------------------------------
+    netsh interface portproxy 
+    add v4tov4   | 添加一个条目，用来监听通过Ipv4的Ipv4与代理连接
+    add v4tov6   | 添加一个条目，用来监听通过Ipv6的Ipv4与代理连接
+    add v6tov6   | 添加一个条目，用来监听通过Ipv4的Ipv6与代理连接
+    add v6tov4   | 添加一个条目，用来监听通过Ipv6的Ipv6与代理连接
+    delete v4tov4| 删除一个条目，该条目用来监听通过Ipv4的Ipv4与代理连接
+    delete v4tov6| 删除一个条目，该条目用来监听通过Ipv6的Ipv4与代理连接
+    delete v6tov4| 删除一个条目，该条目用来监听通过Ipv4的Ipv6与代理连接
+    delete v6tov6| 删除一个条目，该条目用来监听通过Ipv6的Ipv6与代理连接
+    dump         | 显示上下文内的配置脚本设置
+    reset        | 重置portproxy配置状态
+    set v4tov4   | 更新一个条目，用来监听通过Ipv4的Ipv4与代理连接
+    set v4tov6   | 更新一个条目，用来监听通过Ipv6的Ipv4与代理连接
+    set v6tov4   | 更新一个条目，用来监听通过Ipv4的Ipv6与代理连接
+    set v6tov6   | 更新一个条目，用来监听通过Ipv6的Ipv6与代理连接
+    show all     | 显示所有端口代理参数
+    show v4tov4  | 显示一些参数，这些参数用于代理Ipv4到其他Ipv4端口的连接
+    show v4tov6  | 显示一些参数，这些参数用于代理Ipv4到Ipv6的连接
+    show v6tov4  | 显示一些参数，这些参数用于代理Ipv6到Ipv4的连接
+    show v6tov6  | 显示一些参数，这些参数用于代理Ipv6到其他Ipv6端口的连接
+    -------------------------------------------------------------------------------
+    netsh interface tcp 
+    add chimneyapplication   | 向TCP Chimney offload表添加一个应用程序
+    add chimneyport          | 为指定的本地源端口与远程目的端口向TCP Chimney offload表添加一个应用程序
+    delete chimneyapplication| 从卸载表中删除一个TCP Chimney 端口条目
+    dump                     | 显示上下文内配置脚本设置
+    reset                    | 将所有TCP参数重置为其各自的默认值
+    set global               | 设置全局TCP参数
+    show chimneyapplications | 显示TCP Chimney offload表中的应用程序
+    show chimneyports        | 显示TCP Chimney offload表中的端口
+    show global              | 显示全局TCP参数
+    -------------------------------------------------------------------------------
+    netsh interface teredo 
+    dump      | 显示上下文内配置脚本设置
+    set state | 设置Teredo状态
+    show state| 显示Teredo状态 
+    ------------------------------------------------------------------------------
+
+Netsh Ipsec 
+    使用Netsh Ipsec上下文及其相关子上下文，可以对Internet协议安全（IPsec）进行配置，表B-13总结了本上下文及其相关所有子上下文中可用的命令。
+    表B-13  用于Netsh Ipsec、Netsh Ipsec Dynamic、Netsh Ipsec Static上下文中的命令
+    -----------------------------------------------------------------------------
+    上下文/命令  | 描述
+    -----------------------------------------------------------------------------
+    netsh ipsec 
+    dump   | 显示上下文内配置脚本设置
+    dynamic| 切换到netsh ipsec dynamic上下文
+    static | 切换到netsh ipsec static上下文
+    -----------------------------------------------------------------------------
+    netsh ipsec dynamic 
+    add mmpolicy   | 向SPD添加一条主模式策略
+    add qmpolicy   | 向SPD添加一条快速模式策略
+    add rule       | 向SPD添加一条规则及其相关联的过滤器
+    delete all     | 从SPD中删除所有的策略、过滤器及操作
+    delete mmpolicy| 从SPD中删除一条主模式策略
+    delete qmpolicy| 从SPD中删除一条快速模式策略
+    delete rule    | 从SPD中删除一条规则及其相关联的过滤器
+    delete sa      | 删除一个安全关联
+    dump           | 显示上下文内配置脚本设置
+    set config     | 设置IPsec配置及引导时间行为
+    set mmpolicy   | 修改SPD中的一条主模式策略
+    set qmpolicy   | 修改SPD中的一条快速模式策略
+    set rule       | 修改SPD中的一条规则及其相关联的过滤器
+    show all       | 显示SPD中的策略、过滤器、SA以及一些统计信息
+    show config    | 显示IPsec配置
+    show mmfilter  | 显示SPD中的主模式过滤器的详细资料
+    show mmpolicy  | 显示SPD中的主模式策略的详细资料
+    show mmsas     | 显示SPD中主模式安全关联
+    show qmfilter  | 显示SPD中的快速模式过滤器的详细资料
+    show qmpolicy  | 显示SPD中的快速模式策略的详细资料
+    show qmsas     | 显示SPD中快速模式的安全关联
+    show rule      | 显示SPD中规则详细资料
+    show stats     | 显示SPD中IPsec与IKE统计信息
+    ---------------------------------------------------------------------------------
+    netsh ipsec static 
+    add filter            | 想过滤器列表中添加一个过滤器
+    add filteraction      | 创建一个过滤器操作
+    add filterlsit        | 创建一个空的过滤器列表
+    add policy            | 常见一条策略，使用默认的响应规则
+    add rule              | 为指定策略创建一条规则
+    delete all            | 删除所有的策略、过滤器列表与过滤器操作
+    delete filter         | 从过滤器列表中删除一个过滤器
+    delete filteraction   | 删除一个过滤器操作
+    delete filterlist     | 删除一个过滤器列表
+    delete policy         | 删除一条策略及其规则
+    dump                  | 显示上下文内配置脚本设置
+    exportpolicy          | 从策略库中导出所有策略
+    importpolicy          | 将策略从文件中导入策略库
+    set batch             | 设置批量更新模式
+    set defaultrule       | 修改策略的默认响应规则
+    set filteraction      | 修改过滤器操作
+    set filterlist        | 修改过滤器列表
+    set policy            | 修改策略
+    set rule              | 修改规则
+    set store             | 设置当前策略库
+    show all              | 显示所有策略及其相关信息的详细资料
+    show filteraction     | 显示过滤器操作的详细资料
+    show filterlist       | 显示过滤器列表的详细资料
+    show gpoassignedpolicy| 显示组指定策略的详细资料
+    show policy           | 显示策略的详细资料
+    show rule             | 显示规则的详细资料
+    show store            | 显示当前策略库
+    ---------------------------------------------------------------------------------
+
+Netsh Lan 
+    在Wired AutoConfig服务处于激活状态时，可以通过Netsh Lan上下文查看与管理自动配置的有线网络接口及其相关的配置与设置。表B-14总结了这一上下文中可用的命令。
+    表B-14  Netsh Lan上下文内的命令
+    ---------------------------------------------------------------------------------
+    命令                | 描述
+    --------------------|-------------------------------------------------------------
+    add profile         | 向计算机上指定网络接口上添加LAN配置文件
+    delete profile      | 从一个或多个网络接口上删除LAN配置文件
+    dump                | 显示上下文内配置脚本设置
+    export              | 将LAN配置文件保存为XML文件
+    reconnect           | 在一个网络接口上重新连接
+    set autoconfig      | 激活或禁用网络接口上的自动配置
+    set profileparameter| 对无线配置中的认证与签名机制进行配置
+    set tracing         | 激活或禁用追踪
+    show interfaces     | 显示系统中当前有线网络接口列表
+    show profiles       | 显示计算机上当前配置的有线网络配置列表
+    show settings       | 显示有线LAN当前的全局设置
+    show tracing        | 显示有线LAN追中处于激活还是禁用状态
+    ----------------------------------------------------------------------------------
+
+Netsh Nap 
+    Netsh Nap上下文可以用于对网络访问保护（NAP）的配置进行管理。表B-15总结了这一上下文及其相关的Client、Hra子上下文中可用的命令。
+    表B-15  Netsh Nap及其相关子上下文内的命令
+    -----------------------------------------------------------------------------------
+    命令  | 描述
+    -----------------------------------------------------------------------------------
+    netsh nap 
+    client             | 切换到netsh nap client上下文 
+    dump               | 显示上下文内配置脚本设置
+    hra                | 切换到netsh nap hra上下文 
+    reset configuration| 重置NAP配置
+    show configuration | 显示NAP配置
+    ------------------------------------------------------------------------------------
+    netsh nap client 
+    add server               | 添加可信服务器配置
+    add trustedservergroup   | 添加可信服务器组配置
+    delete server            | 删除可信服务器配置
+    delete trustedservergroup| 删除可信服务器组配置
+    dump                     | 显示上下文内配置脚本设置
+    export                   | 导出配置设置
+    import                   | 导入配置设置
+    rename server            | 对可信服务器组内现存可信服务器的URL进行重命名
+    rename trustedservergroup| 对可信服务器组进行重命名 
+    reset configuration      | 重置NAP客户端配置
+    reset csp                | 重置CSP配置
+    reset enforcement        | 重置强制配置
+    reset hash               | 重置hash配置
+    reset server             | 重置可信服务器配置
+    reset tracing            | 重置追踪配置
+    reset trustedservergroup | 重置可信服务器组配置
+    reset userinterface      | 重置用户接口配置
+    set csp                  | 设置CSP配置
+    set enforcement          | 设置强制配置
+    set hash                 | 设置hash配置
+    set server               | 设置可信服务器配置
+    set tracing              | 设置追踪配置
+    set userinterface        | 设置用户接口配置
+    show configuration       | 显示配置
+    show csps                | 显示CSP配置
+    show grouppolicy         | 显示组策略配置
+    show hashes              | 显示hash配置
+    show state               | 显示状态
+    show trustedservergroup  | 显示所有可信服务器组
+    -----------------------------------------------------------------------------------
+    netsh nap hra 
+    add asymmetrickey   | 添加非同步密钥配置
+    add caserver        | 添加CS服务器配置
+    add csp             | 添加CSP配置
+    add hash            | 添加hash配置
+    add useragent       | 添加用户agent配置
+    delete asymmetrickey| 删除非同步密钥配置
+    delete caserver     | 删除CA服务器配置
+    delete csp          | 删除CSP配置
+    delete hash         | 删除hash配置
+    delete useragent    | 删除用户agent
+    dump                | 显示上下文内配置脚本设置
+    export              | 导出配置设置
+    import              | 导入配置设置
+    rename caserver     | 对CA服务器配置进行重命名
+    reset asymmetrickey | 重置非同步密钥配置
+    reset caserver      | 重置CA服务器配置
+    reset configuration | 重置配置 
+    reset csp           | 重置CSP配置 
+    reset hash          | 重置hash配置
+    reset opmode        | 重置HRA当前模式
+    reset templates     | 重置HRA整数模版配置
+    reset timeout       | 重置超时设置
+    reset userpolicyOIDs| 重置策略OID配置
+    reset useragent     | 重置用户agent
+    reset validityperiod| 重置HRA有效性周期
+    set caserver        | 设置CA服务器配置
+    set opmode          | 设置HRA模式
+    set templates       | 设置HRA证书模版配置
+    set timeout         | 设置超时配置
+    set userpolicyOIDs  | 设置策略OID配置
+    set validityperiod  | 设置蒸煮的有效期（以分钟计数）
+    show asymmetrickeys | 显示非同步密钥
+    show configuration  | 显示配置
+    show csps           | 显示CSP
+    show hashes         | 显示hash 
+    -----------------------------------------------------------------------------------
+
+Netsh Netio 
+    Netsh Netio上下文可以用于添加、删除或列出网络绑定的过滤器，可用的命令包括下面列举的。
+    · add bindingfilter。添加绑定的过滤器。
+    · delete bindingfilter。删除绑定的过滤器。
+    · dump。显示配置脚本。
+    · show bindingfilters。显示所有绑定的过滤器。
+
+Netsh Nps 
+    Netsh Nps上下文可以用于管理网络策略服务器（Nps）的配置。在Windows Server 2008中，NPS取代了Windows Server 2008中的Internet认证服务（IAS）。表B-16总结了该上下文中可用的命令。
+    表B-16  Netsh Nps上下文中的命令 
+    -----------------------------------------------------------------------------------
+    命令                         | 描述  
+    -----------------------------|------------------------------------------------------
+    add client                   | 添加客户端配置
+    add crp                      | 添加连接请求策略配置
+    add np                       | 添加网络策略配置
+    add registerdserver          | 在活动目录中注册NPS服务器
+    add remediationserver        | 添加矫正服务器配置
+    add remediationservergroup   | 添加矫正服务器组配置
+    add remoteserver             | 添加远程服务器配置
+    add remoteservergroup        | 添加远程服务器组配置
+    add shvtemplate              | 添加健康策略配置
+    delete client                | 删除客户端配置
+    delete crp                   | 删除链接请求策略配置
+    delete np                    | 删除网络策略配置
+    delete registeredserver      | 在活动目录中取消注册NPS服务器
+    delete remediationserver     | 删除矫正服务器配置
+    delete remediationservergroup| 删除矫正服务器组配置
+    delete remoteserver          | 删除远程服务器配置
+    delete remoteservergroup     | 删除远程服务器组配置
+    delete shvtemplate           | 删除健康策略配置
+    dump                         | 显示上下文内配置脚本设置 
+    export                       | 导出配置
+    import                       | 导入配置
+    rename client                | 重命名客户端配置
+    rename crp                   | 重命名连接请求策略配置
+    rename np                    | 重命名网络策略配置
+    rename remediationserver     | 重命名矫正服务器配置
+    rename remediationservergroup| 重命名矫正服务器组配置
+    rename remoteserver          | 重命名远程服务器配置
+    rename remoteservergroup     | 重命名远程服务器组配置
+    rename shvtemplate           | 重命名健康策略配置
+    reset client                 | 重置客户端配置
+    reset config                 | 重置配置
+    reset crp                    | 重置连接请求策略配置
+    reset eventlog               | 重置事件日志配置
+    reset filelog                | 重置文件日志配置
+    reset np                     | 重置网络策略配置
+    reset ports                  | 重置端口配置
+    reset remediationserver      | 重置矫正服务器配置
+    reset remediationservergroup | 重置矫正服务器组配置
+    reset remoteserver           | 重置远程服务器配置
+    reset remoteservergroup      | 重置远程服务器组配置
+    reset shv                    | 重置系统健康验证器配置
+    reset shvtemplate            | 重置健康策略配置
+    reset sqllog                 | 重置SQL日志配置
+    set client                   | 设置客户端配置
+    set crp                      | 设置连接请求策略配置
+    set eventlog                 | 设置事件日志配置
+    set filelog                  | 设置文件日志配置
+    set np                       | 设置网络策略配置
+    set ports                    | 设置端口配置
+    set remediationserver        | 设置矫正服务器配置
+    ser remoteserver             | 设置远程服务器配置
+    set shv                      | 设置系统健康验证器配置
+    set shvtemplate              | 设置健康策略配置
+    set sqllog                   | 设置SQL日志配置
+    show client                  | 显示客户端配置
+    show config                  | 显示配置
+    show crp                     | 显示连接请求策略配置
+    show crpconditionattributes  | 显示所有可用的连接请求策略条件属性
+    show crpprofileattributes    | 显示所有可用的连接请求策略配置属性
+    show eventlog                | 显示事件日志配置
+    show filelog                 | 显示文件日志配置
+    show napserverinfo           | 显示NAP服务器信息
+    show np                      | 显示网络策略配置
+    show npconditionattributes   | 显示所有可用的网络策略条件属性
+    show npprofileattributes     | 显示所有可用的网络策略配置属性
+    show ports                   | 显示端口配置
+    show registeredserver        | 显示活动目录中NPS服务器的注册
+    show remediationservergroup  | 显示矫正服务器配置
+    show remediationservergroup  | 显示矫正服务器组配置
+    show remoteserver            | 显示远程服务器配置
+    show remoteservergroup       | 显示远程服务器组配置
+    show shv                     | 显示系统健康验证器配置
+    show shvtemplate             | 显示健康策略配置
+    show sqlog                   | 显示SQL日志配置
+    show vendors                 | 显示所有可用的销售商
+    ---------------------------------------------------------------------------------------
+
+Netsh P2p 
+    Netsh P2p上下文及其相关子上下文可以用于管理点对点网络（P2P）的配置，表B-16总结了该上下文及其相关子上下文中可用的命令。
+    表B-17  Netsh P2p上下文中及其相关子上下文中的命令
+    --------------------------------------------------------------------------------------
+    上下文/命令  |  描述
+    --------------------------------------------------------------------------------------
+    netsh p2p 
+    collab| 切换到netsh p2p collab上下文
+    dump  | 显示上下文内配置脚本设置
+    group | 切换到neths p2p group上下文
+    idmgr | 切换到netsh p2p idmgr上下文
+    pnrp  | 切换到netsh p2p pnrp上下文
+    -------------------------------------------------------------------------------------
+    netsh p2p collab 
+    contect| 切换到netsh p2p collab contact上下文
+    dump   | 显示上下文内配置脚本设置 
+    -------------------------------------------------------------------------------------
+    netsh p2p collab contect 
+    delete       | 从联系人数据库中删除一个联系人
+    dump         | 显示上下文内配置脚本设置
+    export       | 将联系人Me（代表当前用户）导出到一个文件
+    import       | 将联系人导入联系人数据库
+    set          | 改变联系人数据
+    show contects| 显示联系人数据
+    show xml     | 显示联系人XML文件内容
+    ------------------------------------------------------------------------------------
+    netsh p2p group 
+    database       | 切换到netsh p2p group database上下文
+    dump           | 显示上下文内配置脚本设置
+    gping          | 检测到远程组端口的连通性
+    resolve        | 解析组内的一个参与方列出其地址
+    show acl       | 列出访问控制列表（ACL）信息
+    show address   | 解析当前节点内的一个参与方并列出其地址
+    show statistics| 列出给定<identity P2PID><group P2PID>的数据库统计信息
+    -----------------------------------------------------------------------------------
+    netsh p2p idmgr 
+    delete group    | 从实体中删除组
+    delete identity | 删除实体
+    dump            | 显示上下文内配置脚本设置
+    show groups     | 显示实体与组列表
+    show identities | 显示实体列表
+    show statistics | 显示实体统计信息
+    -----------------------------------------------------------------------------------
+    netsh p2p pnrp 
+    cloup      | 切换到netsh p2p pnrp cloud上下文
+    diagnostics| 切换到netsh p2p pnrp diagnostics上下文
+    dump       | 显示上下文内配置脚本设置
+    peer       | 切换到netsh p2p pnrp peer上下文
+    -----------------------------------------------------------------------------------
+    netsh p2p pnrp cloud 
+    dump               | 显示上下文内配置脚本设置
+    flush              | 清空缓存条目
+    repair             | 开始分割检测与恢复
+    set pnrpmode       | 修改PNRP模式配置参数
+    set seed           | 修改PNRP SeedServer模式配置参数
+    show initialization| 显示cloud自举配置/状态
+    show list          | 显示cloud列表
+    show names         | 显示本地注册名
+    show pnrpmode      | 显示PNRP模式配置参数
+    show seed          | 显示PNRP SeedServer模式配置参数
+    show statistics    | 显示cloud统计信息
+    start              | 启动P2P网络cloud
+    synchronize host   | 将cloud与指定的主机同步
+    synchronize seed   | 将cloud与其种子服务器同步
+    -----------------------------------------------------------------------------------
+    netsh p2p pnrp diagnostics 
+    dump | 显示上下文内配置脚本设置
+    ping | 对PNRP节点进行ping操作
+    -----------------------------------------------------------------------------------
+    netsh p2p pnrp peer 
+    add registration   | 注册一个端点名
+    delete registration| 取消端点名的注册
+    dump               | 显示上下文内配置脚本设置
+    enumerate          | 美剧指定cloud内的端点名
+    resolve            | 解析端点名
+    set machinename    | 设置PnrpAutoReg服务的配置信息
+    show convertedname | 端点名到DNS名的互相转换
+    show machinename   | 显示PNRP及其名发布服务的配置信息
+    show registration  | 列出注册的端点名
+    traceroote         | 解析带路径追踪的端点名
+    -----------------------------------------------------------------------------------
+
+Netsh Ras 
+    Netsh Ras上下文可以用于管理远程访问服务（RAS）、路由与远程访问服务（RRAS）的配置，表B-18总结了该上下文中可用的命令。
+    表B-18  Netsh Ras上下文中的命令
+    ----------------------------------------------------------------------------------
+    命令     |  描述
+    ----------------------------------------------------------------------------------
+    aaaa                   | 切换到netsh ras aaaa上下文
+    add authtype           | 添加远程访问服务器协商使用的认证类型
+    add link               | 添加PPP协商使用的链路属性列表
+    add multilink          | 添加PPP协商使用的多链路类型列表
+    add registeredserver   | 将给定的Windows计算机注册为给定域内活动目录中远程访问服务器
+    delete authtype        | 删除远程访问服务器的一种认证类型
+    delete link            | 从PPP协商使用的链路属性列表进行删除
+    delete multilink       | 从PPP协商使用的多链路类型列表中进行删除
+    delete registeredserver| 将给定的Windows计算机取消注册为给定域内活动目录中远程访问服务器
+    demanddial             | 切换到netsh ras demanddial上下文
+    diagnostics            | 切换到netsh ras diagnostics上下文
+    dump                   | 显示上下文内配置脚本设置
+    ip                     | 切换到netsh ras ip上下文 
+    ipv6                   | 切换到netsh ras ipv6上下文 
+    set authmode           | 设置认证模式
+    set client             | 重置统计信息，或断开远程客户端的连接
+    set conf               | 设置服务器的配置状态
+    set portstatus         | 设置RAS端口的统计信息
+    set type               | 设置计算机的路由器与RAS功能
+    set user               | 设置用户的远程访问属性
+    show activeservers     | 通过列出远程访问服务器广告显示活跃的RAS服务器
+    show authmode          | 显示认证模式
+    show client            | 显示连接到计算机的远程访问客户端及其状态
+    show conf              | 显示服务器的配置状态
+    show link              | 显示PPP协商使用的链路属性
+    shwo multilink         | 显示PPP协商使用的多链路类型
+    show portstatus        | 显示RAS端口的当前状态
+    show registeredserver  | 显示某计算机是否已注册为给定域内的活动目录中远程访问服务器
+    show status            | 显示路由与远程访问服务器的状态
+    show type              | 显示计算机的路由器与RAS功能
+    show user              | 显示用户的远程访问属性
+    ----------------------------------------------------------------------------------
+
+    表B-19、表B-20、表B-21分别总结了Netsh Ras Asss上下文、Netsh Ras Demanddial上下文、Netsh Ras Diagnostics上下文中可用的命令。另外两个上下文Netsh Ras Ip与Netsh Ras Ipv6中可用的命令则在表B-22中总结。
+    表B-19  Netsh Ras Aaaa上下文中的命令
+    -----------------------------------------------------------------------------------
+    命令               |  描述
+    -------------------|----------------------------------------------------------------
+    add acctserver     | 添加一个RADIUS记账服务器
+    add authserver     | 添加一个RADIUS认证服务器
+    delete acctserver  | 删除一个RADIUS记账服务器
+    delete authserver  | 删除一个RADIUS服务器 
+    dump               | 显示上下文内配置脚本设置
+    set accounting     | 设置记账提供者
+    set acctserver     | 设置记账服务器的属性
+    set authentication | 设置认证提供者
+    set authserver     | 设置认证服务器属性
+    set ipsecpolicy    | 设置L2TP连接的IPsec策略
+    show accounting    | 显示当前的记账提供者
+    show acctserver    | 显示用于记账的RADIUS服务器
+    show authentication| 显示当前的认证提供者
+    show authserver    | 显示用于认证的RADIUS服务器
+    show ipsecpolicy   | 显示L2TP连接的IPsec策略
+    -----------------------------------------------------------------------------------
+
+    表B-20 Netsh Ras Demanddial上下文的命令 
+    ------------------------------------------------------------------------------------
+    命令               |   描述  
+    -------------------|-----------------------------------------------------------------
+    add interface      | 
+    delete interface   | 
+    dump               | 
+    set callbackdevice | 
+    set credentials    | 
+    set interface      | 
+    set PPP            | 
+    set security       | 
+    show callbackdevice| 
+    show interface     | 
+    show ppp           | 
+    show security      | 
+    -----------------------------------------------------------------------------------
