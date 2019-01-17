@@ -954,16 +954,433 @@ Netsh Ras
     ------------------------------------------------------------------------------------
     命令               |   描述  
     -------------------|-----------------------------------------------------------------
-    add interface      | 
-    delete interface   | 
-    dump               | 
-    set callbackdevice | 
-    set credentials    | 
-    set interface      | 
-    set PPP            | 
-    set security       | 
-    show callbackdevice| 
-    show interface     | 
-    show ppp           | 
-    show security      | 
+    add interface      | 添加一个新的请求拨号接口
+    delete interface   | 删除一个请求拨号接口
+    dump               | 显示上下文内配置脚本设置
+    set callbackdevice | 设置用于请求拨号接口的回拨设备的回拨号
+    set credentials    | 设置请求拨号接口的拨号凭据
+    set interface      | 设置请求拨号接口的选项设置
+    set PPP            | 设置请求拨号接口的PPP选项
+    set security       | 设置请求拨号接口的安全选项
+    show callbackdevice| 显示用于请求拨号接口的回拨设备的回拨号
+    show interface     | 显示请求拨号接口的设置
+    show ppp           | 显示请求拨号接口的PPP选项
+    show security      | 显示请求拨号接口的安全选项
     -----------------------------------------------------------------------------------
+
+    表B-21  Netsh Ras Diagnostics上下文中的命令 
+    -----------------------------------------------------------------------------------
+    命令                 |  描述
+    ---------------------|-------------------------------------------------------------
+    dump                 | 显示上下文内配置脚本设置
+    set cmtracing        | 激活/禁用连接管理者记录
+    set loglevel         | 设置RRAS的全局日志级别
+    set modemtracing     | 激活/禁用网络连接中调制解调器设置与消息追踪
+    set rastracing       | 激活/禁用对某组件的扩展追踪
+    set securityeventlog | 激活/禁用安全事件记录。要查看安全事件日志，可以使用事件查看器
+    set tracefacilities  | 激活/禁用对所有组件的扩展追踪
+    show all             | 生成扩展的远程访问诊断报告
+    show cmtracing       | 显示连接管理者记录是否激活
+    show configuration   | 显示配置信息
+    show installation    | 显示安装信息
+    show loglevel        | 显示RRAS的全局日志级别
+    show logs            | 显示所有日志
+    show modemtracing    | 显示网络连接中调制解调器设置与消息追踪是否激活
+    show rastracing      | 显示对某组件的扩展追踪是否激活
+    show securityeventlog| 显示安全事件记录是否激活
+    show tracefacilities | 显示对所有组件的扩展追踪是否激活
+    ----------------------------------------------------------------------------------
+
+    表B-22  Netsh Ras Ip与Netsh Ras Ipv6上下文中的命令 
+    ----------------------------------------------------------------------------------
+    上下文/命令   |  描述
+    ----------------------------------------------------------------------------------
+    netsh ras ip 
+    add range                  | 向静态IP地址池中添加一个范围
+    dekete pool                | 从静态IP地址池中删除所有范围
+    delete range               | 从静态IP地址池中删除一个范围
+    dump                       | 显示上下文内配置脚本设置
+    set access                 | 设置客户端是否可以访问远程访问服务器
+    set addressign             | 设置远程访问服务器为其客户端分配IP地址的方法
+    set addrreq                | 设置客户端是否可以请求自己的IP地址
+    set broadcastnameresolution| 设置是否激活或禁用广播名解析（使用基于TCP/IP的NetBIOS）
+    set negotiation            | 设置是否为客户端远程访问连接协商IP
+    set preferredadapter       | 指定用于路由与远程访问服务的首选适配器
+    show config                | 显示当前的远程访问IP配置
+    show preferredadapter      | 显示用于路由与远程访问服务的首选适配器
+    ----------------------------------------------------------------------------------
+    netsh ras ipv6 
+    dump           | 显示上下文内配置脚本设置
+    set access     | 设置客户端是否可以访问远程访问服务器
+    set negotiation| 设置是否为客户端远程访问连接协商Ipv6
+    set prefix     | 设置RAS服务器使用的前缀
+    show config    | 显示当前的远程访问Ipv6配置
+    ---------------------------------------------------------------------------------
+
+Netsh Routing 
+    在将软件路由器配置为路由与远程访问服务（RRAS）的一部分时，Netsh Routing上下文可以用于管理IP路由的配置。表B-23总结了这一上下文及Routing Demanddial子上下文中可用的命令，表B-24总结了Routing Ip子上下文中的命令。
+    表B-23  Netsh Routing与Netsh Demanddial上下文中的命令 
+    ------------------------------------------------------------------------------
+    上下文/命令| 描述
+    ------------------------------------------------------------------------------
+    netsh routing 
+    demanddial         | 切换到netsh routing demanddial上下文 
+    dump               | 显示上下文内配置脚本设置
+    Ip                 | 切换到netsh routing ip上下文 
+    ipv6               | 切换到netsh routing ipv6上下文 
+    reset              | 将IP路由重置为干净状态
+    add interface      | 添加一个新的请求拨号接口
+    delete interface   | 删除一个请求拨号接口
+    set callbackdevice | 设置用于请求拨号接口的回拨设备的回拨号
+    set credentials    | 设置请求拨号接口的拨号凭据
+    set interface      | 设置请求拨号接口的选项设置
+    set ppp            | 设置请求拨号接口的PPP选项 
+    set security       | 设置请求拨号接口的安全选项
+    show callbackdevice| 显示用于请求拨号接口的回拨设备的回拨号
+    show interface     | 显示请求拨号接口的设置
+    show ppp           | 显示请求拨号接口的PPP选项 
+    show security      | 显示请求拨号接口的安全选项
+    -----------------------------------------------------------------------------
+    表B-24  Netsh Routing与Netsh Routing Ip上下文中的命令 
+    -----------------------------------------------------------------------------
+    命令                        |   描述
+    ----------------------------|-------------------------------------------------
+    add boundary                | 在接口上添加一个多播范围边界
+    add filter                  | 在指定的接口上添加一个数据包过滤器
+    add interface               | 在接口上激活IP转发
+    add persistentroute         | 添加持久性静态路由
+    add preferenceforprorocol   | 添加路由协议的首选级别
+    add rtmroute                | 添加非持久性（NetMgmt）路由
+    add scope                   | 添加一个多播范围
+    autodhcp                    | 切换到netsh routing ip autodhcp上下文
+    delete boundary             | 从接口上删除一个多播范围边界
+    delete filter               | 从指定的接口上删除一个数据包过滤器
+    delete interface            | 在指定的接口上删除IP转发
+    delete persistentroute      | 删除持久性静态路由
+    delete preferenceforprorocol| 删除指定协议的首选
+    delete rtmroute             | 删除用于网络管理的非持久性路由
+    delete scope                | 删除一个多播范围
+    dnsproxy                    | 切换到netsh routing ip dnsproxy上下文
+    dump                        | 显示上下文内配置脚本设置
+    igmp                        | 切换到netsh routing ip igmp上下文
+    nat                         | 切换到netsh routing ip nat上下文 
+    relay                       | 切换到netsh routing ip relay上下文
+    reset                       | 将IP路由重置为干净状态 
+    rip                         | 切换到netsh routing ip rip上下文
+    routerdiscovery             | 切换到netsh routing ip routerdiscovery上下文
+    set filter                  | 改变指定接口上的过滤器属性
+    set interface               | 设置接口状态
+    set loglevel                | 设置全局记录级别
+    set persistentroute         | 修改持久性静态路由
+    set preferenceforprotocol   | 设置路由协议的首选级别
+    set rtmroute                | 修改非持久性（NetMgmt）路由
+    set scope                   | 设置多播范围名
+    set updateroutes            | 更新指定的或所有接口的路由信息
+    show boundary               | 显示已配置的多播范围边界
+    show boundarystats          | 显示IP多播边界
+    show filter                 | 显示数据报过滤器信息
+    show interface              | 显示接口信息
+    show loglevel               | 显示全局记录级别
+    show mfe                    | 显示多播转发条目
+    show mfestats               | 显示多播转发条目统计信息
+    show persistenroutes        | 显示持久性静态路由
+    show preferenceforprotocol  | 显示所有协议的首选级别
+    show protocol               | 显示所有已配置的IP协议
+    show rtmdestionations       | 显示路由表中的目的地址
+    show scope                  | 显示路由表中的路由信息
+    show rtmroutes              | 显示路由器上配置的多播范围
+    update                      | 更新接口上的自动静态路由
+    --------------------------------------------------------------------------------
+
+    表B-25、表B-26、表B-27、表B-28总结了Netsh Routing Ip上下文的一些子上下文中可用的命令。其中，表B-25总结了Netsh Routing Ip Autodhcp与Netsh Routing Ip Dnsproxy中的命令，表B-26总结了Netsh Routing Ip Igmp与Netsh Routing Ip Nat中的命令，表B-27总结了Netsh Routing Ip Relay与Netsh Routing Ip Rip中的命令，表B-28总结了Netsh Routing Ip Routerdiscovery、Netsh Routing Ipv6、Netsh Routing Ipv6 Relayv6中的命令。
+
+    表B-25  Netsh Routing Ip Autodhcp与Netsh Routing Ip Dnsproxy中的命令 
+    -------------------------------------------------------------------------------
+    上下文/命令  |  描述
+    -------------------------------------------------------------------------------
+    netsh routing ip autodhcp 
+    add exclusion   | 为DHCP分配器范围添加排除
+    delete exclusion| 从DHCP分配器范围中删除排除
+    dump            | 显示上下文内配置脚本设置
+    install         | 安装与当前上下文相对应的路由协议
+    set global      | 修改全局DHCP分配器参数
+    set interface   | 修改某接口DHCP分配器参数
+    show global     | 显示DHCP分配器配置
+    show interface  | 显示指定接口的DHCP分配器配置
+    uninstall       | 移除与当前上下文相对应的路由协议
+    ------------------------------------------------------------------------------
+    netsh routing ip dnsproxy 
+    dump          | 显示上下文内配置脚本设置
+    install       | 安装与当前上下文向对应的路由协议
+    set global    | 设置全局DNS代理参数
+    set interface | 设置某接口DNS代理参数
+    show global   | 显示DNS代理配置
+    show interface| 显示指定接口的DNS代理配置
+    uninstall     | 移除与当前上下文相对应的路由协议
+    ------------------------------------------------------------------------------
+
+    表B-26  Netsh Routing Ip Igmp与Netsh Routing Ip Nat中的命令 
+    ------------------------------------------------------------------------------
+    上下文/命令   |   描述
+    ------------------------------------------------------------------------------
+    netsh routing ip igmp 
+    add interface       | 在指定的接口上配置IGMP
+    delete interface    | 从指定的接口上移除IGMP路由器/代理
+    dump                | 显示上下文内配置脚本设置
+    install             | 安装IGMP路由器/代理并设置全局记录
+    set global          | 设置IGMP全局参数
+    set interface       | 修改接口配置参数
+    show global         | 显示全局IGMP参数
+    show grouptable     | 显示多播组的IGMP主机组表
+    show ifstats        | 显示指定接口的IGMP统计信息
+    show iftable        | 显示指定接口的IGMP主机组
+    show interface      | 显示接口IGMP信息
+    show proxygrouptable| 显示IGMP代理接口的IGMP主机组表
+    show rasgrouptable  | 显示远程访问客户端接口的主机组表
+    uninstall           | 移除与当前上下文相对应的路由协议
+    -----------------------------------------------------------------------------
+    netsh routing ip nat 
+    add addesssmapping   | 向NAT接口地址池中添加IP地址映射
+    add addressrange     | 向NAT接口地址池中添加地址范围
+    add ftp              | 激活FTP代理
+    add interface        | 在指定的接口上配置NAT
+    add portmapping      | 在NAT接口上添加协议端口映射
+    delete addressmapping| 从NAT接口地址池中删除IP地址映射
+    delete addressrange  | 从NAT接口地址池中删除地址范围
+    delete ftp           | 禁用FTP代理
+    delete interface     | 从指定的接口上移除NAT
+    delete portmapping   | 从NAT接口上移除协议端口映射
+    dump                 | 显示上下文内配置脚本设置
+    install              | 安装与当前上下文相对应的路由协议
+    set global           | 设置全局NAT参数
+    set interface        | 修改某接口NAT参数
+    show global          | 显示NAT配置
+    show interface       | 显示指定接口的NAT配置
+    uninstall            | 移除与当前上下文相对应的路由协议
+    -----------------------------------------------------------------------------
+
+    表B-27  Netsh Routing Ip Relay与Netsh Routing Ip Rip中的命令 
+    -----------------------------------------------------------------------------
+    上下文/命令  |  描述   
+    -----------------------------------------------------------------------------
+    netsh routing ip relay 
+    add dhcpserver   | 向DHCP服务器全局列表添加一台DHCP服务器
+    add interface    | 激活接口上的DHCP Relay agent 
+    delete dhcpserver| 从DHCP服务器全局列表删除一台DHCP服务器
+    delete inteface  | 禁用接口上的DHCP Relay agent 
+    dump             | 显示上下文内配置脚本设置
+    install          | 安装与当前上下文相对应的路由协议
+    set global       | 设置DHCP Relay agent配置的全局参数
+    set interface    | 更新接口上的DHCP agent配置的全局参数 
+    show global      | 显示DHCP Relay agent全局配置
+    show ifbinding   | 显示接口的IP地址绑定
+    show ifconfig    | 显示每个接口配置的DHCP Relay agent 
+    show ifstats     | 显示每个接口配置的DHCP Relay agent统计信息
+    show interface   | 显示特定接口的DHCP Relay agent配置 
+    uninstall        | 移除与当前上下文相对应的路由协议
+    ----------------------------------------------------------------------------
+    netsh routing ip rip 
+    add acceptfilter     | 为某接口上接收的路由添加一个接收过滤器
+    add anouncefilter    | 为某接口上宣称的路由添加一个过滤器
+    add interface        | 在指定的接口上配置RIP 
+    add neighbor         | 在某接口上添加RIP邻居
+    add peerfilter       | 为可以接受为端点的服务器添加过滤器
+    delete acceptfilter  | 从某接口上接收的路由中删除一个接受过滤器
+    delete announcefilter| 从某接口上宣称的路由中删除一个过滤器
+    delete interface     | 从指定的接口上移除RIP
+    delete neighbor      | 从某接口上删除RIP邻居
+    delete peerfilter    | 从已接受的端点服务器删除过滤器
+    dump                 | 显示上下文内配置脚本设置
+    isntall              | 安装与当前上下文相对应的路由协议
+    set flags            | 为某指定接口设置RIP相关的标志
+    set global           | 设置全局RIP参数
+    set interface        | 修改指定端口上的RIP配置
+    show flags           | 显示指定接口的RIP标志集
+    show global          | 显示RIP全局参数
+    show globalstats     | 显示RIP全局统计信息
+    show ifbinfing       | 显示RIP接口的IP地址绑定
+    show ifstats         | 显示每个接口的RIP统计信息
+    show interface       | 显示指定接口的RIP配置
+    show neighbor        | 显示RIP端点统计信息
+    uninstall            | 移除与当前上下文相对应的路由协议
+    --------------------------------------------------------------------------
+
+    表B-28  Netsh Routing Ip Routerdiscovery、Netsh Routing Ipv6、Netsh Routing Ipv6 Relayv6中的命令 
+    --------------------------------------------------------------------------
+    上下文/命令  |  描述
+    --------------------------------------------------------------------------
+    netsh routing ip routerdiscovery 
+    add interface   | 为指定接口配置路由器发现
+    delete interface| 从指定接口移除路由器发现
+    dump            | 显示上下文内配置脚本设置
+    set interface   | 更新接口的路由器发现配置
+    show interface  | 显示路由器发现信息
+    uninstall       | 移除与当前上下文相对应的路由协议
+    ---------------------------------------------------------------------------
+    netsh routing ipv6 
+    add filter            | 向指定接口添加IPv6数据包过滤器
+    add persistentroute   | 向指定接口添加持久性路由
+    delete filter         | 从指定接口删除IPv6数据包过滤器
+    delete persistentroute| 删除持久性静态路由
+    dump                  | 显示上下文内配置脚本的设置
+    relayv6               | 切换到netsh routing ipv6 relayv6上下文
+    set filter            | 改变指定接口上的IPv6过滤器属性
+    set persistentroute   | 修改持久性静态路由
+    show filter           | 显示IPv6数据包过滤器信息
+    show persistentroutes | 显示持久性静态路由
+    ---------------------------------------------------------------------------
+    netsh routing ipv6 relayv6 
+    add dhcpserver   | 向DHCPv6服务器全局列表添加DHCPv6服务器
+    add interface    | 激活接口上的DHCPv6 Relay Agent 
+    delete dhcpserver| 从DHCPv6服务器全局列表中删除DHCPv6服务器
+    delete interface | 禁用接口上的DHCPv6 Relay Agent
+    dump             | 显示上下文内配置脚本设置
+    install          | 安装与当前上下文向对应的路由协议 
+    set global       | 设置DHCPv6 Relay Agent的全局参数 
+    set interface    | 更新接口上的DHCPv6 Relay Agent配置 
+    show global      | 显示DHCPv6 Relay Agent全局配置
+    show interface   | 显示特定端口的DHCPv6 Relay Agent配置
+    uninstall        | 移除与当前上下文相对应的路由协议
+    ----------------------------------------------------------------------------
+
+Netsh Rpc 
+    Netsh Rpc上下文与Netsh Rpc Filter上下文可以用于操作远程过程调用（Rpc）防火墙，表B-29总结了这些上下文中可用的命令。
+    表B-29  Netsh Rpc与Netsh Rpc Filter上下文中的命令
+    ----------------------------------------------------------------------------
+    上下文/命令  |  描述
+    ----------------------------------------------------------------------------
+    netsh rpc 
+    add   | 创建一个子网添加列表
+    delete| 创建一个子网删除列表
+    dump  | 显示上下文内配置脚本设置
+    filter| 切换到netsh rpc filter上下文 
+    reset | 将选择性的绑定设置重置为“空”（在所有接口上监听）
+    show  | 显示系统上每一子网的选择性绑定状态
+    ---------------------------------------------------------------------------
+    neths rpc filter 
+    add condition| 向现有的RPC防火墙过滤器规则中添加条件
+    add filter   | 添加一个RPC防火墙过滤器
+    add rule     | 添加一条RPC防火墙过滤器规则
+    delete filter| 删除一个RPC防火墙过滤器
+    delete rule  | 添加一条RPC防火墙过滤器规则 
+    dump         | 显示上下文内配置脚本设置
+    show filter  | 列出RPC防火墙过滤器
+    ---------------------------------------------------------------------------
+
+Netsh Winhttp 
+    Netsh Winhttp上下文可以用于管理Windows HTTP（WinHTTP）代理与追踪设置，该上下文中可用的命令包括下面列举的。
+    · dump。显示配置脚本。 
+    · import。导入WinHTTP代理设置。
+    · reset proxy。将WinHTTP代理设置重置为直接值。
+    · reset tracing。将WinHTTP追踪参数重置为其默认值。
+    · set proxy。配置WinHTTP代理设置。
+    · set tracing。配置WinHTTP追踪参数。
+    · show proxy。显示当前WinHTTP代理设置。
+    · show tracing。显示当前WinHTTP追踪参数。
+
+Netsh wins
+    Netsh Wins上下文与Netsh Wins Server上下文可以用于管理Windows Internet命名服务（WINS）服务器及其配置。表B-30总结了这些上下文中可用的命令。要注意的是，只有当Windows Server计算机上已经安装了WINS Server功能时，这些上下文才是可用的。如果尚未安装该功能而使用Wins命令，则会导致进入Winsock上下文。
+    表B-30  Netsh Wins上下文与Netsh Wins Server上下文中的命令 
+    ---------------------------------------------------------------------------
+    netsh wins 
+    dump                            | 显示配置
+    server[\\ServerName|\\IPAddress]| 切换到指定的服务器上下文。如果不指定服务器名或IP地址，则默认操作的是本地计算机上的WINS服务器
+    --------------------------------------------------------------------------
+    netsh wins server 
+    add name              | 向服务器中添加名称记录
+    add partner           | 向服务器中添加复制参与方
+    add pgserver          | 向当前服务器中添加Persona Grata Servers列表
+    add pngserver         | 向当前服务器中添加Persona Non Grata Servers列表 
+    check database        | 检查数据库的一致性
+    check name            | 检查WINS服务器集的名称记录列表
+    check version         | 检查版本号的一致性
+    delete name           | 从服务器数据库中删除注册名
+    delete owners         | 删除属主列表及其记录
+    delete partners       | 从复制参与方列表中删除一个复制参与方
+    delete pgserver       | 从列表中删除所有的或选定的Persona Grata Servers 
+    delete pngserver      | 从列表中删除所有的或选定的Persona Non Grata Servers
+    delete recodes        | 从服务器中删除或冻结所有的或部分记录集
+    dump                  | 显示配置
+    init backup           | 初始化WINS数据库的备份
+    init import           | 初始化从LMHOSTS文件的导入
+    init pull             | 初始化并将pull触发器发送到另外的WINS服务器
+    init pullrange        | 初始化并从另外的WINS服务器复制选定反问的记录
+    init push             | 初始化并将push触发器发送到另外的WINS服务器
+    init replicate        | 初始化与复制参与方的数据库复制
+    init restore          | 初始化从文件进行的数据库恢复
+    init scavenge         | 初始化清楚服务器的WINS数据库
+    init search           | 初始化在WINS服务器数据库中搜索（用来发现指定的记录）
+    reset                 | 重置表中的配置条目
+    set autopartnerconfig | 为服务器设置自动化的复制参与方配置信息
+    set backuppath        | 为服务器设置备份参数
+    set burstparam        | 为服务为设置紧急处理参数
+    set defaultparam      | 将WINS Server配置参数设置为默认值
+    set logparam          | 设置数据库与事件记录选项
+    set migrateflag       | 设置服务器的迁移标记
+    set namerecord        | 设置服务器的间隔与超时值
+    set periodicdbchecking| 设置服务器的周期性数据库检测参数
+    set pgmode            | 设置Persona Grata/Non Grata模式
+    set pullparam         | 设置服务器的默认pull参与方参数
+    set pullpartnerconfig | 设置指定pull参与方的配置参数
+    set pushparam         | 设置服务器的默认push参与方参数
+    set pushpartnerconfig | 设置指定push参与方的配置参数
+    set replicateflag     | 设置服务器的复制标记
+    set startversion      | 设置数据库的开始版本ID
+    show brower           | 显示所有活跃域主机浏览器[1Bh]记录
+    show database         | 为所有或部分指定属主服务器显示数据库与记录
+    show info             | 显示服务器配置信息
+    show name             | 显示服务器中特定记录的详细信息
+    show partner          | 显示服务器的所有参与方，或push参与方，或pull参与方
+    show partnerproperties| 显示默认的参与方配置
+    show pullpartnerconfig| 显示pull参与方的配置信息
+    show pushpartnerconfig| 显示push参与方的配置信息
+    show recbyversion     | 显示特定服务器拥有的记录
+    show reccount         | 显示特定属主服务器拥有的记录数目
+    show server           | 显示当前选定的服务器
+    show statistics       | 显示WINS服务器的统计信息
+    show version          | 显示WINS服务器的当前最大版本计数器值
+    show versionmap       | 显示属主ID到Maximum Version Number的映射
+    ----------------------------------------------------------------------------
+
+Netsh Winsock 
+    Netsh Winsock上下文可以用于管理Winssock通信，该上下文中可用的命令包括下面列举的。
+    · audit trial。展示分层服务提供商（LSP）安装与卸载的审计踪迹。
+    · dump。显示配置脚本。 
+    · remove provider。从系统中移除Winsock LSP。 
+    · reset。将Winsock Catalog重置为干净状态。
+    · show catalog。显示Winsock Catalog的内容。
+
+Netsh Wlan 
+    Netsh Wlan上下文可以用于管理计算机的无线网络配置，表B-31总结了该上下文中可用的命令。
+    表B-31  Netsh Wlan上下文中的命令
+    ---------------------------------------------------------------------------
+    命令                     |  描述
+    -------------------------|--------------------------------------------------
+    add filter               | 将无线网络添加到允许或阻止的无线网络列表
+    add profile              | 将WLAN配置文件添加到系统中指定的接口上
+    connect                  | 连接到无线网络
+    delete filter            | 从允许或阻止的无线网络列表中删除无线网络
+    delete profile           | 从一个或多个接口上删除WLAN配置文件
+    disconnect               | 断开与无线网络的连接
+    dump                     | 显示上下文内配置脚本设置
+    export                   | 将WLAN配置文件保存到XML文件
+    set autoconfig           | 激活或禁用接口上的自动配置逻辑
+    set blockednetworks      | 在可视网络列表中显示或隐藏阻止的网络
+    set createalluserprofile | 允许或禁止每个人创建所有用户的配置文件
+    set profileorder         | 设置无线网络配置文件的首选顺序
+    set tracing              | 激活或禁用追踪
+    show all                 | 显示完整的无线设备与网络信息
+    show autoconfig          | 显示自动配置逻辑处于激活还是禁用状态
+    show blockednetworks     | 显示阻止的网络显示设置
+    show createalluserprofile| 显示是否每个人都可以创建所有用户配置文件
+    show drivers             | 显示系统上无线LAN驱动程序的属性
+    show filters             | 显示允许或阻止的网络列表
+    show interfaces          | 显示系统上无线LAN接口列表
+    show networks            | 显示系统上可见网络列表
+    show profiles            | 显示系统上已配置的配置文件列表
+    show settings            | 显示无线LAN的全局设置
+    show tracing             | 显示无线LAN追踪是激活还是禁用
+    ----------------------------------------------------------------------------
+
+
+（完）
