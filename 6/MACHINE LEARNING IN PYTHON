@@ -1,0 +1,83 @@
+Macchine Learning in Python
+
+
+To my children,Scott,Seth,and Cayley. THeir blossoming lives and selves bring me more joy than anythiong else in the world.
+
+To my close friends David and Ron for their selfless generosity and steadfast friendship. 
+
+To my friends and colleagues at Hacker Dojo in Mountain View, California, for their technical challenges and repartee.
+
+To my climbing partners. One of them, Katherine, says climbing partners make the best friends because "they see you paralyzed with fear, offer encouragement to overcome it, cnd celebrate when you do."
+
+
+
+
+
+About the AUthor 
+----------------
+
+Dr.Michael Bowles(Mike) holds Bachelor's and Master's degrees in mechanical Engineering, an Sc.D. in Instrumentation, and an MBA.He has worked in academia, technology, and business. Mike currently works with startup companies where machine learning is integral ti success. He serves variously as part of the mangement team, a consultant, or advisor. He also teaches machine learning counses at Hacker DOjo, a co-working space and startup incubator in Mountain View, California. 
+Mike was born in Oklahoma and earned his Bachelor's and Master's degress there.Then after a stint in southeast Asia,Mike went to Cambridge for his Sc.D. and them held the C.Stark Draper Chair at MIT after graduation. Mike left Boston to work on communications satellites at Hughes Aircraft company in Southern California, and then after completing an MBA at UCLA moved to the San Franciso Bay Area to take roles as founder and CEO of two successful venture-backed startups. 
+Miek remains actively involved in technaical and startup-related work. Recent projects include the use of machine learning in automated trading, predicting biological outcomes on the basis of genetic information, natural language processing for website optimization, predicting parient outcomes from demographic and lab data, and due dilligence work on companies in the machine learning and big data arenas. Mike can be reached through www.mbowles.com.
+
+
+About the Technical Editor 
+--------------------------
+
+Daniel Posner holds Bachelor's and Master's degrees in Economics and is completing a PH.D. in Biostatistics at Biston University. He has provided statistical consultation for pharmaceutical and biotech ad well as for researches at the Palo Alto VA hospital.
+Daniel has collaborated with the author extensively on topics covered in this book. In the past, they have written grant proposals to develop web=scale gradient booktinh algorithms. Most recently, they worked together on a consulting contract involving random forests and spline basis expansions to identitg key variables in drug trial outcomes and to sharpen predications in order to reduce the required trial populations.
+
+
+Credits 
+-------
+
+Executive Editor                 Professional Technology & Strategy Director 
+Robeart Elliott                  Barry Pruett 
+
+Project Editor                   Business Manager 
+Jennifer Lynn                    Amy Knies 
+
+Technical Editor                 Associate Publisher 
+Daniel Posner                    Jim Minatel 
+
+Production Editor                Project Coordinator, Cover 
+Dassi Zeidel                     Brent savage 
+
+
+Copy Editor                     Proofreader 
+Keith Cline                     Word One New York 
+
+Manager of Content Development  Indexer 
+Mary Beth Wakefirld             Johnna VanHoose Dinse 
+
+
+Marketing Director              Conver Designer 
+David Mayhew                    Wiley 
+
+Marketing Manager 
+Carrie Sherrill 
+
+
+Acknowledgments
+---------------
+
+
+I'd like to acknowledge the splendid support that people at Wiley have offered during the course of writing this book. It began with Robert Elliot, the acquisitions editor, who first contacted me about writing a book; he was very easy to work with. It continued with Jennifer Lynn, who has done the editing on the book. She's been very responsive to questions and very patiently kept me on schedule during the writing. I thank you both. 
+I also want to acknowledge the enormous comfort that comes from having such a sharp, thorough statistician and programmer as Daniel Posner doing the technical editing on the book. Thank you for that and thanks also for the fun and interesting discussions on machien learning, statistics, and algorithms. I don't know anyone else who'll get as deep as fast.
+
+
+Contents at a Glance
+--------------------
+
+Introducation    xxiii
+
+Chapter 1  The Two Essential Algorithms for Marking Predictions    1 
+Chapter 2 Understand the Problem by Understanding the Data    23 
+Chapter 3 Predictive Model BUilding: Balancing Performance, Complexity, and Big Data    75 
+Chpater 4 Penalized Linear Regression    121 
+Chapter 5 Building Predictive Models Using Penzlized Linear Methods    165 
+Chapter 6 Ensemble Methods    211 
+Chapter 7 Building Ensemble Models with Python 255
+Index      319 
+
+

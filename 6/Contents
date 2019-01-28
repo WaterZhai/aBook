@@ -1,0 +1,108 @@
+Contents 
+
+Introducation    xxiii
+Chapter 1 The Two Essential Algorithms for Marking Predications    1 
+          Why Are These Two Aligorithms So Useful?    2 
+          What Are Penalized Regression Methods?    7
+          What Are Ensemble Methods?    9 
+          How to Decide Which Algorithm to Use    11 
+          THe Process Steps for Building a Predicative Model    13
+            Framing a Machien Learning Problem    15
+            Feature Extraction and Feature Engineering    17 
+            Determining Performance of a Trained Model    18 
+          Chapter Contents and Dependencies    18 
+          Summary    20 
+
+CHapter 2 Understand the Problem by Understanding the Data    23 
+          The Anatomy of a New Problem    24 
+            Different Types of Attributes and Labels Drive Modeling Choices    26 
+            Things to Notice about Your New Data Set    27 
+          Classification Problems: Detecting Unexploded Mines Using Sonar    28 
+            Physical CHaracterstics of the Rocks Versus Mines Data Set    29 
+            Statistical Summaries of the Rocks versus Mines Data Set    32 
+            Visualization of Outliers Using Quantile-Quantile Plot    35 
+            Statistical Characterization of Categorical Attributes    37 
+            How to Use Python Pandas to Summarize the Rocks Versus Mines Data Set    37
+          Visualizing Properties of the Rocks versus Mines Data Set    40 
+            Visualizing with Parallel Coordinates Plots    40 
+            Visualizing Interrelationships between Attributes and Labels    42 
+            Visualizing Attribute and Label Correlations Using a Heat Map    49 
+            Summarizing the Process for Understanding Rocks versus Mines Data Set    50 
+          Real-Valued Predictions with Factor Variables: How Old Is Your Abalone?    50 
+            Parallel Coordinates for Regression Problems--Visualize Variable Relationships for Abalone Probelm    56 
+            How to Use Correlation Heat Map for Regression--Visualize Pair-Wise Correlations for the Abalone Problem    60 
+          Real-Valued Predictions Using Real-Valued Attributes: Calculate How Your Wine Tastes    62 
+          Multiclass Classfication Problem: What Type of Glass Is That?    68 
+          Summary    73
+
+Chapter 3 Predictive Model BUilding:Balancing Performance, Complexity, and Big Data    75 
+          The Basic Problem: Understanding Function Approximation    76 
+            Working with Training Data    76 
+            Assessing Performance of Predictive Models    78 
+          Factors Driving Algorithm Choices and Performance--Complexity and Data    79 
+            Contrast Between a Simple Problem and a Complex Problem    80 
+            Contrast Between a Simple Model and a Complex Model    82 
+            Factors Driving Predictive Algorithm Performance    86 
+            CHoosing an Alogorithm: Linear or Nonlinear?    87 
+          Measuring the Performance of Predictive Models    88 
+           Performance Measures for Different Types of Problems    88 
+           Simulating Performance if Deployed Models    99
+          Achieving Harmony Between Model and Data    101 
+            Choosing a Model to Balance Problem Complexity, Model Complexity, and Data Set Size    102
+            Using Forward Stepwise Regression to Control Overfitting    103
+            Evaluating and Understanding Your Predictive Model    108 
+            Control Overfitting by Penalizing Regression Coefficients--Ridge Regression    110 
+          Summary    119 
+
+Chapter 4 Penalized Linear Regression    121 
+          Why Penalized Linear Regression Methods Are So Useful    122 
+            Extremely Fast Coefficient Estimation    122 
+            Variable Importance Information    122 
+            Extremely Fast Evaluation When Deployed    123 
+            Reliable Performance    123 
+            Sparse Solutions    123 
+            Problem May Require Linear Model    124 
+            When to Use Ensemble Methods    124 
+          Penalized Linear Regreesion: Regulating Linear Regression for Optimum Performance    124 
+            Training Linear Models: Minimizing Errors and More    126 
+            Adding a Coefficient Penalty to the OLS Formulation    127 
+            Other Useful Coefficient Penalties--Manhattan and ElasticNet    128 
+            Why Lasso Penalty Leads to Sparse Coefficient Vectors    129 
+            ElasticNet Penalty Includes Both Lasso and Ridge    131 
+          Solving the Penalized Linear Regression Problem    132 
+            Understanding Least Angle Regression and Its Relationship to Forward Stepwise Regression    132 
+            How LARS Generates Hundreds of Models of Varying Complexity    136 
+            Choosing the Best Model from The Hundreds LARS Generates    139 
+            Using Glmnet:Very Fast and Very General    144 
+              Comparison of the Mechanics of Glmnet and LARS Algorithms    145 
+              Initializing and Iterating the Glmnet Algotithm    146 
+          Extensions to Linear Regression with Numeric Input    151 
+            Solving Classfication Problems with Penalized Regression    151 
+            Working with Classfication Problems Having More Than Two Outcomes    155 
+            Understanding Basis Expansion: Using Linear Methods on Nonlinear Problems    156 
+            Incorporating Non-Numeric Attributes into Linear Methods    158 
+          Summary    163 
+
+Chapter 5 Building Predictive Models Using Penalized Linear Methods    165 
+          Python Pachages for Penalized Linear Regression    166 
+          Multivariable Regression: Predicting Wine Taste    167 
+            Building and Testing a Model to Predict Wine Taste    168 
+            Training on the Whole Data Set before Deployment    172 
+              Basis Expansion: Improving Performance by Creating New Variables from Old Ones    178 
+          Binary Classfication: Using Penalized Linear Regression to Detect Unexploded Mines    181 
+            Build a Rocks versus Mines Classfier for Deployment    191 
+          Multiclass Classfication: Classifying Crime Scene Glass Samples    204 
+          Summary    209 
+
+Chapter 6 Ensemble Methods    211 
+          Bunary Decision Trees    212 
+            How a Binaary Decision Tree Generates Predictions    213 
+            How to Train a Binary Decision Tree    214 
+            Tree Training Equals Split Point Selection    218 
+                How Split Point Selection Affects Predications    218 
+                Algorithm for Selecting Split Points    219 
+                Multivarable Tree Training--Which Attribute to Split?    219 
+                Recursive Splitting for More Tree Depth    220 
+            Overfitting Binary Trees    221 
+                Measuring Overfit with Binary Trees    221 
+                Balancing Binary Tree Complexity for Best Performance    222
