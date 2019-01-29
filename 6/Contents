@@ -106,3 +106,54 @@ Chapter 6 Ensemble Methods    211
             Overfitting Binary Trees    221 
                 Measuring Overfit with Binary Trees    221 
                 Balancing Binary Tree Complexity for Best Performance    222
+            Modifications for Classfication and Categorical Features    225 
+          Bootstrap Aggregation:"Bagging"   226
+            How Does the Bagging Algorithm Work?    226
+                Bagging Performance--Bias versus Variance    229 
+                How Bagging Behaves on Multivariable Problem    231 
+                Bagging Needs Tree Depth for Performance    235 
+            Summary of Bagging    236 
+          Gradient Booting    236
+            Basic Principle of Gradient Boosting Algorithm    237 
+                Parameter Settings for Gradient Boosting    239 
+                How Gradient Boosting Iterates Toward a Predictive Model    240 
+            Getting the Best Performance from Gradient Boosting    240 
+            Gradient Boosting on a Multivariable Problem    244 
+            Summary for Gradient Boosting    247 
+          Random Forest    247 
+            Random Forests: Bagging Plus Random Attribute Subsets    250 
+            Random Forests Performance Drivers    251 
+            Random Forests Summary    252 
+          Summary    252 
+
+Chapter 7 Building Ensemble Models with Python    255 
+          Solving Regression Problems with Python Ensemble Packages    255 
+            Building a Random Forest Model to Predict Wine Taste    256
+                Construction a RandomForestRegressor Object    256 
+                Modeling Wine Taste with RandomForestRegressor    259 
+                Visualizing the Performance of a Random Forests Regression Model    262 
+            Using Gradient Boosting to Predict Wine Taste    263 
+                Using the Class Constructor for GradientBoostingRegressor    263 
+                Using GradientBoostingRegressor to Implement a Regression Model    267
+                Assessing the Performance of a Grdient Boosting Model    269
+            Coding Bagging to Predict Wine Taste    270 
+            Incorporating Non-Numeric Attributes in Python Ensemble Models    275 
+                Coding the sex of Abalone for Imput to Random Forest Regression in Python    275 
+                Assessing Performance and the Importance of Coded Variables    278
+                Codeing the Sex of Abalone for Gradient Boosting Regression in Python    278 
+                Assessing Performance and the Importance of Coded Variables with Gradient Boosting    282 
+            Solving Bunary Classification Problems with Python Ensemble Methods    284 
+                Detecting Unexploded Mines with Python Random Forest    285 
+                Constructing a Random Forests Model to Detect Unexploded Mines    287 
+                Determining the Performance of a Random Forests Classifier    291 
+                Detecting Unexploded Mines with Python Gradient Boosting    291 
+                Determining the Performance of a Grdient Boosting Classifier    298 
+            Solving Multiclass Classification Problems with Python Ensemble Methods    302 
+                Classifying Glass with Random Forests    302 
+                Dealing with Class Imbalances    305 
+                Classifying Glass Using Gradient Boosting    307 
+                Assessing the Advantage of Using Random Forest Base Learners with Gradient Boosting    311 
+            Gomparing Algorithms    314 
+            Summary    315 
+        
+Index    319

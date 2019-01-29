@@ -1,0 +1,62 @@
+Chapter 1 The Two Essential Algorithms for Making Predictions 
+
+This book focuses on the machine learning process and so covers just a few of the most effective and widely used algorithms. It does not provide a survey if machien learning techniques. Too many of the algorithms that might be included in a suvey are nit actively used by practitioners. 
+This book deals with one class of machine learning problems, generally referred to as function approximation. Function approximation is a sunset of problems that are called supervised learning problems. Linear regression and its classifier cousin, logistic regression, provide familiar examples of algorithms for function approximation problems.Function approximation problems include an enormous breadth of practical classification and regression problems in all sorts of arenas, including text classification, search responses, ad placements, spam filtering, predicting customer behavior, diagnostics, and so forth. The list is almost endless. 
+Broadly speaking, this book covers two classes of algorithms for soving function approximation problems: penalized linear regression methods and ensemble methods. This chapter introduces you to both of these algorithms, outlines some of their characteristics, and reviews the results of comparative studies of algorithm performance in order to demonstrate their consistent high performance. 
+This chapter then discusses the process of building predictive models. It describes the kinds of problem that you'll be able to address with the tool covered here and the flexibilities that you hace in how you set up your problem and define the features that you'll use for making predictions. It describes process steps involved in building a predictive model and qualifying it for deployment. 
+
+Why Are These Two Algorithms So Useful?
+----------------------------------------
+Several factors make the penalized linear regression and ensemble methods a useful collection. Stated simply,they will provide optinum or near-optimum performance on the vast majority of predictive analytics(function approximation) problems encountered in practice, includeing big data sets, little data sets, wide data sets, tall skinny data sets, complicated problems, and simple problems.Evidence for this assertion can be found in two papers by Rich Caruana and his colleagues:
+·   "An Empirical Comparison of Supervised Learning Algorithms," by Rich Caruana and Alexandru Niculescu-Mizil 
+·   "An Empirical Evaluation of Supervised Learning in High Dimensions," by Rich Caruana, Nikos Karampatziakits, and Ainur Yessenalina. 
+In those two papers, the authors chose a variety of classification problems and applied a variety of different algorithms to build predictive models.The models were run on test data that were not included in training the models, and then the algorithms included in the studies were ranked on the basis of their performance on the problems.The first study compared 9 different basic algorithms on 11 different machine learning(binary classification) problems. 
+The problems used in the study came from a wide variety of areas, including demographic data, text processing, pattern recognition, physics, and biology. Table 1-1 lists the data sets used in the study using the same names given by the study authors. The table shows how many attributes were available for predicting outcomes for each of the data sets, and it show s what percentage of the examples were positive. 
+The term positive example in a classification problem means an experment(a lien of data from the input data set) in which the outcome is positive. For example, if the classifier is being designed to determine whether a radar retun sihnal indicates the presence of an airplane, then the positive example would be those returns where there was actually an airplane in the radar's field of view. The tern positive comes from this sort of example where the two outcomes represent presence or absence. Other examples include presence or absence of disease in a medical test or presence or absence of cheating on a tax return. 
+Not all classification problems deal with presence or absence. For example, determing the gender of an author by machine-reading their text or machine-analyzing a handwriting sample has two classes-male and female--but there's no sense in which one is the absence of the other.In these cases, these's some arbitrariness in the assignment of the designations "positive" and "negative". The assignments of positive and negative can be arbitrary, but once chosen must be uesd consistently.
+Some of the problems in the first stuby had many more examples of one class than the other. These are called unbalanced. For example, the two data sets Letter.p1 and Letter.p2 pose closely related problems in correctly classifying typed uppercase letters in a wide variety of fonts. The task with Letter.p1 is to correctly classify the letter O in a standard mix of letters. The task with Letter.p2 is to correctly classify A-M versus N-Z. The percentage of positives shown in Table 1-1 reflects this didderence.
+Table 1-1 also shows the number of "attributes" in each of the data sets. Attributes are the variables you have available to base a prediction on. For example, to predict whether an airplane will arrive at its destination on time or not, you might incorporate attributes such as the name of the airline company, the make and year of the airplane,the level of precipitation at the destination airport, the wind speed and direction along the flight path, and so on. Having a lot of attributes upon which to base a prediction can be a blessing and a curse.Attributes that relate directly to the outcomes being predicted are a blessing. Attributes that are unrelated to the outcomes are a curse. Telling the difference between blesses and cursed attributes requires data. Chapter 3,"Predictive Model Building: Balancing Performance, Complexity, and Big Data," goes into that in more detail. 
+
+Table 1-1: Sketch of Problems in Machine Learning Comparison Study 
+    -----------------------------------------------------------------------------
+    DATA SET NAME | NUMBER OF ATTRIBUTES  |  % OF EXAMPLES THAT ARE POSITIVE   
+    --------------|-----------------------|--------------------------------------
+    Adult         | 14                    |  25  
+    Bact          | 11                    | 69 
+    COd           | 15                    | 50 
+    Calhous       | 9                     | 52 
+    Cov_Type      | 54                    | 36 
+    HS            | 200                   | 24 
+    Letter.p1     | 16                    | 3 
+    Letter.p2     | 16                    | 53 
+    Medis         | 63                    | 11 
+    Mg            | 124                   | 17 
+    Slac          | 59                    | 50 
+    ----------------------------------------------------------------------------
+
+Table 1-2 shows how the algorithms covered in this book fared relative to the other algorithms used in the study. Table 1-2 shows which algorithms showed the top five performance scores for ech of the problems listed in Table 1-1. Algorithms covered in this book are spelled out(boosted decision trees, Random Forest, Bagged decision trees, and logisitic regression). The first therr of these are ensemble methods. Penalized regression was not fully developed when the study was done and wasn't evaluated. Logisitc regression is a close relative and is used to gauge the success of regression methods. Each of the 9 algorithms used in the study had 3 different data reduction techniques applied, for a total of 27 combinations.The top five positions represent roughly the top 20 percent of performance scores.The row next to the heading Covt indicates that the boosted decision trees algorithm was was the first and second best relative to performance, Random Forests algorirhm was the fourth and fifth best, and bagged decision trees algorithm was the third best. In the cases where algorithms nit covered here were in the top five, an entry appears in the Other column. The algorithms that show up there are k nearest neighbors(KNNs), artificial neural nets(ANNs),and support vector machines(SVMs).
+
+Table 1-2 How the Algorithms Coverd in This Book Compare on Different Problems 
+    ------------------------------------------------------------------------------------------------------------
+    ALGORITHM | BOOSTED DECISION TREES | RANDOM FORESTS | BAGGED DECISION TREES | LOGISTIC REGRESSION | OTHER
+    ----------|------------------------|----------------|-----------------------|---------------------|---------
+    Cort      | 1,2                    | 4,5            | 3
+    Adult     | 1,4                    | 2              | 3,5                    
+    LTR.P1    | 1                      |                |                       |                     | SVM,KNN 
+    LTR.P2    | 1,2                    | 4,5            |                       |                     | SVM 
+    MEDIS     |                        | 1,3            |                       | 5                   | ANN 
+    SLAC      |                        | 1,2,3          | 4,5 
+    HS        | 1,3                    |                |                       |                     | ANN 
+    MG        |                        | 2,4,5          | 1,3 
+    CALHOUS   | 1,2                    | 5              | 3,4 
+    COD       | 1,2                    |                | 3,4,5 
+    BACT      | 2,5                    |                | 1,3,4
+    ------------------------------------------------------------------------------------------------------------
+
+Logistic regression captures top-five honors in only ine case in Table 1-2. The reason for that is that these data sets have few attributes(at most 200) relative to example(5000 in each data set).These's plenty of data to resolve a model with so few attributes, and yet the training  sets are small enough that the training time is not execssive. 
+
+[NOTE]  As you'll see in Chapter 3 and in the examples covered in Chapter 5,"Building Predictive Models Using Penalized Linear Methods," and Chapter 7,"Building Ensemble Models with Python," the penalized regression methods perform best relative to other algorithms when there are numerous attributes and not enough examples or time to train a more complicated ensemble model. 
+
+Caruana et al.have run a newer study(2008) to address how these algorithms compare when the number of attributes increases. That is, how do these algorithms compare on big data? A numberof fields have significantly more attributes than the data sets in the first study.For example, genomic problems have several tens of thousands of attributes(one attribute per gene), and text mining problems can have millions of attributes(one attribute per distinct word or per distinct pair of words).Table 1-3 shows how linear regression and ensemble methods fare as the number of attributes grows.The results in Table 1-3 show the ranking of the algorithms used in the second study.The table shows the performance on each of the problems individually and in the far right column shows the ranking of each algorithm's average score across all the problems.The algorithms uesd in the study are broken into two groups. The top group of algorithms are ones that will be covered in this book.The bottom group will not be covered. 
+The problems shown in Table 1-3 are arranged in order of their number if attributes, ranging from 761 to 685569.Linear(logistic) regression is in the top three for 5 of the 11 test cases uesd in the study.Those superior scores were concentrated among the larger data sets.Notice that boosted decision tree(denoted by BSTDT in Table 1-3) and Random Forest (denoted by RF in Table 1-3) algorithms still perform near the top.They come in first and second for overall score on these problems. 
+The algorithms covered in this book have other advantages besides raw predictive performance.An 
